@@ -10,7 +10,7 @@ export const Route = createFileRoute("/_app/agua")({
 });
 
 function Agua() {
-  const plano = useStore((s) => s.plano)!;
+  const plano = useStore((s) => s.plano);
   const agua = useStore((s) => s.agua);
   const addAgua = useStore((s) => s.addAgua);
   const reset = useStore((s) => s.resetAguaIfNewDay);
