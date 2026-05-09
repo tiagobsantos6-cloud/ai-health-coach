@@ -11,7 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as GerandoRouteImport } from './routes/gerando'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTreinoRouteImport } from './routes/_app.treino'
+import { Route as AppPerfilRouteImport } from './routes/_app.perfil'
+import { Route as AppEvolucaoRouteImport } from './routes/_app.evolucao'
+import { Route as AppDietaRouteImport } from './routes/_app.dieta'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppAguaRouteImport } from './routes/_app.agua'
 
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
@@ -23,38 +30,121 @@ const GerandoRoute = GerandoRouteImport.update({
   path: '/gerando',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppTreinoRoute = AppTreinoRouteImport.update({
+  id: '/treino',
+  path: '/treino',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPerfilRoute = AppPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
+  id: '/evolucao',
+  path: '/evolucao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDietaRoute = AppDietaRouteImport.update({
+  id: '/dieta',
+  path: '/dieta',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAguaRoute = AppAguaRouteImport.update({
+  id: '/agua',
+  path: '/agua',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gerando': typeof GerandoRoute
   '/onboarding': typeof OnboardingRoute
+  '/agua': typeof AppAguaRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/dieta': typeof AppDietaRoute
+  '/evolucao': typeof AppEvolucaoRoute
+  '/perfil': typeof AppPerfilRoute
+  '/treino': typeof AppTreinoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gerando': typeof GerandoRoute
   '/onboarding': typeof OnboardingRoute
+  '/agua': typeof AppAguaRoute
+  '/dashboard': typeof AppDashboardRoute
+  '/dieta': typeof AppDietaRoute
+  '/evolucao': typeof AppEvolucaoRoute
+  '/perfil': typeof AppPerfilRoute
+  '/treino': typeof AppTreinoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/gerando': typeof GerandoRoute
   '/onboarding': typeof OnboardingRoute
+  '/_app/agua': typeof AppAguaRoute
+  '/_app/dashboard': typeof AppDashboardRoute
+  '/_app/dieta': typeof AppDietaRoute
+  '/_app/evolucao': typeof AppEvolucaoRoute
+  '/_app/perfil': typeof AppPerfilRoute
+  '/_app/treino': typeof AppTreinoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/gerando' | '/onboarding'
+  fullPaths:
+    | '/'
+    | '/gerando'
+    | '/onboarding'
+    | '/agua'
+    | '/dashboard'
+    | '/dieta'
+    | '/evolucao'
+    | '/perfil'
+    | '/treino'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/gerando' | '/onboarding'
-  id: '__root__' | '/' | '/gerando' | '/onboarding'
+  to:
+    | '/'
+    | '/gerando'
+    | '/onboarding'
+    | '/agua'
+    | '/dashboard'
+    | '/dieta'
+    | '/evolucao'
+    | '/perfil'
+    | '/treino'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/gerando'
+    | '/onboarding'
+    | '/_app/agua'
+    | '/_app/dashboard'
+    | '/_app/dieta'
+    | '/_app/evolucao'
+    | '/_app/perfil'
+    | '/_app/treino'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   GerandoRoute: typeof GerandoRoute
   OnboardingRoute: typeof OnboardingRoute
 }
@@ -75,6 +165,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GerandoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -82,11 +179,74 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/treino': {
+      id: '/_app/treino'
+      path: '/treino'
+      fullPath: '/treino'
+      preLoaderRoute: typeof AppTreinoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/perfil': {
+      id: '/_app/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AppPerfilRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/evolucao': {
+      id: '/_app/evolucao'
+      path: '/evolucao'
+      fullPath: '/evolucao'
+      preLoaderRoute: typeof AppEvolucaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dieta': {
+      id: '/_app/dieta'
+      path: '/dieta'
+      fullPath: '/dieta'
+      preLoaderRoute: typeof AppDietaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/agua': {
+      id: '/_app/agua'
+      path: '/agua'
+      fullPath: '/agua'
+      preLoaderRoute: typeof AppAguaRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAguaRoute: typeof AppAguaRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+  AppDietaRoute: typeof AppDietaRoute
+  AppEvolucaoRoute: typeof AppEvolucaoRoute
+  AppPerfilRoute: typeof AppPerfilRoute
+  AppTreinoRoute: typeof AppTreinoRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAguaRoute: AppAguaRoute,
+  AppDashboardRoute: AppDashboardRoute,
+  AppDietaRoute: AppDietaRoute,
+  AppEvolucaoRoute: AppEvolucaoRoute,
+  AppPerfilRoute: AppPerfilRoute,
+  AppTreinoRoute: AppTreinoRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   GerandoRoute: GerandoRoute,
   OnboardingRoute: OnboardingRoute,
 }
