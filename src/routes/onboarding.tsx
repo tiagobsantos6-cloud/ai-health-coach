@@ -1,0 +1,308 @@
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useStore, type DadosUsuario } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Slider } from "@/components/ui/slider";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Sparkles, ArrowRight, ArrowLeft, Check } from "lucide-react";
+
+export const Route = createFileRoute("/onboarding")({
+  component: Onboarding,
+});
+
+const objetivos = ["Hipertrofia", "Emagrecimento", "Definição", "Performance", "Corrida", "Saúde", "Reeducação Alimentar"];
+const restricoesList = ["Lactose", "Glúten", "Vegano", "Vegetariano", "Outro"];
+
+function Onboarding() {
+  const navigate = useNavigate();
+  const setDados = useStore((s) => s.setDados);
+  const tema = useStore((s) => s.tema);
+  const [step, setStep] = useState(1);
+  const [d, setD] = useState<DadosUsuario>({
+    nome: "", sexo: "masculino", idade: 25,
+    peso: 70, altura: 170, gordura: undefined, biotipo: "Mesomorfo",
+    objetivo: "", diasTreino: 4, tempoTreino: 60, local: "Academia", horario: "Manhã",
+    restricoes: [], favoritos: "", naoGosta: "", refeicoes: 4, orcamento: 800, suplementos: false,
+    saude: "", sono: 7, estresse: 5,
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", tema === "dark");
+  }, [tema]);
+
+  const update = (p: Partial<DadosUsuario>) => setD({ ...d, ...p });
+
+  const canNext = () => {
+    if (step === 1) return d.nome.trim() && d.idade > 0;
+    if (step === 2) return d.peso > 0 && d.altura > 0;
+    if (step === 3) return !!d.objetivo;
+    return true;
+  };
+
+  const finish = () => {
+    setDados(d);
+    navigate({ to: "/gerando" });
+  };
+
+  return (
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <header className="flex items-center gap-2 p-6">
+        <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+          <Sparkles className="w-5 h-5 text-primary-foreground" />
+        </div>
+        <span className="font-bold text-lg">VitaIA</span>
+      </header>
+
+      <div className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
+            <span>Etapa {step} de 5</span>
+            <span>{Math.round((step / 5) * 100)}%</span>
+          </div>
+          <div className="h-2 bg-muted rounded-full overflow-hidden">
+            <motion.div
+              className="h-full bg-primary"
+              initial={false}
+              animate={{ width: `${(step / 5) * 100}%` }}
+              transition={{ type: "spring", stiffness: 100, damping: 20 }}
+            />
+          </div>
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.25 }}
+            className="space-y-6"
+          >
+            {step === 1 && (
+              <>
+                <div>
+                  <h2 className="text-2xl font-bold">Vamos nos conhecer</h2>
+                  <p className="text-muted-foreground">Conte um pouco sobre você</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Nome</Label>
+                  <Input value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
+                </div>
+                <div className="space-y-2">
+                  <Label>Sexo</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["masculino", "feminino", "outro"].map((s) => (
+                      <button
+                        key={s}
+                        onClick={() => update({ sexo: s })}
+                        className={`px-3 py-3 rounded-lg border text-sm capitalize transition-colors ${
+                          d.sexo === s ? "border-primary bg-primary/10 text-primary" : "border-border"
+                        }`}
+                      >
+                        {s}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Idade</Label>
+                  <Input type="number" value={d.idade} onChange={(e) => update({ idade: Number(e.target.value) })} />
+                </div>
+              </>
+            )}
+
+            {step === 2 && (
+              <>
+                <div>
+                  <h2 className="text-2xl font-bold">Dados físicos</h2>
+                  <p className="text-muted-foreground">Para calcular suas necessidades</p>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Peso (kg)</Label>
+                    <Input type="number" value={d.peso} onChange={(e) => update({ peso: Number(e.target.value) })} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Altura (cm)</Label>
+                    <Input type="number" value={d.altura} onChange={(e) => update({ altura: Number(e.target.value) })} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>% gordura corporal (opcional)</Label>
+                  <Input type="number" value={d.gordura ?? ""} onChange={(e) => update({ gordura: e.target.value ? Number(e.target.value) : undefined })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Biotipo</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["Ectomorfo", "Mesomorfo", "Endomorfo"].map((b) => (
+                      <button
+                        key={b}
+                        onClick={() => update({ biotipo: b })}
+                        className={`px-3 py-3 rounded-lg border text-sm transition-colors ${
+                          d.biotipo === b ? "border-primary bg-primary/10 text-primary" : "border-border"
+                        }`}
+                      >
+                        {b}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {step === 3 && (
+              <>
+                <div>
+                  <h2 className="text-2xl font-bold">Qual seu objetivo?</h2>
+                  <p className="text-muted-foreground">Selecione sua principal meta</p>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  {objetivos.map((o) => (
+                    <button
+                      key={o}
+                      onClick={() => update({ objetivo: o })}
+                      className={`px-4 py-5 rounded-xl border text-sm font-medium transition-all ${
+                        d.objetivo === o
+                          ? "border-primary bg-primary/10 text-primary scale-[1.02]"
+                          : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {o}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+
+            {step === 4 && (
+              <>
+                <div>
+                  <h2 className="text-2xl font-bold">Sua rotina</h2>
+                  <p className="text-muted-foreground">Como será seu treino</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Dias de treino por semana: {d.diasTreino}</Label>
+                  <Slider value={[d.diasTreino]} min={1} max={7} step={1} onValueChange={(v) => update({ diasTreino: v[0] })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Tempo por treino (min)</Label>
+                  <div className="grid grid-cols-4 gap-2">
+                    {[30, 45, 60, 90].map((t) => (
+                      <button key={t} onClick={() => update({ tempoTreino: t })} className={`px-3 py-2 rounded-lg border text-sm ${d.tempoTreino === t ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                        {t}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Local</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["Academia", "Casa", "Rua"].map((l) => (
+                      <button key={l} onClick={() => update({ local: l })} className={`px-3 py-2 rounded-lg border text-sm ${d.local === l ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Horário preferido</Label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {["Manhã", "Tarde", "Noite"].map((h) => (
+                      <button key={h} onClick={() => update({ horario: h })} className={`px-3 py-2 rounded-lg border text-sm ${d.horario === h ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                        {h}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </>
+            )}
+
+            {step === 5 && (
+              <>
+                <div>
+                  <h2 className="text-2xl font-bold">Alimentação e saúde</h2>
+                  <p className="text-muted-foreground">Personalizando o plano</p>
+                </div>
+                <div className="space-y-2">
+                  <Label>Restrições alimentares</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {restricoesList.map((r) => (
+                      <label key={r} className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border cursor-pointer">
+                        <Checkbox
+                          checked={d.restricoes.includes(r)}
+                          onCheckedChange={(c) =>
+                            update({ restricoes: c ? [...d.restricoes, r] : d.restricoes.filter((x) => x !== r) })
+                          }
+                        />
+                        <span className="text-sm">{r}</span>
+                      </label>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Alimentos favoritos</Label>
+                  <Textarea value={d.favoritos} onChange={(e) => update({ favoritos: e.target.value })} placeholder="Ex: frango, arroz, banana..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Alimentos que não gosta</Label>
+                  <Textarea value={d.naoGosta} onChange={(e) => update({ naoGosta: e.target.value })} placeholder="Ex: brócolis, peixe..." />
+                </div>
+                <div className="space-y-2">
+                  <Label>Refeições por dia: {d.refeicoes}</Label>
+                  <Slider value={[d.refeicoes]} min={3} max={6} step={1} onValueChange={(v) => update({ refeicoes: v[0] })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Orçamento mensal: R$ {d.orcamento}</Label>
+                  <Slider value={[d.orcamento]} min={200} max={2000} step={50} onValueChange={(v) => update({ orcamento: v[0] })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Usa suplementos?</Label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {[{l:"Sim",v:true},{l:"Não",v:false}].map((o) => (
+                      <button key={o.l} onClick={() => update({ suplementos: o.v })} className={`px-3 py-2 rounded-lg border text-sm ${d.suplementos === o.v ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                        {o.l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label>Problemas de saúde / lesões (opcional)</Label>
+                  <Textarea value={d.saude} onChange={(e) => update({ saude: e.target.value })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Qualidade do sono: {d.sono}/10</Label>
+                  <Slider value={[d.sono]} min={1} max={10} step={1} onValueChange={(v) => update({ sono: v[0] })} />
+                </div>
+                <div className="space-y-2">
+                  <Label>Nível de estresse: {d.estresse}/10</Label>
+                  <Slider value={[d.estresse]} min={1} max={10} step={1} onValueChange={(v) => update({ estresse: v[0] })} />
+                </div>
+              </>
+            )}
+          </motion.div>
+        </AnimatePresence>
+
+        <div className="flex gap-3 mt-8">
+          {step > 1 && (
+            <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
+              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+            </Button>
+          )}
+          {step < 5 ? (
+            <Button onClick={() => setStep(step + 1)} disabled={!canNext()} className="flex-1">
+              Continuar <ArrowRight className="w-4 h-4 ml-2" />
+            </Button>
+          ) : (
+            <Button onClick={finish} className="flex-1">
+              Gerar meu plano <Check className="w-4 h-4 ml-2" />
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
