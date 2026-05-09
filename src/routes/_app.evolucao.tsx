@@ -16,10 +16,11 @@ export const Route = createFileRoute("/_app/evolucao")({
 });
 
 function Evolucao() {
-  const plano = useStore((s) => s.plano)!;
-  const dados = useStore((s) => s.dados)!;
+  const plano = useStore((s) => s.plano);
+  const dados = useStore((s) => s.dados);
   const evolucao = useStore((s) => s.evolucao);
   const addEvolucao = useStore((s) => s.addEvolucao);
+  const [peso, setPeso] = useState(dados?.peso ?? 70);
 
   const [peso, setPeso] = useState(dados.peso);
   const [energia, setEnergia] = useState(7);
