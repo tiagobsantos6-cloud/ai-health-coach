@@ -6,7 +6,7 @@ const SYSTEM_PROMPT = `Você é um especialista em nutrição esportiva, persona
   "resumo": { "imc": "", "tmb": "", "tdee": "", "meta_calorica": "", "proteinas_g": "", "carboidratos_g": "", "gorduras_g": "", "agua_diaria_ml": "", "sono_ideal_h": "" },
   "plano_alimentar": [ { "refeicao": "", "horario": "", "alimentos": [ { "nome": "", "quantidade_g": 0, "calorias": 0, "proteinas_g": 0, "carboidratos_g": 0, "gorduras_g": 0 } ], "total_calorias": 0 } ],
   "substituicoes": [ { "original": "", "substituto": "", "equivalencia": "" } ],
-  "treino": { "divisao": "", "dias": [ { "dia": "", "foco": "", "exercicios": [ { "nome": "", "musculo": "", "series": 0, "repeticoes": "", "descanso_s": 0, "execucao": "", "erros_comuns": "" } ], "cardio": { "tipo": "", "duracao_min": 0, "intensidade": "" } } ] },
+  "treino": { "divisao": "", "dias": [ { "dia": "", "foco": "", "exercicios": [ { "nome": "", "musculo": "", "series": 0, "repeticoes": "", "descanso_s": 0 } ], "cardio": { "tipo": "", "duracao_min": 0, "intensidade": "" } } ] },
   "rotina_semanal": [ { "dia_semana": "", "treino": "", "refeicoes_resumo": "", "meta_agua": "", "meta_sono": "" } ],
   "disciplina": { "metas_diarias": [], "checklist": [], "habitos": [], "estrategias": [] },
   "acompanhamento": { "frequencia": "", "metricas": [], "ajustes_automaticos": "" }
@@ -14,8 +14,23 @@ const SYSTEM_PROMPT = `Você é um especialista em nutrição esportiva, persona
 
 function parseJson(text: string): Plano {
   let clean = text.trim();
-  clean = clean.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```$/i, "").trim();
-  return JSON.parse(clean);
+  clean = clean.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+  try {
+    return JSON.parse(clean);
+  } catch {
+    const start = clean.search(/[\{\[]/);
+    const isArray = start !== -1 && clean[start] === "[";
+    const end = clean.lastIndexOf(isArray ? "]" : "}");
+    if (start !== -1 && end !== -1 && end > start) {
+      const sliced = clean.substring(start, end + 1);
+      try {
+        return JSON.parse(sliced);
+      } catch {
+        throw new Error("JSON incompleto recebido da IA. Por favor, tente novamente.");
+      }
+    }
+    throw new Error("JSON incompleto recebido da IA. Por favor, tente novamente.");
+  }
 }
 
 export async function gerarPlano(dados: DadosUsuario): Promise<Plano> {
@@ -33,7 +48,7 @@ export async function gerarPlano(dados: DadosUsuario): Promise<Plano> {
         generationConfig: {
           responseMimeType: "application/json",
           temperature: 0.7,
-          maxOutputTokens: 8192,
+          maxOutputTokens: 65536,
         },
       }),
     },
@@ -45,7 +60,13 @@ export async function gerarPlano(dados: DadosUsuario): Promise<Plano> {
   }
   const data = await response.json();
   const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Resposta vazia da IA");
+  const finishReason = data?.candidates?.[0]?.finishReason;
+  if (!text) {
+    if (finishReason === "MAX_TOKENS") {
+      throw new Error("Resposta da IA foi truncada por limite de tokens. Tente novamente.");
+    }
+    throw new Error("Resposta vazia da IA");
+  }
   return parseJson(text);
 }
 
