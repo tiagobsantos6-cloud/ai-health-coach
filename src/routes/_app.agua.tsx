@@ -17,6 +17,7 @@ function Agua() {
 
   useEffect(() => { reset(); }, [reset]);
 
+  if (!plano) return null;
   const meta = Number(plano.resumo.agua_diaria_ml) || 2500;
   const total = agua.reduce((a, r) => a + r.ml, 0);
   const pct = Math.min(100, Math.round((total / meta) * 100));
