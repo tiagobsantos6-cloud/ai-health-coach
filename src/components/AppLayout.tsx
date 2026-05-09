@@ -16,6 +16,7 @@ export function AppLayout() {
   const tema = useStore((s) => s.tema);
   const setTema = useStore((s) => s.setTema);
   const plano = useStore((s) => s.plano);
+  const dados = useStore((s) => s.dados);
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
 
@@ -24,8 +25,8 @@ export function AppLayout() {
   }, [tema]);
 
   useEffect(() => {
-    if (!plano) navigate({ to: "/onboarding" });
-  }, [plano, navigate]);
+    if (!dados && !plano) navigate({ to: "/onboarding" });
+  }, [dados, plano, navigate]);
 
   return (
     <div className="min-h-screen flex w-full bg-background text-foreground">
