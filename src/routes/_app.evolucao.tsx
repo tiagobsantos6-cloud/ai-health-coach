@@ -21,14 +21,14 @@ function Evolucao() {
   const evolucao = useStore((s) => s.evolucao);
   const addEvolucao = useStore((s) => s.addEvolucao);
   const [peso, setPeso] = useState(dados?.peso ?? 70);
-
-  const [peso, setPeso] = useState(dados.peso);
   const [energia, setEnergia] = useState(7);
   const [fome, setFome] = useState(5);
   const [treino, setTreino] = useState(7);
   const [obs, setObs] = useState("");
   const [ajustes, setAjustes] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  if (!plano || !dados) return null;
 
   const salvar = () => {
     addEvolucao({
