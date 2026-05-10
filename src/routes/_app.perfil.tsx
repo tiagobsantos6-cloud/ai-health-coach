@@ -101,7 +101,13 @@ function Perfil() {
       <Card className="p-5 space-y-3">
         <h3 className="font-semibold">Ações</h3>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={refazer}>Refazer plano completo</Button>
+          {podeRegenerar ? (
+            <Button variant="outline" onClick={refazer}>Refazer plano completo</Button>
+          ) : (
+            <Button asChild variant="outline" title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.regenerar_plano]}`}>
+              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> Refazer plano (plano {NOMES_PLANOS[RECURSO_MIN.regenerar_plano]})</Link>
+            </Button>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">Limpar todos os dados</Button>
