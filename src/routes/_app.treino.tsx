@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Timer, ChevronDown, Activity, Pause, Play, RotateCcw } from "lucide-react";
+import { Timer, Activity, Pause, Play, RotateCcw } from "lucide-react";
 
 export const Route = createFileRoute("/_app/treino")({
   component: Treino,
@@ -58,8 +57,7 @@ function Treino() {
   );
 }
 
-function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: number; repeticoes: string; descanso_s: number; execucao: string; erros_comuns: string } }) {
-  const [open, setOpen] = useState(false);
+function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: number; repeticoes: string; descanso_s: number } }) {
   const [timer, setTimer] = useState(0);
   const [running, setRunning] = useState(false);
   const ref = useRef<number | null>(null);
@@ -119,22 +117,6 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
           </div>
         </div>
       )}
-
-      <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger className="mt-3 text-xs text-muted-foreground flex items-center gap-1 hover:text-foreground">
-          Ver detalhes <ChevronDown className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 space-y-2 text-sm">
-          <div>
-            <div className="text-xs font-bold text-primary uppercase">Execução</div>
-            <p className="text-muted-foreground">{ex.execucao}</p>
-          </div>
-          <div>
-            <div className="text-xs font-bold text-destructive uppercase">Erros comuns</div>
-            <p className="text-muted-foreground">{ex.erros_comuns}</p>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
     </Card>
   );
 }
