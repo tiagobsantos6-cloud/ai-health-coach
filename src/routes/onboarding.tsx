@@ -23,8 +23,8 @@ function Onboarding() {
   const tema = useStore((s) => s.tema);
   const [step, setStep] = useState(1);
   const [d, setD] = useState<DadosUsuario>({
-    nome: "", sexo: "masculino", idade: 25,
-    peso: 70, altura: 170, gordura: undefined, biotipo: "Mesomorfo",
+    nome: "", sexo: "masculino", idade: 0,
+    peso: 0, altura: 0, gordura: undefined, biotipo: "Mesomorfo",
     objetivo: "", diasTreino: 4, tempoTreino: 60, local: "Academia", horario: "Manhã",
     restricoes: [], restricaoOutro: "", favoritos: "", naoGosta: "", refeicoes: 4, orcamento: 800, suplementos: false, suplementosQuais: "",
     saude: "", sono: 7, estresse: 5,
@@ -110,7 +110,7 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label>Idade</Label>
-                  <Input type="number" value={d.idade} onChange={(e) => update({ idade: Number(e.target.value) })} />
+                  <Input type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
                 </div>
               </>
             )}
@@ -124,11 +124,11 @@ function Onboarding() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Peso (kg)</Label>
-                    <Input type="number" value={d.peso} onChange={(e) => update({ peso: Number(e.target.value) })} />
+                    <Input type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
                     <Label>Altura (cm)</Label>
-                    <Input type="number" value={d.altura} onChange={(e) => update({ altura: Number(e.target.value) })} />
+                    <Input type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
                   </div>
                 </div>
                 <div className="space-y-2">
