@@ -37,20 +37,12 @@ function Gerando() {
       navigate({ to: "/onboarding" });
       return;
     }
-    if (!localStorage.getItem("gemini_api_key")) {
-      navigate({ to: "/perfil", search: { msg: "configurar" } as never });
-      return;
-    }
     try {
       const plano = await gerarPlano(dados);
       setPlano(plano);
       navigate({ to: "/dashboard" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Erro desconhecido";
-      if (msg === "API_KEY_MISSING") {
-        navigate({ to: "/perfil" });
-        return;
-      }
       setErro(msg);
     }
   };
