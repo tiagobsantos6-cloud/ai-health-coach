@@ -105,6 +105,8 @@ type State = {
   checklist: Record<string, boolean>;
   checklistData: string;
   tema: "dark" | "light";
+  planoAssinatura: PlanoAssinatura;
+  setPlanoAssinatura: (p: PlanoAssinatura) => void;
   setDados: (d: DadosUsuario) => void;
   setPlano: (p: Plano) => void;
   addAgua: (ml: number) => void;
