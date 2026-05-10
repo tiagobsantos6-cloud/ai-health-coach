@@ -22,9 +22,13 @@ function Dashboard() {
 
   const macros = useMemo(() => {
     if (!plano) return [];
-    const p = Number(plano.resumo.proteinas_g) || 0;
-    const c = Number(plano.resumo.carboidratos_g) || 0;
-    const g = Number(plano.resumo.gorduras_g) || 0;
+    const cleanValue = (val: string | number) => {
+      if (typeof val === "number") return val;
+      return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
+    };
+    const p = cleanValue(plano.resumo.proteinas_g);
+    const c = cleanValue(plano.resumo.carboidratos_g);
+    const g = cleanValue(plano.resumo.gorduras_g);
     return [
       { name: "Proteínas", value: p, color: "var(--chart-1)" },
       { name: "Carboidratos", value: c, color: "var(--chart-3)" },
@@ -46,10 +50,26 @@ function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard icon={<Flame className="w-4 h-4" />} label="Meta calórica" value={`${plano.resumo.meta_calorica} kcal`} />
-        <StatCard icon={<Beef className="w-4 h-4" />} label="Proteínas" value={`${plano.resumo.proteinas_g} g`} />
-        <StatCard icon={<Wheat className="w-4 h-4" />} label="Carboidratos" value={`${plano.resumo.carboidratos_g} g`} />
-        <StatCard icon={<Droplet className="w-4 h-4" />} label="Água" value={`${plano.resumo.agua_diaria_ml} ml`} />
+        <StatCard 
+          icon={<Flame className="w-4 h-4" />} 
+          label="Meta calórica" 
+          value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} 
+        />
+        <StatCard 
+          icon={<Beef className="w-4 h-4" />} 
+          label="Proteínas" 
+          value={`${plano.resumo.proteinas_g.toString().replace(/ g/gi, "")} g`} 
+        />
+        <StatCard 
+          icon={<Wheat className="w-4 h-4" />} 
+          label="Carboidratos" 
+          value={`${plano.resumo.carboidratos_g.toString().replace(/ g/gi, "")} g`} 
+        />
+        <StatCard 
+          icon={<Droplet className="w-4 h-4" />} 
+          label="Água" 
+          value={`${plano.resumo.agua_diaria_ml.toString().replace(/ ml/gi, "")} ml`} 
+        />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
