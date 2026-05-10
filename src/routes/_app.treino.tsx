@@ -58,8 +58,7 @@ function Treino() {
   );
 }
 
-function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: number; repeticoes: string; descanso_s: number; execucao: string; erros_comuns: string } }) {
-  const [open, setOpen] = useState(false);
+function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: number; repeticoes: string; descanso_s: number } }) {
   const [timer, setTimer] = useState(0);
   const [running, setRunning] = useState(false);
   const ref = useRef<number | null>(null);
