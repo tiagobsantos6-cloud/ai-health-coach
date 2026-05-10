@@ -72,14 +72,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "AI Health Coach" },
+      { name: "description", content: "AI Health Coach is a web app that creates personalized nutrition and fitness plans using AI." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "AI Health Coach" },
+      { property: "og:description", content: "AI Health Coach is a web app that creates personalized nutrition and fitness plans using AI." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "AI Health Coach" },
+      { name: "twitter:description", content: "AI Health Coach is a web app that creates personalized nutrition and fitness plans using AI." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/TI6pShJ7nVSN38OqYQYqhtVDcvu1/social-images/social-1778430823069-ChatGPT_Image_10_de_mai._de_2026,_13_33_34.webp" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/TI6pShJ7nVSN38OqYQYqhtVDcvu1/social-images/social-1778430823069-ChatGPT_Image_10_de_mai._de_2026,_13_33_34.webp" },
     ],
     links: [
       {
