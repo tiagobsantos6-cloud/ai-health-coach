@@ -61,7 +61,7 @@ function Perfil() {
             <Info label="IMC" value={plano.resumo.imc} />
             <Info label="TMB" value={plano.resumo.tmb} />
             <Info label="TDEE" value={plano.resumo.tdee} />
-            <Info label="Meta calórica" value={`${plano.resumo.meta_calorica} kcal`} />
+            <Info label="Meta calórica" value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} />
           </div>
         </Card>
       )}
