@@ -21,20 +21,6 @@ function Perfil() {
   const planoAss = useStore((s) => s.planoAssinatura);
   const reset = useStore((s) => s.reset);
   const podeRegenerar = temAcesso(planoAss, "regenerar_plano");
-  const [apiKey, setApiKey] = useState("");
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    setApiKey(localStorage.getItem("gemini_api_key") || "");
-    setSaved(!!localStorage.getItem("gemini_api_key"));
-  }, []);
-
-  const salvar = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem("gemini_api_key", apiKey.trim());
-      setSaved(true);
-    }
-  };
 
   const refazer = () => {
     reset();
