@@ -85,7 +85,7 @@ export function AppLayout() {
       </main>
 
       <nav className="md:hidden fixed bottom-0 left-0 right-0 bg-card border-t border-border z-40">
-        <div className="grid grid-cols-6">
+        <div className="grid grid-cols-7">
           {items.map((it) => {
             const active = path === it.to;
             const Icon = it.icon;
