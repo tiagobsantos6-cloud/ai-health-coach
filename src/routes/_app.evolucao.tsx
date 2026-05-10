@@ -150,7 +150,7 @@ function Evolucao() {
               </tr>
             </thead>
             <tbody>
-              {[...evolucao].reverse().map((r, i) => (
+              {(podeHistoricoCompleto ? [...evolucao].reverse() : [...evolucao].reverse().slice(0, LIMITE_HISTORICO_GRATUITO)).map((r, i) => (
                 <tr key={i} className="border-b border-border last:border-0">
                   <td className="py-2">{r.data}</td>
                   <td>{r.peso}</td>
@@ -160,6 +160,15 @@ function Evolucao() {
                   <td className="max-w-xs truncate text-muted-foreground">{r.observacoes}</td>
                 </tr>
               ))}
+              {!podeHistoricoCompleto && evolucao.length > LIMITE_HISTORICO_GRATUITO && (
+                <tr>
+                  <td colSpan={6} className="py-3 text-center text-xs text-muted-foreground">
+                    <Link to="/planos" className="text-primary hover:underline inline-flex items-center gap-1">
+                      <Lock className="w-3 h-3" /> Veja todo o histórico no plano {NOMES_PLANOS[RECURSO_MIN.historico_completo_evolucao]}
+                    </Link>
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </Card>
