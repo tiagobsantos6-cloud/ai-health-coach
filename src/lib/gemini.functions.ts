@@ -70,7 +70,8 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       if (finishReason === "length") throw new Error("Resposta truncada por limite de tokens. Tente novamente.");
       throw new Error("Resposta vazia da IA");
     }
-    return parseJson(text) as Record<string, unknown>;
+    parseJson(text); // validate
+    return { json: text };
   });
 
 export const gerarAjustesFn = createServerFn({ method: "POST" })
