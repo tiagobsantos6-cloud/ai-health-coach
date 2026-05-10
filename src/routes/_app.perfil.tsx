@@ -9,7 +9,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, Lock } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/perfil")({
   component: Perfil,
@@ -19,7 +21,9 @@ function Perfil() {
   const navigate = useNavigate();
   const dados = useStore((s) => s.dados);
   const plano = useStore((s) => s.plano);
+  const planoAss = useStore((s) => s.planoAssinatura);
   const reset = useStore((s) => s.reset);
+  const podeRegenerar = temAcesso(planoAss, "regenerar_plano");
   const [apiKey, setApiKey] = useState("");
   const [saved, setSaved] = useState(false);
 
