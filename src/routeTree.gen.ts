@@ -14,6 +14,7 @@ import { Route as GerandoRouteImport } from './routes/gerando'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTreinoRouteImport } from './routes/_app.treino'
+import { Route as AppPlanosRouteImport } from './routes/_app.planos'
 import { Route as AppPerfilRouteImport } from './routes/_app.perfil'
 import { Route as AppEvolucaoRouteImport } from './routes/_app.evolucao'
 import { Route as AppDietaRouteImport } from './routes/_app.dieta'
@@ -42,6 +43,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppTreinoRoute = AppTreinoRouteImport.update({
   id: '/treino',
   path: '/treino',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPlanosRoute = AppPlanosRouteImport.update({
+  id: '/planos',
+  path: '/planos',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPerfilRoute = AppPerfilRouteImport.update({
@@ -79,6 +85,7 @@ export interface FileRoutesByFullPath {
   '/dieta': typeof AppDietaRoute
   '/evolucao': typeof AppEvolucaoRoute
   '/perfil': typeof AppPerfilRoute
+  '/planos': typeof AppPlanosRoute
   '/treino': typeof AppTreinoRoute
 }
 export interface FileRoutesByTo {
@@ -90,6 +97,7 @@ export interface FileRoutesByTo {
   '/dieta': typeof AppDietaRoute
   '/evolucao': typeof AppEvolucaoRoute
   '/perfil': typeof AppPerfilRoute
+  '/planos': typeof AppPlanosRoute
   '/treino': typeof AppTreinoRoute
 }
 export interface FileRoutesById {
@@ -103,6 +111,7 @@ export interface FileRoutesById {
   '/_app/dieta': typeof AppDietaRoute
   '/_app/evolucao': typeof AppEvolucaoRoute
   '/_app/perfil': typeof AppPerfilRoute
+  '/_app/planos': typeof AppPlanosRoute
   '/_app/treino': typeof AppTreinoRoute
 }
 export interface FileRouteTypes {
@@ -116,6 +125,7 @@ export interface FileRouteTypes {
     | '/dieta'
     | '/evolucao'
     | '/perfil'
+    | '/planos'
     | '/treino'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -127,6 +137,7 @@ export interface FileRouteTypes {
     | '/dieta'
     | '/evolucao'
     | '/perfil'
+    | '/planos'
     | '/treino'
   id:
     | '__root__'
@@ -139,6 +150,7 @@ export interface FileRouteTypes {
     | '/_app/dieta'
     | '/_app/evolucao'
     | '/_app/perfil'
+    | '/_app/planos'
     | '/_app/treino'
   fileRoutesById: FileRoutesById
 }
@@ -186,6 +198,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTreinoRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/planos': {
+      id: '/_app/planos'
+      path: '/planos'
+      fullPath: '/planos'
+      preLoaderRoute: typeof AppPlanosRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/perfil': {
       id: '/_app/perfil'
       path: '/perfil'
@@ -230,6 +249,7 @@ interface AppRouteChildren {
   AppDietaRoute: typeof AppDietaRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
   AppPerfilRoute: typeof AppPerfilRoute
+  AppPlanosRoute: typeof AppPlanosRoute
   AppTreinoRoute: typeof AppTreinoRoute
 }
 
@@ -239,6 +259,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppDietaRoute: AppDietaRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
   AppPerfilRoute: AppPerfilRoute,
+  AppPlanosRoute: AppPlanosRoute,
   AppTreinoRoute: AppTreinoRoute,
 }
 

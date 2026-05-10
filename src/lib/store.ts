@@ -84,6 +84,8 @@ export type Plano = {
   acompanhamento: { frequencia: string; metricas: string[]; ajustes_automaticos: string };
 };
 
+export type PlanoAssinatura = "gratuito" | "basico" | "intermediario" | "completo";
+
 export type RegistroAgua = { ml: number; horario: string };
 export type RegistroEvolucao = {
   data: string;
@@ -103,6 +105,8 @@ type State = {
   checklist: Record<string, boolean>;
   checklistData: string;
   tema: "dark" | "light";
+  planoAssinatura: PlanoAssinatura;
+  setPlanoAssinatura: (p: PlanoAssinatura) => void;
   setDados: (d: DadosUsuario) => void;
   setPlano: (p: Plano) => void;
   addAgua: (ml: number) => void;
@@ -127,6 +131,8 @@ export const useStore = create<State>()(
       checklist: {},
       checklistData: today(),
       tema: "dark",
+      planoAssinatura: "gratuito",
+      setPlanoAssinatura: (p) => set({ planoAssinatura: p }),
       setDados: (d) => set({ dados: d }),
       setPlano: (p) => set({ plano: p }),
       addAgua: (ml) => {
@@ -167,6 +173,7 @@ export const useStore = create<State>()(
         checklist: s.checklist,
         checklistData: s.checklistData,
         tema: s.tema,
+        planoAssinatura: s.planoAssinatura,
       }),
     },
   ),
