@@ -84,6 +84,8 @@ export type Plano = {
   acompanhamento: { frequencia: string; metricas: string[]; ajustes_automaticos: string };
 };
 
+export type PlanoAssinatura = "gratuito" | "basico" | "intermediario" | "completo";
+
 export type RegistroAgua = { ml: number; horario: string };
 export type RegistroEvolucao = {
   data: string;
