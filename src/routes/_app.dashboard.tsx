@@ -22,9 +22,13 @@ function Dashboard() {
 
   const macros = useMemo(() => {
     if (!plano) return [];
-    const p = Number(plano.resumo.proteinas_g) || 0;
-    const c = Number(plano.resumo.carboidratos_g) || 0;
-    const g = Number(plano.resumo.gorduras_g) || 0;
+    const cleanValue = (val: string | number) => {
+      if (typeof val === "number") return val;
+      return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
+    };
+    const p = cleanValue(plano.resumo.proteinas_g);
+    const c = cleanValue(plano.resumo.carboidratos_g);
+    const g = cleanValue(plano.resumo.gorduras_g);
     return [
       { name: "Proteínas", value: p, color: "var(--chart-1)" },
       { name: "Carboidratos", value: c, color: "var(--chart-3)" },
