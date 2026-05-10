@@ -131,6 +131,8 @@ export const useStore = create<State>()(
       checklist: {},
       checklistData: today(),
       tema: "dark",
+      planoAssinatura: "gratuito",
+      setPlanoAssinatura: (p) => set({ planoAssinatura: p }),
       setDados: (d) => set({ dados: d }),
       setPlano: (p) => set({ plano: p }),
       addAgua: (ml) => {
