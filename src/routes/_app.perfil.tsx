@@ -1,15 +1,12 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCircle2, XCircle, ExternalLink, Lock } from "lucide-react";
+import { Lock } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 
@@ -24,20 +21,6 @@ function Perfil() {
   const planoAss = useStore((s) => s.planoAssinatura);
   const reset = useStore((s) => s.reset);
   const podeRegenerar = temAcesso(planoAss, "regenerar_plano");
-  const [apiKey, setApiKey] = useState("");
-  const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    setApiKey(localStorage.getItem("gemini_api_key") || "");
-    setSaved(!!localStorage.getItem("gemini_api_key"));
-  }, []);
-
-  const salvar = () => {
-    if (apiKey.trim()) {
-      localStorage.setItem("gemini_api_key", apiKey.trim());
-      setSaved(true);
-    }
-  };
 
   const refazer = () => {
     reset();
@@ -74,34 +57,6 @@ function Perfil() {
           </div>
         </Card>
       )}
-
-      <Card className="p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Chave da API Google Gemini</h3>
-          {saved ? (
-            <span className="text-xs flex items-center gap-1 text-primary"><CheckCircle2 className="w-4 h-4" /> Configurada</span>
-          ) : (
-            <span className="text-xs flex items-center gap-1 text-destructive"><XCircle className="w-4 h-4" /> Não configurada</span>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label>Chave da API Google Gemini</Label>
-          <Input
-            type="password"
-            value={apiKey}
-            onChange={(e) => { setApiKey(e.target.value); setSaved(false); }}
-            placeholder="Cole sua chave do Google AI Studio aqui"
-          />
-          <a
-            href="https://aistudio.google.com/apikey"
-            target="_blank" rel="noopener noreferrer"
-            className="text-xs text-primary flex items-center gap-1 hover:underline"
-          >
-            Obter chave gratuita em aistudio.google.com/apikey <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
-        <Button onClick={salvar}>Salvar chave</Button>
-      </Card>
 
       <Card className="p-5 space-y-3">
         <h3 className="font-semibold">Ações</h3>

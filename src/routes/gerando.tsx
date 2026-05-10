@@ -37,20 +37,12 @@ function Gerando() {
       navigate({ to: "/onboarding" });
       return;
     }
-    if (!localStorage.getItem("gemini_api_key")) {
-      navigate({ to: "/perfil", search: { msg: "configurar" } as never });
-      return;
-    }
     try {
       const plano = await gerarPlano(dados);
       setPlano(plano);
       navigate({ to: "/dashboard" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Erro desconhecido";
-      if (msg === "API_KEY_MISSING") {
-        navigate({ to: "/perfil" });
-        return;
-      }
       setErro(msg);
     }
   };
@@ -71,9 +63,6 @@ function Gerando() {
           <p className="text-sm text-muted-foreground break-words">{erro}</p>
           <div className="flex gap-2 justify-center">
             <Button onClick={tentar}>Tentar novamente</Button>
-            <Button variant="outline" onClick={() => navigate({ to: "/perfil" })}>
-              Configurar API
-            </Button>
           </div>
         </div>
       </div>
