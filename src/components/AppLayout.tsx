@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Moon, Sun, Sparkles } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Moon, Sun, Sparkles, Crown } from "lucide-react";
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
 
@@ -9,6 +9,7 @@ const items = [
   { to: "/treino", label: "Treino", icon: Dumbbell },
   { to: "/evolucao", label: "Evolução", icon: TrendingUp },
   { to: "/agua", label: "Água", icon: Droplets },
+  { to: "/planos", label: "Planos", icon: Crown },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
