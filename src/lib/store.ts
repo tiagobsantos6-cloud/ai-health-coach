@@ -15,11 +15,13 @@ export type DadosUsuario = {
   local: string;
   horario: string;
   restricoes: string[];
+  restricaoOutro?: string;
   favoritos: string;
   naoGosta: string;
   refeicoes: number;
   orcamento: number;
   suplementos: boolean;
+  suplementosQuais?: string;
   saude: string;
   sono: number;
   estresse: number;
