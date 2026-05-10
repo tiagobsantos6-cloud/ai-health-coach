@@ -26,7 +26,7 @@ function Onboarding() {
     nome: "", sexo: "masculino", idade: 25,
     peso: 70, altura: 170, gordura: undefined, biotipo: "Mesomorfo",
     objetivo: "", diasTreino: 4, tempoTreino: 60, local: "Academia", horario: "Manhã",
-    restricoes: [], favoritos: "", naoGosta: "", refeicoes: 4, orcamento: 800, suplementos: false,
+    restricoes: [], restricaoOutro: "", favoritos: "", naoGosta: "", refeicoes: 4, orcamento: 800, suplementos: false, suplementosQuais: "",
     saude: "", sono: 7, estresse: 5,
   });
 
@@ -242,6 +242,14 @@ function Onboarding() {
                       </label>
                     ))}
                   </div>
+                  {d.restricoes.includes("Outro") && (
+                    <Input
+                      value={d.restricaoOutro ?? ""}
+                      onChange={(e) => update({ restricaoOutro: e.target.value })}
+                      placeholder="Especifique sua restrição"
+                      className="mt-2"
+                    />
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Alimentos favoritos</Label>
@@ -268,6 +276,14 @@ function Onboarding() {
                       </button>
                     ))}
                   </div>
+                  {d.suplementos && (
+                    <Input
+                      value={d.suplementosQuais ?? ""}
+                      onChange={(e) => update({ suplementosQuais: e.target.value })}
+                      placeholder="Quais? Ex: whey, creatina..."
+                      className="mt-2"
+                    />
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label>Problemas de saúde / lesões (opcional)</Label>
