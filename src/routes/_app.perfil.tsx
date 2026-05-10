@@ -59,34 +59,6 @@ function Perfil() {
       )}
 
       <Card className="p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-semibold">Chave da API Google Gemini</h3>
-          {saved ? (
-            <span className="text-xs flex items-center gap-1 text-primary"><CheckCircle2 className="w-4 h-4" /> Configurada</span>
-          ) : (
-            <span className="text-xs flex items-center gap-1 text-destructive"><XCircle className="w-4 h-4" /> Não configurada</span>
-          )}
-        </div>
-        <div className="space-y-2">
-          <Label>Chave da API Google Gemini</Label>
-          <Input
-            type="password"
-            value={apiKey}
-            onChange={(e) => { setApiKey(e.target.value); setSaved(false); }}
-            placeholder="Cole sua chave do Google AI Studio aqui"
-          />
-          <a
-            href="https://aistudio.google.com/apikey"
-            target="_blank" rel="noopener noreferrer"
-            className="text-xs text-primary flex items-center gap-1 hover:underline"
-          >
-            Obter chave gratuita em aistudio.google.com/apikey <ExternalLink className="w-3 h-3" />
-          </a>
-        </div>
-        <Button onClick={salvar}>Salvar chave</Button>
-      </Card>
-
-      <Card className="p-5 space-y-3">
         <h3 className="font-semibold">Ações</h3>
         <div className="flex flex-wrap gap-2">
           {podeRegenerar ? (
