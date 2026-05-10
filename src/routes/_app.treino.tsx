@@ -118,22 +118,6 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
           </div>
         </div>
       )}
-
-      <Collapsible open={open} onOpenChange={setOpen}>
-        <CollapsibleTrigger className="mt-3 text-xs text-muted-foreground flex items-center gap-1 hover:text-foreground">
-          Ver detalhes <ChevronDown className={`w-3 h-3 transition-transform ${open ? "rotate-180" : ""}`} />
-        </CollapsibleTrigger>
-        <CollapsibleContent className="mt-2 space-y-2 text-sm">
-          <div>
-            <div className="text-xs font-bold text-primary uppercase">Execução</div>
-            <p className="text-muted-foreground">{ex.execucao}</p>
-          </div>
-          <div>
-            <div className="text-xs font-bold text-destructive uppercase">Erros comuns</div>
-            <p className="text-muted-foreground">{ex.erros_comuns}</p>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
     </Card>
   );
 }
