@@ -63,9 +63,6 @@ function Gerando() {
           <p className="text-sm text-muted-foreground break-words">{erro}</p>
           <div className="flex gap-2 justify-center">
             <Button onClick={tentar}>Tentar novamente</Button>
-            <Button variant="outline" onClick={() => navigate({ to: "/perfil" })}>
-              Configurar API
-            </Button>
           </div>
         </div>
       </div>
