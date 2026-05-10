@@ -54,28 +54,26 @@ function Dieta() {
                 <Replace className="w-4 h-4 mr-1" /> Substituições
               </Button>
             </DialogTrigger>
+            <DialogContent className="max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Substituições equivalentes</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-2">
+                {plano.substituicoes.map((s, i) => (
+                  <div key={i} className="p-3 rounded-lg border border-border">
+                    <div className="font-medium text-sm">{s.original}</div>
+                    <div className="text-xs text-muted-foreground">→ {s.substituto}</div>
+                    <div className="text-xs text-primary mt-1">{s.equivalencia}</div>
+                  </div>
+                ))}
+              </div>
+            </DialogContent>
+          </Dialog>
         ) : (
           <Button asChild variant="outline" size="sm" title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.substituicoes_alimentares]}`}>
             <Link to="/planos"><Lock className="w-4 h-4 mr-1" /> Substituições</Link>
           </Button>
         )}
-        {podeSubstituir && (
-          <Dialog open={openSub} onOpenChange={setOpenSub}>
-          <DialogContent className="max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Substituições equivalentes</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-2">
-              {plano.substituicoes.map((s, i) => (
-                <div key={i} className="p-3 rounded-lg border border-border">
-                  <div className="font-medium text-sm">{s.original}</div>
-                  <div className="text-xs text-muted-foreground">→ {s.substituto}</div>
-                  <div className="text-xs text-primary mt-1">{s.equivalencia}</div>
-                </div>
-              ))}
-            </div>
-          </DialogContent>
-        </Dialog>
       </div>
 
       <Accordion type="multiple" className="space-y-3">
