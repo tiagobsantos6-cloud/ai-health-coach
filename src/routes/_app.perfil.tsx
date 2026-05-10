@@ -58,7 +58,12 @@ function Perfil() {
 
       {dados && plano && (
         <Card className="p-5">
-          <h3 className="font-semibold mb-3">Resumo</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">Resumo</h3>
+            <Link to="/planos" className="text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+              Plano {NOMES_PLANOS[planoAss]}
+            </Link>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
             <Info label="Nome" value={dados.nome} />
             <Info label="Objetivo" value={dados.objetivo} />
