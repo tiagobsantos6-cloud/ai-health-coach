@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Timer, ChevronDown, Activity, Pause, Play, RotateCcw } from "lucide-react";
+import { Timer, Activity, Pause, Play, RotateCcw } from "lucide-react";
 
 export const Route = createFileRoute("/_app/treino")({
   component: Treino,
