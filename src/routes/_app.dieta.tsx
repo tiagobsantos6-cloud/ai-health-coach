@@ -5,7 +5,9 @@ import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Clock, Replace } from "lucide-react";
+import { Clock, Replace, Lock } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/dieta")({
   component: Dieta,
@@ -13,8 +15,10 @@ export const Route = createFileRoute("/_app/dieta")({
 
 function Dieta() {
   const plano = useStore((s) => s.plano);
+  const planoAss = useStore((s) => s.planoAssinatura);
   const [openSub, setOpenSub] = useState(false);
   if (!plano) return null;
+  const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
 
   const totals = plano.plano_alimentar.reduce(
     (acc, r) => {
@@ -43,12 +47,20 @@ function Dieta() {
           <h1 className="text-2xl md:text-3xl font-bold">Plano alimentar</h1>
           <p className="text-muted-foreground">Suas refeições do dia</p>
         </div>
-        <Dialog open={openSub} onOpenChange={setOpenSub}>
-          <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Replace className="w-4 h-4 mr-1" /> Substituições
-            </Button>
-          </DialogTrigger>
+        {podeSubstituir ? (
+          <Dialog open={openSub} onOpenChange={setOpenSub}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Replace className="w-4 h-4 mr-1" /> Substituições
+              </Button>
+            </DialogTrigger>
+        ) : (
+          <Button asChild variant="outline" size="sm" title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.substituicoes_alimentares]}`}>
+            <Link to="/planos"><Lock className="w-4 h-4 mr-1" /> Substituições</Link>
+          </Button>
+        )}
+        {podeSubstituir && (
+          <Dialog open={openSub} onOpenChange={setOpenSub}>
           <DialogContent className="max-h-[80vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Substituições equivalentes</DialogTitle>
