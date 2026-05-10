@@ -9,7 +9,9 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { CheckCircle2, XCircle, ExternalLink } from "lucide-react";
+import { CheckCircle2, XCircle, ExternalLink, Lock } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/perfil")({
   component: Perfil,
@@ -19,7 +21,9 @@ function Perfil() {
   const navigate = useNavigate();
   const dados = useStore((s) => s.dados);
   const plano = useStore((s) => s.plano);
+  const planoAss = useStore((s) => s.planoAssinatura);
   const reset = useStore((s) => s.reset);
+  const podeRegenerar = temAcesso(planoAss, "regenerar_plano");
   const [apiKey, setApiKey] = useState("");
   const [saved, setSaved] = useState(false);
 
@@ -54,7 +58,12 @@ function Perfil() {
 
       {dados && plano && (
         <Card className="p-5">
-          <h3 className="font-semibold mb-3">Resumo</h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">Resumo</h3>
+            <Link to="/planos" className="text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-primary/10 text-primary hover:bg-primary/20">
+              Plano {NOMES_PLANOS[planoAss]}
+            </Link>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-3 text-sm">
             <Info label="Nome" value={dados.nome} />
             <Info label="Objetivo" value={dados.objetivo} />
@@ -97,7 +106,13 @@ function Perfil() {
       <Card className="p-5 space-y-3">
         <h3 className="font-semibold">Ações</h3>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={refazer}>Refazer plano completo</Button>
+          {podeRegenerar ? (
+            <Button variant="outline" onClick={refazer}>Refazer plano completo</Button>
+          ) : (
+            <Button asChild variant="outline" title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.regenerar_plano]}`}>
+              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> Refazer plano (plano {NOMES_PLANOS[RECURSO_MIN.regenerar_plano]})</Link>
+            </Button>
+          )}
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="destructive">Limpar todos os dados</Button>
