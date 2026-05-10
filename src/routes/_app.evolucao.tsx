@@ -8,8 +8,10 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Lock } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { gerarAjustes } from "@/lib/gemini";
+import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/evolucao")({
   component: Evolucao,
@@ -19,7 +21,10 @@ function Evolucao() {
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const evolucao = useStore((s) => s.evolucao);
+  const planoAss = useStore((s) => s.planoAssinatura);
   const addEvolucao = useStore((s) => s.addEvolucao);
+  const podeAjustesIA = temAcesso(planoAss, "ajustes_ia_evolucao");
+  const podeHistoricoCompleto = temAcesso(planoAss, "historico_completo_evolucao");
   const [peso, setPeso] = useState(dados?.peso ?? 70);
   const [energia, setEnergia] = useState(7);
   const [fome, setFome] = useState(5);
@@ -104,17 +109,28 @@ function Evolucao() {
       <Card className="p-5">
         <div className="flex justify-between items-center mb-3">
           <h3 className="font-semibold">Ajustes inteligentes</h3>
-          <Button onClick={gerar} disabled={loading || evolucao.length === 0} size="sm">
-            {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-            Gerar ajustes com IA
-          </Button>
+          {podeAjustesIA ? (
+            <Button onClick={gerar} disabled={loading || evolucao.length === 0} size="sm">
+              {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+              Gerar ajustes com IA
+            </Button>
+          ) : (
+            <Button asChild size="sm" variant="outline">
+              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> Plano {NOMES_PLANOS[RECURSO_MIN.ajustes_ia_evolucao]}</Link>
+            </Button>
+          )}
         </div>
-        {ajustes && (
+        {!podeAjustesIA && (
+          <p className="text-sm text-muted-foreground">
+            Os ajustes automáticos pela IA estão disponíveis no plano <span className="font-medium text-foreground">{NOMES_PLANOS[RECURSO_MIN.ajustes_ia_evolucao]}</span> ou superior.
+          </p>
+        )}
+        {podeAjustesIA && ajustes && (
           <div className="p-4 rounded-lg bg-primary/5 border border-primary/20 whitespace-pre-wrap text-sm">
             {ajustes}
           </div>
         )}
-        {!ajustes && evolucao.length === 0 && (
+        {podeAjustesIA && !ajustes && evolucao.length === 0 && (
           <p className="text-sm text-muted-foreground">Registre pelo menos uma semana para gerar ajustes.</p>
         )}
       </Card>
