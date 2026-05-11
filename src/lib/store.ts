@@ -42,14 +42,7 @@ export type Plano = {
   plano_alimentar: Array<{
     refeicao: string;
     horario: string;
-    alimentos: Array<{
-      nome: string;
-      quantidade_g: number;
-      calorias: number;
-      proteinas_g: number;
-      carboidratos_g: number;
-      gorduras_g: number;
-    }>;
+    alimentos: Array<Alimento & { opcoes?: Alimento[] }>;
     total_calorias: number;
   }>;
   substituicoes: Array<{ original: string; substituto: string; equivalencia: string }>;
