@@ -27,6 +27,16 @@ export type DadosUsuario = {
   estresse: number;
 };
 
+export type Alimento = {
+  nome: string;
+  quantidade_g: number;
+  medida_caseira?: string;
+  calorias: number;
+  proteinas_g: number;
+  carboidratos_g: number;
+  gorduras_g: number;
+};
+
 export type Plano = {
   resumo: {
     imc: string;
