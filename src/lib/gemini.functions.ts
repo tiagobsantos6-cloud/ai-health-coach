@@ -94,22 +94,55 @@ function rateLimit() {
   }
 }
 
+function repairJson(s: string): string {
+  // Remove última vírgula e tenta fechar strings/objetos/arrays abertos.
+  let str = s;
+  // Se a última posição estiver dentro de uma string (nº ímpar de aspas não escapadas), corta até a última vírgula segura.
+  let inStr = false;
+  let escape = false;
+  const stack: string[] = [];
+  let lastSafe = -1;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (escape) { escape = false; continue; }
+    if (c === "\\") { escape = true; continue; }
+    if (c === '"') { inStr = !inStr; continue; }
+    if (inStr) continue;
+    if (c === "{" || c === "[") stack.push(c === "{" ? "}" : "]");
+    else if (c === "}" || c === "]") stack.pop();
+    if (!inStr && (c === "}" || c === "]" || c === ",")) lastSafe = i;
+  }
+  if (inStr) {
+    // corta antes do início da string aberta
+    str = str.substring(0, lastSafe + 1);
+  }
+  // remove vírgula final
+  str = str.replace(/,\s*$/, "");
+  // recomputa stack após corte
+  const stack2: string[] = [];
+  let inStr2 = false;
+  let esc2 = false;
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (esc2) { esc2 = false; continue; }
+    if (c === "\\") { esc2 = true; continue; }
+    if (c === '"') { inStr2 = !inStr2; continue; }
+    if (inStr2) continue;
+    if (c === "{") stack2.push("}");
+    else if (c === "[") stack2.push("]");
+    else if (c === "}" || c === "]") stack2.pop();
+  }
+  while (stack2.length) str += stack2.pop();
+  return str;
+}
+
 function parseJson(text: string): unknown {
-  let clean = text.trim();
-  clean = clean.replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
-  try {
-    return JSON.parse(clean);
-  } catch {
-    const start = clean.search(/[\{\[]/);
-    const isArray = start !== -1 && clean[start] === "[";
-    const end = clean.lastIndexOf(isArray ? "]" : "}");
-    if (start !== -1 && end !== -1 && end > start) {
-      try {
-        return JSON.parse(clean.substring(start, end + 1));
-      } catch {
-        throw new Error("JSON incompleto recebido da IA. Por favor, tente novamente.");
-      }
-    }
+  let clean = text.trim().replace(/^```json\s*/i, "").replace(/^```\s*/i, "").replace(/```\s*$/i, "").trim();
+  try { return JSON.parse(clean); } catch {}
+  const start = clean.search(/[\{\[]/);
+  if (start !== -1) clean = clean.substring(start);
+  try { return JSON.parse(clean); } catch {}
+  try { return JSON.parse(repairJson(clean)); } catch {
     throw new Error("JSON incompleto recebido da IA. Por favor, tente novamente.");
   }
 }
