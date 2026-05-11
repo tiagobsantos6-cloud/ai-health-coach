@@ -139,6 +139,21 @@ export const useStore = create<State>()(
       setPlanoAssinatura: (p) => set({ planoAssinatura: p }),
       setDados: (d) => set({ dados: d }),
       setPlano: (p) => set({ plano: p }),
+      trocarAlimento: (refIdx, alIdx, novo) => {
+        const s = get();
+        if (!s.plano) return;
+        const plano_alimentar = s.plano.plano_alimentar.map((r, i) => {
+          if (i !== refIdx) return r;
+          const alimentos = r.alimentos.map((a, j) =>
+            j === alIdx ? { ...novo, opcoes: a.opcoes } : a,
+          );
+          const total_calorias = Math.round(
+            alimentos.reduce((acc, a) => acc + (a.calorias || 0), 0),
+          );
+          return { ...r, alimentos, total_calorias };
+        });
+        set({ plano: { ...s.plano, plano_alimentar } });
+      },
       addAgua: (ml) => {
         const s = get();
         const t = today();
