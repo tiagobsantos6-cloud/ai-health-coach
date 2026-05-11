@@ -5,7 +5,8 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Activity, Pause, Play, RotateCcw } from "lucide-react";
+import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_app/treino")({
   component: Treino,
@@ -104,6 +105,10 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
         </div>
       </div>
 
+      <div className="mt-3">
+        <ExecucaoModal nome={ex.nome} />
+      </div>
+
       {(timer > 0 || running) && (
         <div className="mt-3 p-3 rounded-lg bg-primary/10 flex items-center justify-between">
           <div className="text-2xl font-bold text-primary tabular-nums">{timer}s</div>
@@ -118,5 +123,62 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
         </div>
       )}
     </Card>
+  );
+}
+
+function ExecucaoModal({ nome }: { nome: string }) {
+  const [open, setOpen] = useState(false);
+  const query = encodeURIComponent(`${nome} execução correta`);
+  const searchUrl = `https://www.youtube.com/results?search_query=${query}`;
+  const embedUrl = `https://www.youtube.com/embed?listType=search&list=${query}`;
+  const gifUrl = `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${nome
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_|_$/g, "")}/images/0.jpg`;
+  const [gifOk, setGifOk] = useState(true);
+
+  return (
+    <div className="space-y-2">
+      {gifOk && (
+        <img
+          src={gifUrl}
+          alt={`Execução: ${nome}`}
+          loading="lazy"
+          onError={() => setGifOk(false)}
+          className="w-full max-h-48 object-contain rounded-md bg-muted"
+        />
+      )}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>
+          <Button size="sm" variant="outline" className="w-full">
+            <PlayCircle className="w-4 h-4 mr-2" /> Ver execução
+          </Button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle className="text-base">{nome}</DialogTitle>
+          </DialogHeader>
+          <div className="aspect-video w-full rounded-md overflow-hidden bg-black">
+            <iframe
+              src={embedUrl}
+              title={`YouTube: ${nome}`}
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              className="w-full h-full"
+            />
+          </div>
+          <a
+            href={searchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:underline"
+          >
+            <ExternalLink className="w-4 h-4" /> Abrir busca no YouTube
+          </a>
+        </DialogContent>
+      </Dialog>
+    </div>
   );
 }
