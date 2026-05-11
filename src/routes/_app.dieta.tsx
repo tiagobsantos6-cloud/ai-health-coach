@@ -18,6 +18,7 @@ export const Route = createFileRoute("/_app/dieta")({
 function Dieta() {
   const plano = useStore((s) => s.plano);
   const planoAss = useStore((s) => s.planoAssinatura);
+  const trocarAlimento = useStore((s) => s.trocarAlimento);
   const [openSub, setOpenSub] = useState(false);
   if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
