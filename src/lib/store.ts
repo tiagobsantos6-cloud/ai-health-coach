@@ -112,6 +112,7 @@ type State = {
   setPlanoAssinatura: (p: PlanoAssinatura) => void;
   setDados: (d: DadosUsuario) => void;
   setPlano: (p: Plano) => void;
+  trocarAlimento: (refIdx: number, alIdx: number, novo: Alimento) => void;
   addAgua: (ml: number) => void;
   resetAguaIfNewDay: () => void;
   addEvolucao: (r: RegistroEvolucao) => void;
