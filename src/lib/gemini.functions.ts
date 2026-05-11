@@ -136,7 +136,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
           { role: "user", content: JSON.stringify(data.dados) },
         ],
         response_format: { type: "json_object" },
-        max_tokens: 32000,
+        max_tokens: 65000,
       }),
     });
 
