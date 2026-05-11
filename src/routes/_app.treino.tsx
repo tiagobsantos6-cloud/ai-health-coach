@@ -105,6 +105,10 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
         </div>
       </div>
 
+      <div className="mt-3">
+        <ExecucaoModal nome={ex.nome} />
+      </div>
+
       {(timer > 0 || running) && (
         <div className="mt-3 p-3 rounded-lg bg-primary/10 flex items-center justify-between">
           <div className="text-2xl font-bold text-primary tabular-nums">{timer}s</div>
