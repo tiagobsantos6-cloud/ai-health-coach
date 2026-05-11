@@ -234,7 +234,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
           { role: "user", content: JSON.stringify(data.dados) },
         ],
         response_format: { type: "json_object" },
-        max_tokens: 65000,
+        max_tokens: 24000,
       }),
     });
 
@@ -247,12 +247,14 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
     const json = await response.json();
     const text = json?.choices?.[0]?.message?.content;
     const finishReason = json?.choices?.[0]?.finish_reason;
+    if (finishReason === "length" || finishReason === "MAX_TOKENS") {
+      throw new Error("Resposta da IA foi cortada por limite de tamanho. Tente gerar novamente.");
+    }
     if (!text) {
-      if (finishReason === "length") throw new Error("Resposta truncada por limite de tokens. Tente novamente.");
       throw new Error("Resposta vazia da IA");
     }
-    parseJson(text); // validate
-    return { json: text };
+    const plano = completarPlano(parseJson(text));
+    return { json: JSON.stringify(plano) };
   });
 
 export const gerarAjustesFn = createServerFn({ method: "POST" })
