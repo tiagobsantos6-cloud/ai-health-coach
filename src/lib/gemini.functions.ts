@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequestHeader } from "@tanstack/react-start/server";
+import { z } from "zod";
 
 const SYSTEM_PROMPT = `Você é um especialista em nutrição esportiva, personal trainer e coach de disciplina. Baseado nos dados do usuário, gere um plano 100% personalizado. Responda SOMENTE com um JSON válido, sem texto adicional, sem markdown, sem blocos de código. O JSON deve ter exatamente esta estrutura. IMPORTANTE: No objeto "resumo", envie apenas os números (ex: "2500" em vez de "2500 kcal").
 
@@ -14,6 +16,83 @@ const SYSTEM_PROMPT = `Você é um especialista em nutrição esportiva, persona
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
+
+// Strip AI control tokens / role markers from free-text inputs to mitigate prompt injection.
+function sanitizeText(s: string): string {
+  return s
+    .replace(/<\|.*?\|>/g, " ")
+    .replace(/\b(system|assistant|user)\s*:/gi, " ")
+    .replace(/```/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+const shortText = (max: number) =>
+  z.string().max(max).transform(sanitizeText).optional().default("");
+
+const dadosSchema = z.object({
+  nome: z.string().max(100).transform(sanitizeText),
+  sexo: z.string().max(20).transform(sanitizeText),
+  idade: z.number().min(0).max(120),
+  peso: z.number().min(0).max(500),
+  altura: z.number().min(0).max(300),
+  gordura: z.number().min(0).max(100).optional(),
+  biotipo: z.string().max(50).transform(sanitizeText),
+  objetivo: z.string().max(100).transform(sanitizeText),
+  diasTreino: z.number().min(0).max(7),
+  tempoTreino: z.number().min(0).max(600),
+  local: z.string().max(50).transform(sanitizeText),
+  horario: z.string().max(50).transform(sanitizeText),
+  restricoes: z.array(z.string().max(100).transform(sanitizeText)).max(20),
+  restricaoOutro: shortText(300),
+  favoritos: shortText(500),
+  naoGosta: shortText(500),
+  refeicoes: z.number().min(1).max(10),
+  orcamento: z.number().min(0).max(100000),
+  suplementos: z.boolean(),
+  suplementosQuais: shortText(300),
+  saude: shortText(500),
+  sono: z.number().min(0).max(24),
+  estresse: z.number().min(0).max(10),
+});
+
+const resumoPlanoSchema = z.record(z.string(), z.string().max(50)).optional().default({});
+
+const historicoSchema = z
+  .array(
+    z.object({
+      data: z.string().max(30),
+      peso: z.number().min(0).max(500),
+      energia: z.number().min(0).max(10),
+      fome: z.number().min(0).max(10),
+      treino: z.number().min(0).max(10),
+      observacoes: z.string().max(300).transform(sanitizeText).optional().default(""),
+    }),
+  )
+  .max(60);
+
+// Lightweight in-memory per-IP rate limiter. Best-effort mitigation; not a
+// substitute for real auth (see security memory).
+const RATE_WINDOW_MS = 60_000;
+const RATE_MAX = 5;
+const hits = new Map<string, number[]>();
+function rateLimit() {
+  const ip =
+    getRequestHeader("cf-connecting-ip") ||
+    getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
+    "unknown";
+  const now = Date.now();
+  const arr = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS);
+  if (arr.length >= RATE_MAX) {
+    throw new Error("Muitas requisições. Aguarde um minuto e tente novamente.");
+  }
+  arr.push(now);
+  hits.set(ip, arr);
+  if (hits.size > 1000) {
+    // basic cleanup
+    for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW_MS)) hits.delete(k);
+  }
+}
 
 function parseJson(text: string): unknown {
   let clean = text.trim();
@@ -36,8 +115,11 @@ function parseJson(text: string): unknown {
 }
 
 export const gerarPlanoFn = createServerFn({ method: "POST" })
-  .inputValidator((data: { dados: unknown }) => data)
+  .inputValidator((data: { dados: unknown }) => ({
+    dados: dadosSchema.parse((data as { dados: unknown }).dados),
+  }))
   .handler(async ({ data }) => {
+    rateLimit();
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY não configurada no servidor");
 
@@ -54,6 +136,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
           { role: "user", content: JSON.stringify(data.dados) },
         ],
         response_format: { type: "json_object" },
+        max_tokens: 8000,
       }),
     });
 
@@ -75,8 +158,13 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
   });
 
 export const gerarAjustesFn = createServerFn({ method: "POST" })
-  .inputValidator((data: { dados: unknown; resumoPlano: unknown; historico: unknown }) => data)
+  .inputValidator((data: { dados: unknown; resumoPlano: unknown; historico: unknown }) => ({
+    dados: dadosSchema.parse(data.dados),
+    resumoPlano: resumoPlanoSchema.parse(data.resumoPlano),
+    historico: historicoSchema.parse(data.historico),
+  }))
   .handler(async ({ data }) => {
+    rateLimit();
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("LOVABLE_API_KEY não configurada no servidor");
 
@@ -91,6 +179,7 @@ export const gerarAjustesFn = createServerFn({ method: "POST" })
       body: JSON.stringify({
         model: MODEL,
         messages: [{ role: "user", content: prompt }],
+        max_tokens: 2000,
       }),
     });
 
