@@ -1,13 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
-import { useStore } from "@/lib/store";
+import { useStore, type Alimento } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Clock, Replace, Lock } from "lucide-react";
+import { Clock, Replace, Lock, ArrowLeftRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
+import { medidaCaseira } from "@/lib/medidaCaseira";
 
 export const Route = createFileRoute("/_app/dieta")({
   component: Dieta,
