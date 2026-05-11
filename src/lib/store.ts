@@ -27,6 +27,16 @@ export type DadosUsuario = {
   estresse: number;
 };
 
+export type Alimento = {
+  nome: string;
+  quantidade_g: number;
+  medida_caseira?: string;
+  calorias: number;
+  proteinas_g: number;
+  carboidratos_g: number;
+  gorduras_g: number;
+};
+
 export type Plano = {
   resumo: {
     imc: string;
@@ -42,14 +52,7 @@ export type Plano = {
   plano_alimentar: Array<{
     refeicao: string;
     horario: string;
-    alimentos: Array<{
-      nome: string;
-      quantidade_g: number;
-      calorias: number;
-      proteinas_g: number;
-      carboidratos_g: number;
-      gorduras_g: number;
-    }>;
+    alimentos: Array<Alimento & { opcoes?: Alimento[] }>;
     total_calorias: number;
   }>;
   substituicoes: Array<{ original: string; substituto: string; equivalencia: string }>;
@@ -109,6 +112,7 @@ type State = {
   setPlanoAssinatura: (p: PlanoAssinatura) => void;
   setDados: (d: DadosUsuario) => void;
   setPlano: (p: Plano) => void;
+  trocarAlimento: (refIdx: number, alIdx: number, novo: Alimento) => void;
   addAgua: (ml: number) => void;
   resetAguaIfNewDay: () => void;
   addEvolucao: (r: RegistroEvolucao) => void;
@@ -135,6 +139,21 @@ export const useStore = create<State>()(
       setPlanoAssinatura: (p) => set({ planoAssinatura: p }),
       setDados: (d) => set({ dados: d }),
       setPlano: (p) => set({ plano: p }),
+      trocarAlimento: (refIdx, alIdx, novo) => {
+        const s = get();
+        if (!s.plano) return;
+        const plano_alimentar = s.plano.plano_alimentar.map((r, i) => {
+          if (i !== refIdx) return r;
+          const alimentos = r.alimentos.map((a, j) =>
+            j === alIdx ? { ...novo, opcoes: a.opcoes } : a,
+          );
+          const total_calorias = Math.round(
+            alimentos.reduce((acc, a) => acc + (a.calorias || 0), 0),
+          );
+          return { ...r, alimentos, total_calorias };
+        });
+        set({ plano: { ...s.plano, plano_alimentar } });
+      },
       addAgua: (ml) => {
         const s = get();
         const t = today();
