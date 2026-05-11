@@ -153,6 +153,65 @@ function parseJson(text: string): unknown {
   }
 }
 
+const SUBSTITUICOES: Array<{ match: RegExp; nomes: string[] }> = [
+  { match: /\b(frango|peito de frango|ave)\b/i, nomes: ["Patinho moído grelhado", "Filé de tilápia grelhado", "Ovos cozidos"] },
+  { match: /\b(carne|patinho|bife|alcatra)\b/i, nomes: ["Peito de frango grelhado", "Filé de peixe grelhado", "Ovos mexidos"] },
+  { match: /\b(peixe|tilápia|tilapia|salmão|salmao|atum)\b/i, nomes: ["Peito de frango grelhado", "Patinho moído grelhado", "Ovos cozidos"] },
+  { match: /\b(ovo|ovos|omelete)\b/i, nomes: ["Peito de frango desfiado", "Queijo cottage", "Iogurte grego natural"] },
+  { match: /\b(whey|proteína|proteina)\b/i, nomes: ["Iogurte grego natural", "Claras de ovo", "Queijo cottage"] },
+  { match: /\b(arroz|macarrão|macarrao|quinoa|cuscuz)\b/i, nomes: ["Batata-doce cozida", "Mandioca cozida", "Pão integral"] },
+  { match: /\b(batata|mandioca|inhame)\b/i, nomes: ["Arroz integral cozido", "Macarrão integral cozido", "Quinoa cozida"] },
+  { match: /\b(feijão|feijao|lentilha|grão|grao de bico|ervilha)\b/i, nomes: ["Lentilha cozida", "Grão-de-bico cozido", "Feijão carioca cozido"] },
+  { match: /\b(aveia|granola|cereal)\b/i, nomes: ["Pão integral", "Tapioca", "Batata-doce cozida"] },
+  { match: /\b(banana|maçã|maca|pera|laranja|fruta|mamão|mamao)\b/i, nomes: ["Maçã", "Banana", "Mamão"] },
+  { match: /\b(leite|iogurte|cottage|queijo)\b/i, nomes: ["Iogurte natural", "Queijo cottage", "Leite desnatado"] },
+  { match: /\b(azeite|óleo|oleo|castanha|amendoim|abacate)\b/i, nomes: ["Castanhas", "Abacate", "Pasta de amendoim"] },
+  { match: /\b(salada|alface|rúcula|rucula|tomate|brócolis|brocolis|legumes|verdura)\b/i, nomes: ["Brócolis cozido", "Salada verde", "Legumes refogados"] },
+];
+
+function opcoesParaAlimento(alimento: Alimento): Alimento[] {
+  const grupo = SUBSTITUICOES.find((s) => s.match.test(alimento.nome));
+  const nomes = grupo?.nomes ?? ["Opção equivalente 1", "Opção equivalente 2", "Opção equivalente 3"];
+  return nomes.slice(0, 3).map((nome) => ({
+    ...alimento,
+    nome,
+    medida_caseira: medidaCaseira(nome, alimento.quantidade_g),
+  }));
+}
+
+function completarPlano(plano: unknown): Plano {
+  const p = plano as Plano;
+  const substituicoes: Plano["substituicoes"] = [];
+  p.plano_alimentar = (p.plano_alimentar || []).map((refeicao) => {
+    const alimentos = (refeicao.alimentos || []).map((alimento) => {
+      const base = {
+        ...alimento,
+        medida_caseira: medidaCaseira(alimento.nome, alimento.quantidade_g, alimento.medida_caseira),
+      };
+      const opcoes = base.opcoes?.length ? base.opcoes.slice(0, 3) : opcoesParaAlimento(base);
+      const opcoesComMedida = opcoes.map((opcao) => ({
+        ...opcao,
+        medida_caseira: medidaCaseira(opcao.nome, opcao.quantidade_g, opcao.medida_caseira),
+      }));
+      opcoesComMedida.forEach((opcao) => {
+        substituicoes.push({
+          original: base.nome,
+          substituto: opcao.nome,
+          equivalencia: `${opcao.quantidade_g}g — macros equivalentes ao alimento original`,
+        });
+      });
+      return { ...base, opcoes: opcoesComMedida };
+    });
+    return {
+      ...refeicao,
+      alimentos,
+      total_calorias: Math.round(alimentos.reduce((acc, a) => acc + (a.calorias || 0), 0)),
+    };
+  });
+  p.substituicoes = substituicoes;
+  return p;
+}
+
 export const gerarPlanoFn = createServerFn({ method: "POST" })
   .inputValidator((data: { dados: unknown }) => ({
     dados: dadosSchema.parse((data as { dados: unknown }).dados),
