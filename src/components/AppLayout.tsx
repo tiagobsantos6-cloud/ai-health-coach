@@ -1,7 +1,11 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Moon, Sun, Sparkles, Crown } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Moon, Sun, Sparkles, Crown, LogOut } from "lucide-react";
 import { useEffect } from "react";
 import { useStore } from "@/lib/store";
+import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { useQuery } from "@tanstack/react-query";
+import { getMyTierFn } from "@/lib/subscription.functions";
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -16,10 +20,22 @@ const items = [
 export function AppLayout() {
   const tema = useStore((s) => s.tema);
   const setTema = useStore((s) => s.setTema);
+  const setPlanoAssinatura = useStore((s) => s.setPlanoAssinatura);
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
+
+  const fetchTier = useServerFn(getMyTierFn);
+  const tierQuery = useQuery({
+    queryKey: ["my-tier"],
+    queryFn: () => fetchTier(),
+    staleTime: 60_000,
+  });
+
+  useEffect(() => {
+    if (tierQuery.data?.tier) setPlanoAssinatura(tierQuery.data.tier);
+  }, [tierQuery.data, setPlanoAssinatura]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", tema === "dark");
@@ -28,6 +44,11 @@ export function AppLayout() {
   useEffect(() => {
     if (!dados && !plano) navigate({ to: "/onboarding" });
   }, [dados, plano, navigate]);
+
+  const logout = async () => {
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
+  };
 
   return (
     <div className="min-h-screen flex w-full bg-background text-foreground">
@@ -64,6 +85,13 @@ export function AppLayout() {
         >
           {tema === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           Tema {tema === "dark" ? "claro" : "escuro"}
+        </button>
+        <button
+          onClick={logout}
+          className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+        >
+          <LogOut className="w-4 h-4" />
+          Sair
         </button>
       </aside>
 

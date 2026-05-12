@@ -84,10 +84,14 @@ const tiers: Tier[] = [
 
 function Planos() {
   const planoAtual = useStore((s) => s.planoAssinatura);
-  const setPlanoAssinatura = useStore((s) => s.setPlanoAssinatura);
+  // Tier upgrades happen server-side (via a future payments webhook).
+  // Client cannot mutate plan tier — UI is informational only.
 
   return (
     <div className="space-y-8">
+      <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground text-center">
+        Pagamentos em breve. Por enquanto, todas as contas começam no plano gratuito.
+      </div>
       <div className="text-center max-w-2xl mx-auto">
         <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Escolha seu plano</h1>
         <p className="text-muted-foreground mt-2">
@@ -144,11 +148,10 @@ function Planos() {
 
                 <Button
                   variant={ativo ? "outline" : t.destaque ? "default" : "secondary"}
-                  disabled={ativo}
-                  onClick={() => setPlanoAssinatura(t.id)}
+                  disabled
                   className="w-full"
                 >
-                  {ativo ? "Plano atual" : t.id === "gratuito" ? "Começar grátis" : "Assinar"}
+                  {ativo ? "Plano atual" : "Em breve"}
                 </Button>
               </Card>
             </motion.div>
