@@ -9,7 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
 import { Route as GerandoRouteImport } from './routes/gerando'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,9 +23,19 @@ import { Route as AppDietaRouteImport } from './routes/_app.dieta'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppAguaRouteImport } from './routes/_app.agua'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingRoute = OnboardingRouteImport.update({
   id: '/onboarding',
   path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GerandoRoute = GerandoRouteImport.update({
@@ -79,7 +91,9 @@ const AppAguaRoute = AppAguaRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/gerando': typeof GerandoRoute
+  '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/signup': typeof SignupRoute
   '/agua': typeof AppAguaRoute
   '/dashboard': typeof AppDashboardRoute
   '/dieta': typeof AppDietaRoute
@@ -91,7 +105,9 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/gerando': typeof GerandoRoute
+  '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/signup': typeof SignupRoute
   '/agua': typeof AppAguaRoute
   '/dashboard': typeof AppDashboardRoute
   '/dieta': typeof AppDietaRoute
@@ -105,7 +121,9 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_app': typeof AppRouteWithChildren
   '/gerando': typeof GerandoRoute
+  '/login': typeof LoginRoute
   '/onboarding': typeof OnboardingRoute
+  '/signup': typeof SignupRoute
   '/_app/agua': typeof AppAguaRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/dieta': typeof AppDietaRoute
@@ -119,7 +137,9 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/gerando'
+    | '/login'
     | '/onboarding'
+    | '/signup'
     | '/agua'
     | '/dashboard'
     | '/dieta'
@@ -131,7 +151,9 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/gerando'
+    | '/login'
     | '/onboarding'
+    | '/signup'
     | '/agua'
     | '/dashboard'
     | '/dieta'
@@ -144,7 +166,9 @@ export interface FileRouteTypes {
     | '/'
     | '/_app'
     | '/gerando'
+    | '/login'
     | '/onboarding'
+    | '/signup'
     | '/_app/agua'
     | '/_app/dashboard'
     | '/_app/dieta'
@@ -158,16 +182,32 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRoute: typeof AppRouteWithChildren
   GerandoRoute: typeof GerandoRoute
+  LoginRoute: typeof LoginRoute
   OnboardingRoute: typeof OnboardingRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/onboarding': {
       id: '/onboarding'
       path: '/onboarding'
       fullPath: '/onboarding'
       preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gerando': {
@@ -269,8 +309,20 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRoute: AppRouteWithChildren,
   GerandoRoute: GerandoRoute,
+  LoginRoute: LoginRoute,
   OnboardingRoute: OnboardingRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
