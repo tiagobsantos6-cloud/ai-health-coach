@@ -192,7 +192,7 @@ export const useStore = create<State>()(
         checklist: s.checklist,
         checklistData: s.checklistData,
         tema: s.tema,
-        planoAssinatura: s.planoAssinatura,
+        // planoAssinatura intentionally NOT persisted — server is source of truth.
       }),
     },
   ),
