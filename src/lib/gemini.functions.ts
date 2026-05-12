@@ -2,7 +2,12 @@ import { createServerFn } from "@tanstack/react-start";
 import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { medidaCaseira } from "./medidaCaseira";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuth } from "@/integrations/supabase/auth-header.middleware";
 import type { Alimento, Plano } from "./store";
+
+const GENERIC_AI_ERROR = "Erro ao contactar serviço de IA. Tente novamente.";
+const SERVICE_UNAVAILABLE = "Serviço temporariamente indisponível.";
 
 const SYSTEM_PROMPT = `Você é um especialista em nutrição esportiva, personal trainer e coach de disciplina. Baseado nos dados do usuário, gere um plano 100% personalizado. Responda SOMENTE com um JSON válido, sem texto adicional, sem markdown, sem blocos de código.
 
@@ -213,13 +218,17 @@ function completarPlano(plano: unknown): Plano {
 }
 
 export const gerarPlanoFn = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: { dados: unknown }) => ({
     dados: dadosSchema.parse((data as { dados: unknown }).dados),
   }))
   .handler(async ({ data }) => {
     rateLimit();
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY não configurada no servidor");
+    if (!apiKey) {
+      console.error("LOVABLE_API_KEY missing on server");
+      throw new Error(SERVICE_UNAVAILABLE);
+    }
 
     const response = await fetch(GATEWAY_URL, {
       method: "POST",
@@ -240,9 +249,10 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
 
     if (!response.ok) {
       const err = await response.text();
+      console.error(`AI gateway error ${response.status}: ${err.slice(0, 500)}`);
       if (response.status === 429) throw new Error("Muitas requisições. Aguarde um instante e tente novamente.");
-      if (response.status === 402) throw new Error("Créditos da IA esgotados. Adicione créditos ao seu workspace Lovable.");
-      throw new Error(`Erro da IA: ${response.status} ${err.slice(0, 200)}`);
+      if (response.status === 402) throw new Error("Serviço de IA temporariamente indisponível.");
+      throw new Error(GENERIC_AI_ERROR);
     }
     const json = await response.json();
     const text = json?.choices?.[0]?.message?.content;
@@ -251,22 +261,42 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       throw new Error("Resposta da IA foi cortada por limite de tamanho. Tente gerar novamente.");
     }
     if (!text) {
-      throw new Error("Resposta vazia da IA");
+      throw new Error(GENERIC_AI_ERROR);
     }
     const plano = completarPlano(parseJson(text));
     return { json: JSON.stringify(plano) };
   });
 
 export const gerarAjustesFn = createServerFn({ method: "POST" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((data: { dados: unknown; resumoPlano: unknown; historico: unknown }) => ({
     dados: dadosSchema.parse(data.dados),
     resumoPlano: resumoPlanoSchema.parse(data.resumoPlano),
     historico: historicoSchema.parse(data.historico),
   }))
-  .handler(async ({ data }) => {
+  .handler(async ({ data, context }) => {
     rateLimit();
+
+    // Server-side subscription tier gate (matches `ajustes_ia_evolucao` recurso).
+    const { data: sub, error: subErr } = await context.supabase
+      .from("subscriptions")
+      .select("tier")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (subErr) {
+      console.error("[subscription] read error", subErr);
+      throw new Error(SERVICE_UNAVAILABLE);
+    }
+    const tier = sub?.tier ?? "gratuito";
+    if (tier !== "intermediario" && tier !== "completo") {
+      throw new Error("Recurso disponível apenas nos planos Intermediário ou Completo.");
+    }
+
     const apiKey = process.env.LOVABLE_API_KEY;
-    if (!apiKey) throw new Error("LOVABLE_API_KEY não configurada no servidor");
+    if (!apiKey) {
+      console.error("LOVABLE_API_KEY missing on server");
+      throw new Error(SERVICE_UNAVAILABLE);
+    }
 
     const prompt = `Com base nos dados do usuário, plano atual e histórico de evolução, sugira ajustes práticos e específicos no plano alimentar e de treino. Responda em português, em formato de lista com tópicos curtos e claros (sem JSON, sem markdown excessivo).\n\nDados: ${JSON.stringify(data.dados)}\n\nPlano atual (resumo): ${JSON.stringify(data.resumoPlano)}\n\nHistórico: ${JSON.stringify(data.historico)}`;
 
@@ -284,9 +314,11 @@ export const gerarAjustesFn = createServerFn({ method: "POST" })
     });
 
     if (!response.ok) {
+      const err = await response.text();
+      console.error(`AI gateway error ${response.status}: ${err.slice(0, 500)}`);
       if (response.status === 429) throw new Error("Muitas requisições. Aguarde um instante.");
-      if (response.status === 402) throw new Error("Créditos da IA esgotados.");
-      throw new Error(`Erro ao gerar ajustes: ${response.status}`);
+      if (response.status === 402) throw new Error("Serviço de IA temporariamente indisponível.");
+      throw new Error(GENERIC_AI_ERROR);
     }
     const json = await response.json();
     return (json?.choices?.[0]?.message?.content as string) ?? "";
