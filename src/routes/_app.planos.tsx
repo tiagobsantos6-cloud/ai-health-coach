@@ -148,11 +148,10 @@ function Planos() {
 
                 <Button
                   variant={ativo ? "outline" : t.destaque ? "default" : "secondary"}
-                  disabled={ativo}
-                  onClick={() => setPlanoAssinatura(t.id)}
+                  disabled
                   className="w-full"
                 >
-                  {ativo ? "Plano atual" : t.id === "gratuito" ? "Começar grátis" : "Assinar"}
+                  {ativo ? "Plano atual" : "Em breve"}
                 </Button>
               </Card>
             </motion.div>
