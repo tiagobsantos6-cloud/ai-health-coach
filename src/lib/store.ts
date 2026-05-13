@@ -10,6 +10,8 @@ export type DadosUsuario = {
   gordura?: number;
   biotipo: string;
   objetivo: string;
+  pesoDesejado?: number;
+  prazoSemanas?: number;
   diasTreino: number;
   tempoTreino: number;
   local: string;
