@@ -53,6 +53,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_data: {
+        Row: {
+          dados: Json | null
+          plano: Json | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          dados?: Json | null
+          plano?: Json | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          dados?: Json | null
+          plano?: Json | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
