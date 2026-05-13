@@ -150,19 +150,27 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label>Biotipo</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {["Ectomorfo", "Mesomorfo", "Endomorfo"].map((b) => (
-                      <button
-                        key={b}
-                        onClick={() => update({ biotipo: b })}
-                        className={`px-3 py-3 rounded-lg border text-sm transition-colors ${
-                          d.biotipo === b ? "border-primary bg-primary/10 text-primary" : "border-border"
-                        }`}
-                      >
-                        {b}
-                      </button>
-                    ))}
-                  </div>
+                  <TooltipProvider delayDuration={150}>
+                    <div className="grid grid-cols-3 gap-2">
+                      {["Ectomorfo", "Mesomorfo", "Endomorfo"].map((b) => (
+                        <Tooltip key={b}>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => update({ biotipo: b })}
+                              className={`px-3 py-3 rounded-lg border text-sm transition-colors ${
+                                d.biotipo === b ? "border-primary bg-primary/10 text-primary" : "border-border"
+                              }`}
+                            >
+                              {b}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-center">
+                            {biotipoDesc[b]}
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  </TooltipProvider>
                 </div>
               </>
             )}
