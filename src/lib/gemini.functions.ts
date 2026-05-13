@@ -245,7 +245,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
         model: MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: JSON.stringify(data.dados) },
+          { role: "user", content: JSON.stringify({ ...data.dados, metas_calculadas: metas }) },
         ],
         response_format: { type: "json_object" },
         max_tokens: 24000,
@@ -269,6 +269,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       throw new Error(GENERIC_AI_ERROR);
     }
     const plano = completarPlano(parseJson(text));
+    if (metas) plano.metas = metas;
     return { json: JSON.stringify(plano) };
   });
 
