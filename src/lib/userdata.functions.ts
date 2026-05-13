@@ -27,9 +27,11 @@ export const saveMyDataFn = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
   .inputValidator((input: unknown) => payloadSchema.parse(input))
   .handler(async ({ data, context }) => {
-    const row: Record<string, unknown> = { user_id: context.userId };
-    if (data.dados !== undefined) row.dados = data.dados;
-    if (data.plano !== undefined) row.plano = data.plano;
+    const row = {
+      user_id: context.userId,
+      dados: (data.dados ?? null) as never,
+      plano: (data.plano ?? null) as never,
+    };
     const { error } = await context.supabase
       .from("user_data")
       .upsert(row, { onConflict: "user_id" });
