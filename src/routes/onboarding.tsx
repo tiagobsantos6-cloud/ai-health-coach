@@ -196,6 +196,44 @@ function Onboarding() {
                     </button>
                   ))}
                 </div>
+                {(d.objetivo === "Emagrecimento" || d.objetivo === "Definição") && (() => {
+                  const prazo = d.prazoSemanas ?? 12;
+                  const pesoAtual = d.peso || 0;
+                  const pesoAlvo = d.pesoDesejado ?? 0;
+                  const diff = pesoAtual - pesoAlvo;
+                  const perdaSemanal = diff > 0 && prazo > 0 ? diff / prazo : 0;
+                  const perdaMensal = perdaSemanal * 4;
+                  const agressiva = perdaSemanal > 1;
+                  return (
+                    <div className="space-y-4 mt-2 p-4 rounded-xl border border-border bg-muted/30">
+                      <div className="space-y-2">
+                        <Label>Peso desejado (kg)</Label>
+                        <Input
+                          type="number"
+                          placeholder="Ex: 65"
+                          value={d.pesoDesejado ?? ""}
+                          onChange={(e) => update({ pesoDesejado: e.target.value ? Number(e.target.value) : undefined })}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Prazo para atingir o objetivo: {prazo} {prazo === 1 ? "semana" : "semanas"}</Label>
+                        <Slider value={[prazo]} min={1} max={24} step={1} onValueChange={(v) => update({ prazoSemanas: v[0] })} />
+                      </div>
+                      {diff > 0 && perdaSemanal > 0 && (
+                        <div className="space-y-2">
+                          <p className="text-sm">
+                            <span className="font-medium">Meta:</span> perder {diff.toFixed(1)}kg — aprox. {perdaSemanal.toFixed(2)}kg por semana e {perdaMensal.toFixed(2)}kg por mês.
+                          </p>
+                          {agressiva && (
+                            <p className="text-sm text-destructive font-medium">
+                              ⚠️ Meta muito agressiva — recomendamos no máximo 1kg por semana para preservar a saúde.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
               </>
             )}
 
