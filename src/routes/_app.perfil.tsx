@@ -92,6 +92,9 @@ function Perfil() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <Button variant="outline" onClick={sair}>
+            <LogOut className="w-4 h-4 mr-2" /> Sair da conta
+          </Button>
         </div>
       </Card>
     </div>
