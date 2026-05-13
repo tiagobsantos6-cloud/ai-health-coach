@@ -235,6 +235,21 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       throw new Error(SERVICE_UNAVAILABLE);
     }
 
+    const dd = data.dados;
+    const wantsLoss = dd.objetivo === "Emagrecimento" || dd.objetivo === "Definição";
+    const pesoAlvo = dd.pesoDesejado ?? 0;
+    const prazo = dd.prazoSemanas ?? 0;
+    const diff = dd.peso - pesoAlvo;
+    const metas: Plano["metas"] | undefined =
+      wantsLoss && pesoAlvo > 0 && prazo > 0 && diff > 0
+        ? {
+            peso_desejado: pesoAlvo,
+            prazo_semanas: prazo,
+            perda_semanal_kg: Number((diff / prazo).toFixed(2)),
+            perda_mensal_kg: Number(((diff / prazo) * 4).toFixed(2)),
+          }
+        : undefined;
+
     const response = await fetch(GATEWAY_URL, {
       method: "POST",
       headers: {
