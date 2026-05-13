@@ -89,6 +89,93 @@ function Evolucao() {
         <Button onClick={salvar}>Salvar registro</Button>
       </Card>
 
+      {plano.metas && plano.metas.peso_desejado > 0 && (() => {
+        const meta = plano.metas;
+        const pesoInicial = dados.peso;
+        const pesoAtual = evolucao.length > 0 ? evolucao[evolucao.length - 1].peso : pesoInicial;
+        const totalAPerder = pesoInicial - meta.peso_desejado;
+        const jaPerdeu = pesoInicial - pesoAtual;
+        const pct = totalAPerder > 0 ? Math.max(0, Math.min(100, (jaPerdeu / totalAPerder) * 100)) : 0;
+        const restante = Math.max(0, pesoAtual - meta.peso_desejado);
+        const ritmoSemanalEsperado = meta.perda_semanal_kg;
+
+        let semanasRestantes = 0;
+        let mensagem = "";
+        let tom: "ok" | "alerta" | "parabens" = "ok";
+
+        if (evolucao.length >= 2) {
+          const primeiro = evolucao[0];
+          const ultimo = evolucao[evolucao.length - 1];
+          const dias = Math.max(
+            1,
+            (new Date(ultimo.data).getTime() - new Date(primeiro.data).getTime()) / (1000 * 60 * 60 * 24),
+          );
+          const semanas = dias / 7;
+          const ritmoReal = (primeiro.peso - ultimo.peso) / Math.max(0.5, semanas);
+          if (ritmoReal > 0) {
+            semanasRestantes = Math.ceil(restante / ritmoReal);
+          }
+          if (ritmoReal < ritmoSemanalEsperado * 0.7) {
+            tom = "alerta";
+            mensagem = `Você está abaixo do ritmo previsto (${ritmoReal.toFixed(2)}kg/sem vs meta de ${ritmoSemanalEsperado.toFixed(2)}kg/sem). Considere ajustar a dieta ou aumentar a intensidade do treino.`;
+          } else if (ritmoReal > ritmoSemanalEsperado * 1.1) {
+            tom = "parabens";
+            mensagem = `Parabéns! Você está acima do ritmo previsto (${ritmoReal.toFixed(2)}kg/sem). Mantenha o foco e cuide da recuperação.`;
+          } else {
+            mensagem = `Você está no ritmo (${ritmoReal.toFixed(2)}kg/sem). Continue assim!`;
+          }
+        } else {
+          semanasRestantes = ritmoSemanalEsperado > 0 ? Math.ceil(restante / ritmoSemanalEsperado) : meta.prazo_semanas;
+          mensagem = "Registre mais semanas para uma análise de ritmo personalizada.";
+        }
+
+        const previsao = new Date();
+        previsao.setDate(previsao.getDate() + semanasRestantes * 7);
+        const previsaoStr = previsao.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+
+        return (
+          <Card className="p-5 space-y-4">
+            <div className="flex items-baseline justify-between flex-wrap gap-2">
+              <h3 className="font-semibold">Progresso da meta</h3>
+              <span className="text-sm text-muted-foreground">
+                {pesoAtual.toFixed(1)}kg → {meta.peso_desejado}kg
+              </span>
+            </div>
+            <div className="space-y-1">
+              <div className="h-3 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full bg-primary transition-all"
+                  style={{ width: `${pct}%` }}
+                />
+              </div>
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Já perdeu: {jaPerdeu.toFixed(1)}kg</span>
+                <span>Faltam: {restante.toFixed(1)}kg</span>
+                <span>{pct.toFixed(0)}%</span>
+              </div>
+            </div>
+            {restante > 0 && (
+              <p className="text-sm">
+                <span className="font-medium">Previsão:</span> atingir a meta em{" "}
+                <span className="text-primary font-medium">{previsaoStr}</span>
+                {" "}({semanasRestantes} {semanasRestantes === 1 ? "semana" : "semanas"}).
+              </p>
+            )}
+            <p
+              className={`text-sm ${
+                tom === "alerta"
+                  ? "text-destructive"
+                  : tom === "parabens"
+                    ? "text-primary font-medium"
+                    : "text-muted-foreground"
+              }`}
+            >
+              {mensagem}
+            </p>
+          </Card>
+        );
+      })()}
+
       {evolucao.length > 0 && (
         <Card className="p-5">
           <h3 className="font-semibold mb-3">Evolução do peso</h3>
