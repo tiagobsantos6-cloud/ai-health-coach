@@ -117,6 +117,9 @@ type State = {
   checklistData: string;
   tema: "dark" | "light";
   planoAssinatura: PlanoAssinatura;
+  hidratado: boolean;
+  setHidratado: (h: boolean) => void;
+  hydrateFromServer: (payload: { dados: DadosUsuario | null; plano: Plano | null }) => void;
   setPlanoAssinatura: (p: PlanoAssinatura) => void;
   setDados: (d: DadosUsuario) => void;
   setPlano: (p: Plano) => void;
