@@ -10,6 +10,8 @@ export type DadosUsuario = {
   gordura?: number;
   biotipo: string;
   objetivo: string;
+  pesoDesejado?: number;
+  prazoSemanas?: number;
   diasTreino: number;
   tempoTreino: number;
   local: string;
@@ -85,6 +87,12 @@ export type Plano = {
     estrategias: string[];
   };
   acompanhamento: { frequencia: string; metricas: string[]; ajustes_automaticos: string };
+  metas?: {
+    peso_desejado: number;
+    prazo_semanas: number;
+    perda_semanal_kg: number;
+    perda_mensal_kg: number;
+  };
 };
 
 export type PlanoAssinatura = "gratuito" | "basico" | "intermediario" | "completo";

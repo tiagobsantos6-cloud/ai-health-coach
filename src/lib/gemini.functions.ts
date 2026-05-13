@@ -22,8 +22,11 @@ O JSON deve ter exatamente esta estrutura:
   "treino": { "divisao": "", "dias": [ { "dia": "", "foco": "", "exercicios": [ { "nome": "", "musculo": "", "series": 0, "repeticoes": "", "descanso_s": 0 } ], "cardio": { "tipo": "", "duracao_min": 0, "intensidade": "" } } ] },
   "rotina_semanal": [ { "dia_semana": "", "treino": "", "refeicoes_resumo": "", "meta_agua": "", "meta_sono": "" } ],
   "disciplina": { "metas_diarias": [], "checklist": [], "habitos": [], "estrategias": [] },
-  "acompanhamento": { "frequencia": "", "metricas": [], "ajustes_automaticos": "" }
-}`;
+  "acompanhamento": { "frequencia": "", "metricas": [], "ajustes_automaticos": "" },
+  "metas": { "peso_desejado": 0, "prazo_semanas": 0, "perda_semanal_kg": 0, "perda_mensal_kg": 0 }
+}
+
+IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado (perda_semanal_kg ≈ déficit calórico necessário). Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.`;
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
@@ -50,6 +53,8 @@ const dadosSchema = z.object({
   gordura: z.number().min(0).max(100).optional(),
   biotipo: z.string().max(50).transform(sanitizeText),
   objetivo: z.string().max(100).transform(sanitizeText),
+  pesoDesejado: z.number().min(0).max(500).optional(),
+  prazoSemanas: z.number().min(1).max(52).optional(),
   diasTreino: z.number().min(0).max(7),
   tempoTreino: z.number().min(0).max(600),
   local: z.string().max(50).transform(sanitizeText),
@@ -230,6 +235,21 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       throw new Error(SERVICE_UNAVAILABLE);
     }
 
+    const dd = data.dados;
+    const wantsLoss = dd.objetivo === "Emagrecimento" || dd.objetivo === "Definição";
+    const pesoAlvo = dd.pesoDesejado ?? 0;
+    const prazo = dd.prazoSemanas ?? 0;
+    const diff = dd.peso - pesoAlvo;
+    const metas: Plano["metas"] | undefined =
+      wantsLoss && pesoAlvo > 0 && prazo > 0 && diff > 0
+        ? {
+            peso_desejado: pesoAlvo,
+            prazo_semanas: prazo,
+            perda_semanal_kg: Number((diff / prazo).toFixed(2)),
+            perda_mensal_kg: Number(((diff / prazo) * 4).toFixed(2)),
+          }
+        : undefined;
+
     const response = await fetch(GATEWAY_URL, {
       method: "POST",
       headers: {
@@ -240,7 +260,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
         model: MODEL,
         messages: [
           { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: JSON.stringify(data.dados) },
+          { role: "user", content: JSON.stringify({ ...data.dados, metas_calculadas: metas }) },
         ],
         response_format: { type: "json_object" },
         max_tokens: 24000,
@@ -264,6 +284,7 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       throw new Error(GENERIC_AI_ERROR);
     }
     const plano = completarPlano(parseJson(text));
+    if (metas) plano.metas = metas;
     return { json: JSON.stringify(plano) };
   });
 
