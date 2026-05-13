@@ -33,6 +33,12 @@ function Perfil() {
     location.href = "/onboarding";
   };
 
+  const sair = async () => {
+    await supabase.auth.signOut();
+    localStorage.clear();
+    location.href = "/login";
+  };
+
   return (
     <div className="space-y-6">
       <div>
