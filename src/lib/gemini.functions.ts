@@ -50,6 +50,8 @@ const dadosSchema = z.object({
   gordura: z.number().min(0).max(100).optional(),
   biotipo: z.string().max(50).transform(sanitizeText),
   objetivo: z.string().max(100).transform(sanitizeText),
+  pesoDesejado: z.number().min(0).max(500).optional(),
+  prazoSemanas: z.number().min(1).max(52).optional(),
   diasTreino: z.number().min(0).max(7),
   tempoTreino: z.number().min(0).max(600),
   local: z.string().max(50).transform(sanitizeText),
