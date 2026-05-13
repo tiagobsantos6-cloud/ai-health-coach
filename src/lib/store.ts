@@ -198,15 +198,13 @@ export const useStore = create<State>()(
     {
       name: "vita-store",
       partialize: (s) => ({
-        dados: s.dados,
-        plano: s.plano,
         agua: s.agua,
         aguaData: s.aguaData,
         evolucao: s.evolucao,
         checklist: s.checklist,
         checklistData: s.checklistData,
         tema: s.tema,
-        // planoAssinatura intentionally NOT persisted — server is source of truth.
+        // dados, plano, planoAssinatura intentionally NOT persisted — server is source of truth.
       }),
     },
   ),
