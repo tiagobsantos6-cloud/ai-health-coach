@@ -10,6 +10,13 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+const biotipoDesc: Record<string, string> = {
+  Ectomorfo: "Corpo naturalmente magro, metabolismo acelerado, dificuldade em ganhar peso e massa muscular. Ombros e quadris estreitos, pouca gordura corporal.",
+  Mesomorfo: "Corpo atlético e musculoso naturalmente, responde bem ao treino, ganha músculo e perde gordura com facilidade. Ombros largos e cintura definida.",
+  Endomorfo: "Tendência a acumular gordura facilmente, metabolismo mais lento, dificuldade em emagrecer. Corpo mais arredondado, ganha peso com facilidade.",
+};
 
 export const Route = createFileRoute("/onboarding")({
   beforeLoad: async ({ location }) => {
