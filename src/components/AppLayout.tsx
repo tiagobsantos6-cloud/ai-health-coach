@@ -50,15 +50,20 @@ export function AppLayout() {
     if (tierQuery.data?.tier) setPlanoAssinatura(tierQuery.data.tier);
   }, [tierQuery.data, setPlanoAssinatura]);
 
-  // Hydrate dados/plano from server once
+  // Hydrate dados/plano from server once. If the local store already has data
+  // (e.g. user just finished onboarding), keep local and let auto-save push it up.
   useEffect(() => {
-    if (!hidratado && dataQuery.data) {
-      hydrateFromServer({
-        dados: (dataQuery.data.dados as ReturnType<typeof useStore.getState>["dados"]) ?? null,
-        plano: (dataQuery.data.plano as ReturnType<typeof useStore.getState>["plano"]) ?? null,
-      });
+    if (hidratado || !dataQuery.data) return;
+    const localHasData = dados !== null || plano !== null;
+    if (localHasData) {
+      useStore.setState({ hidratado: true });
+      return;
     }
-  }, [dataQuery.data, hidratado, hydrateFromServer]);
+    hydrateFromServer({
+      dados: (dataQuery.data.dados as ReturnType<typeof useStore.getState>["dados"]) ?? null,
+      plano: (dataQuery.data.plano as ReturnType<typeof useStore.getState>["plano"]) ?? null,
+    });
+  }, [dataQuery.data, hidratado, hydrateFromServer, dados, plano]);
 
   // Auto-save dados/plano whenever they change after hydration
   useEffect(() => {
