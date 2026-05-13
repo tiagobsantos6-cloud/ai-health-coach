@@ -38,7 +38,7 @@ function Onboarding() {
   const [d, setD] = useState<DadosUsuario>({
     nome: "", sexo: "masculino", idade: 0,
     peso: 0, altura: 0, gordura: undefined, biotipo: "Mesomorfo",
-    objetivo: "", diasTreino: 4, tempoTreino: 60, local: "Academia", horario: "Manhã",
+    objetivo: "", pesoDesejado: undefined, prazoSemanas: 12, diasTreino: 4, tempoTreino: 60, local: "Academia", horario: "Manhã",
     restricoes: [], restricaoOutro: "", favoritos: "", naoGosta: "", refeicoes: 4, orcamento: 800, suplementos: false, suplementosQuais: "",
     saude: "", sono: 7, estresse: 5,
   });
