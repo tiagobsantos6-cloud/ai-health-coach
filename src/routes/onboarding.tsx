@@ -10,6 +10,13 @@ import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, ArrowRight, ArrowLeft, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+
+const biotipoDesc: Record<string, string> = {
+  Ectomorfo: "Corpo naturalmente magro, metabolismo acelerado, dificuldade em ganhar peso e massa muscular. Ombros e quadris estreitos, pouca gordura corporal.",
+  Mesomorfo: "Corpo atlético e musculoso naturalmente, responde bem ao treino, ganha músculo e perde gordura com facilidade. Ombros largos e cintura definida.",
+  Endomorfo: "Tendência a acumular gordura facilmente, metabolismo mais lento, dificuldade em emagrecer. Corpo mais arredondado, ganha peso com facilidade.",
+};
 
 export const Route = createFileRoute("/onboarding")({
   beforeLoad: async ({ location }) => {
@@ -143,19 +150,27 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label>Biotipo</Label>
-                  <div className="grid grid-cols-3 gap-2">
-                    {["Ectomorfo", "Mesomorfo", "Endomorfo"].map((b) => (
-                      <button
-                        key={b}
-                        onClick={() => update({ biotipo: b })}
-                        className={`px-3 py-3 rounded-lg border text-sm transition-colors ${
-                          d.biotipo === b ? "border-primary bg-primary/10 text-primary" : "border-border"
-                        }`}
-                      >
-                        {b}
-                      </button>
-                    ))}
-                  </div>
+                  <TooltipProvider delayDuration={150}>
+                    <div className="grid grid-cols-3 gap-2">
+                      {["Ectomorfo", "Mesomorfo", "Endomorfo"].map((b) => (
+                        <Tooltip key={b}>
+                          <TooltipTrigger asChild>
+                            <button
+                              onClick={() => update({ biotipo: b })}
+                              className={`px-3 py-3 rounded-lg border text-sm transition-colors ${
+                                d.biotipo === b ? "border-primary bg-primary/10 text-primary" : "border-border"
+                              }`}
+                            >
+                              {b}
+                            </button>
+                          </TooltipTrigger>
+                          <TooltipContent side="bottom" className="max-w-xs text-center">
+                            {biotipoDesc[b]}
+                          </TooltipContent>
+                        </Tooltip>
+                      ))}
+                    </div>
+                  </TooltipProvider>
                 </div>
               </>
             )}
