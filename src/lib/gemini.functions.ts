@@ -22,8 +22,11 @@ O JSON deve ter exatamente esta estrutura:
   "treino": { "divisao": "", "dias": [ { "dia": "", "foco": "", "exercicios": [ { "nome": "", "musculo": "", "series": 0, "repeticoes": "", "descanso_s": 0 } ], "cardio": { "tipo": "", "duracao_min": 0, "intensidade": "" } } ] },
   "rotina_semanal": [ { "dia_semana": "", "treino": "", "refeicoes_resumo": "", "meta_agua": "", "meta_sono": "" } ],
   "disciplina": { "metas_diarias": [], "checklist": [], "habitos": [], "estrategias": [] },
-  "acompanhamento": { "frequencia": "", "metricas": [], "ajustes_automaticos": "" }
-}`;
+  "acompanhamento": { "frequencia": "", "metricas": [], "ajustes_automaticos": "" },
+  "metas": { "peso_desejado": 0, "prazo_semanas": 0, "perda_semanal_kg": 0, "perda_mensal_kg": 0 }
+}
+
+IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado (perda_semanal_kg ≈ déficit calórico necessário). Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.`;
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
