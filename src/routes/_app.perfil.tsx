@@ -6,9 +6,10 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Lock } from "lucide-react";
+import { Lock, LogOut } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/_app/perfil")({
   component: Perfil,
@@ -30,6 +31,12 @@ function Perfil() {
   const limparTudo = () => {
     localStorage.clear();
     location.href = "/onboarding";
+  };
+
+  const sair = async () => {
+    await supabase.auth.signOut();
+    localStorage.clear();
+    location.href = "/login";
   };
 
   return (
@@ -85,6 +92,9 @@ function Perfil() {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <Button variant="outline" onClick={sair}>
+            <LogOut className="w-4 h-4 mr-2" /> Sair da conta
+          </Button>
         </div>
       </Card>
     </div>

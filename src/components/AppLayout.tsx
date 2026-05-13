@@ -1,11 +1,12 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Moon, Sun, Sparkles, Crown, LogOut } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getMyTierFn } from "@/lib/subscription.functions";
+import { getMyDataFn, saveMyDataFn } from "@/lib/userdata.functions";
 
 const items = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -21,6 +22,8 @@ export function AppLayout() {
   const tema = useStore((s) => s.tema);
   const setTema = useStore((s) => s.setTema);
   const setPlanoAssinatura = useStore((s) => s.setPlanoAssinatura);
+  const hidratado = useStore((s) => s.hidratado);
+  const hydrateFromServer = useStore((s) => s.hydrateFromServer);
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const navigate = useNavigate();
@@ -33,17 +36,53 @@ export function AppLayout() {
     staleTime: 60_000,
   });
 
+  const fetchData = useServerFn(getMyDataFn);
+  const dataQuery = useQuery({
+    queryKey: ["my-data"],
+    queryFn: () => fetchData(),
+    staleTime: 30_000,
+  });
+
+  const saveData = useServerFn(saveMyDataFn);
+  const lastSavedRef = useRef<string>("");
+
   useEffect(() => {
     if (tierQuery.data?.tier) setPlanoAssinatura(tierQuery.data.tier);
   }, [tierQuery.data, setPlanoAssinatura]);
+
+  // Hydrate dados/plano from server once. If the local store already has data
+  // (e.g. user just finished onboarding), keep local and let auto-save push it up.
+  useEffect(() => {
+    if (hidratado || !dataQuery.data) return;
+    const localHasData = dados !== null || plano !== null;
+    if (localHasData) {
+      useStore.setState({ hidratado: true });
+      return;
+    }
+    hydrateFromServer({
+      dados: (dataQuery.data.dados as ReturnType<typeof useStore.getState>["dados"]) ?? null,
+      plano: (dataQuery.data.plano as ReturnType<typeof useStore.getState>["plano"]) ?? null,
+    });
+  }, [dataQuery.data, hidratado, hydrateFromServer, dados, plano]);
+
+  // Auto-save dados/plano whenever they change after hydration
+  useEffect(() => {
+    if (!hidratado) return;
+    const payload = JSON.stringify({ dados, plano });
+    if (payload === lastSavedRef.current) return;
+    lastSavedRef.current = payload;
+    saveData({ data: { dados, plano } }).catch((e) => console.error("save user data", e));
+  }, [dados, plano, hidratado, saveData]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", tema === "dark");
   }, [tema]);
 
+  // Routing: hydrated user with no plan → onboarding
   useEffect(() => {
-    if (!dados && !plano) navigate({ to: "/onboarding" });
-  }, [dados, plano, navigate]);
+    if (!hidratado) return;
+    if (!dados && !plano && path !== "/onboarding") navigate({ to: "/onboarding" });
+  }, [hidratado, dados, plano, path, navigate]);
 
   const logout = async () => {
     await supabase.auth.signOut();
