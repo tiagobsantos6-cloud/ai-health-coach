@@ -149,6 +149,8 @@ export const useStore = create<State>()(
       evolucao: [],
       checklist: {},
       checklistData: today(),
+      refeicoesFeitas: {},
+      refeicoesData: today(),
       tema: "dark",
       planoAssinatura: "gratuito",
       hidratado: false,
