@@ -131,6 +131,8 @@ type State = {
   addEvolucao: (r: RegistroEvolucao) => void;
   toggleChecklist: (k: string) => void;
   resetChecklistIfNewDay: () => void;
+  toggleRefeicaoFeita: (idx: number) => void;
+  resetRefeicoesIfNewDay: () => void;
   setTema: (t: "dark" | "light") => void;
   reset: () => void;
 };
