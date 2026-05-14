@@ -1,6 +1,6 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -35,11 +35,35 @@ export function AppLayout() {
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
 
+  // Track auth session — gate all server fns on this
+  const [userId, setUserId] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      setUserId(data.session?.user?.id ?? null);
+      setAuthReady(true);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserId(session?.user?.id ?? null);
+    });
+    return () => sub.subscription.unsubscribe();
+  }, []);
+
   const fetchTier = useServerFn(getMyTierFn);
-  const tierQuery = useQuery({ queryKey: ["my-tier"], queryFn: () => fetchTier(), staleTime: 60_000 });
+  const tierQuery = useQuery({
+    queryKey: ["my-tier", userId],
+    queryFn: () => fetchTier(),
+    staleTime: 60_000,
+    enabled: !!userId,
+  });
 
   const fetchData = useServerFn(getMyDataFn);
-  const dataQuery = useQuery({ queryKey: ["my-data"], queryFn: () => fetchData(), staleTime: 30_000 });
+  const dataQuery = useQuery({
+    queryKey: ["my-data", userId],
+    queryFn: () => fetchData(),
+    staleTime: 30_000,
+    enabled: !!userId,
+  });
 
   const saveData = useServerFn(saveMyDataFn);
   const lastSavedRef = useRef<string>("");
@@ -59,12 +83,13 @@ export function AppLayout() {
   }, [dataQuery.data, hidratado, hydrateFromServer, dados, plano]);
 
   useEffect(() => {
-    if (!hidratado) return;
+    if (!hidratado || !userId) return;
+    if (dados === null && plano === null) return;
     const payload = JSON.stringify({ dados, plano });
     if (payload === lastSavedRef.current) return;
     lastSavedRef.current = payload;
     saveData({ data: { dados, plano } }).catch((e) => console.error("save user data", e));
-  }, [dados, plano, hidratado, saveData]);
+  }, [dados, plano, hidratado, userId, saveData]);
 
   // Force dark theme — MyFitnessPal-inspired design
   useEffect(() => { document.documentElement.classList.add("dark"); }, []);
