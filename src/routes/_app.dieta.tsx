@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore, type Alimento } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Clock, Replace, Lock, ArrowLeftRight } from "lucide-react";
+import { Clock, Replace, Lock, ArrowLeftRight, Check, RotateCcw } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 import { medidaCaseira } from "@/lib/medidaCaseira";
@@ -15,33 +15,110 @@ export const Route = createFileRoute("/_app/dieta")({
   component: Dieta,
 });
 
+const cleanNum = (val: string | number) => {
+  if (typeof val === "number") return val;
+  return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
+};
+
+const STORAGE_KEY = "refeicoes_hoje";
+const today = () => new Date().toISOString().slice(0, 10);
+
 function Dieta() {
   const plano = useStore((s) => s.plano);
   const planoAss = useStore((s) => s.planoAssinatura);
   const trocarAlimento = useStore((s) => s.trocarAlimento);
+  const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
+  const toggleRefeicao = useStore((s) => s.toggleRefeicaoFeita);
+  const resetRefeicoes = useStore((s) => s.resetRefeicoesIfNewDay);
   const [openSub, setOpenSub] = useState(false);
+  const [openItems, setOpenItems] = useState<string[]>(["item-0"]);
+
+  // Reset at new day + hydrate from 'refeicoes_hoje'
+  useEffect(() => {
+    resetRefeicoes();
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw) as { data: string; feitas: Record<number, boolean> };
+        if (parsed?.data === today() && parsed.feitas) {
+          // Sync to store if differs
+          Object.keys(parsed.feitas).forEach((k) => {
+            const idx = Number(k);
+            if (!!refeicoesFeitas[idx] !== !!parsed.feitas[idx]) toggleRefeicao(idx);
+          });
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Mirror to localStorage with required key
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: today(), feitas: refeicoesFeitas }));
+    } catch {}
+  }, [refeicoesFeitas]);
+
   if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
 
-  const totals = plano.plano_alimentar.reduce(
-    (acc, r) => {
-      const macros = r.alimentos.reduce(
-        (a, al) => ({
-          p: a.p + (al.proteinas_g || 0),
-          c: a.c + (al.carboidratos_g || 0),
-          g: a.g + (al.gorduras_g || 0),
-        }),
-        { p: 0, c: 0, g: 0 },
-      );
-      return {
-        kcal: acc.kcal + (r.total_calorias || 0),
-        p: acc.p + macros.p,
-        c: acc.c + macros.c,
-        g: acc.g + macros.g,
-      };
-    },
-    { kcal: 0, p: 0, c: 0, g: 0 },
+  const totals = useMemo(
+    () =>
+      plano.plano_alimentar.reduce(
+        (acc, r) => {
+          const macros = r.alimentos.reduce(
+            (a, al) => ({
+              p: a.p + (al.proteinas_g || 0),
+              c: a.c + (al.carboidratos_g || 0),
+              g: a.g + (al.gorduras_g || 0),
+            }),
+            { p: 0, c: 0, g: 0 },
+          );
+          return {
+            kcal: acc.kcal + (r.total_calorias || 0),
+            p: acc.p + macros.p,
+            c: acc.c + macros.c,
+            g: acc.g + macros.g,
+          };
+        },
+        { kcal: 0, p: 0, c: 0, g: 0 },
+      ),
+    [plano],
   );
+
+  const consumido = useMemo(
+    () =>
+      plano.plano_alimentar.reduce(
+        (acc, r, i) => {
+          if (!refeicoesFeitas[i]) return acc;
+          const macros = r.alimentos.reduce(
+            (a, al) => ({
+              p: a.p + (al.proteinas_g || 0),
+              c: a.c + (al.carboidratos_g || 0),
+              g: a.g + (al.gorduras_g || 0),
+            }),
+            { p: 0, c: 0, g: 0 },
+          );
+          return {
+            kcal: acc.kcal + (r.total_calorias || 0),
+            p: acc.p + macros.p,
+            c: acc.c + macros.c,
+            g: acc.g + macros.g,
+          };
+        },
+        { kcal: 0, p: 0, c: 0, g: 0 },
+      ),
+    [plano, refeicoesFeitas],
+  );
+
+  const meta = {
+    kcal: cleanNum(plano.resumo.meta_calorica),
+    p: cleanNum(plano.resumo.proteinas_g),
+    c: cleanNum(plano.resumo.carboidratos_g),
+    g: cleanNum(plano.resumo.gorduras_g),
+  };
+
+  
 
   return (
     <div className="space-y-6 pb-24">
@@ -79,7 +156,25 @@ function Dieta() {
         )}
       </div>
 
-      <Accordion type="multiple" className="space-y-3">
+      {/* Resumo diário */}
+      <Card className="p-5 bg-card border-border rounded-2xl">
+        <div className="flex items-end justify-between mb-4">
+          <p className="card-title">Resumo do dia</p>
+          <div className="text-right">
+            <div className="text-2xl font-bold text-primary leading-none">
+              {Math.round(consumido.kcal)}
+              <span className="text-sm text-muted-foreground font-medium"> / {meta.kcal} kcal</span>
+            </div>
+          </div>
+        </div>
+        <div className="space-y-3">
+          <MacroBar label="Proteínas" value={consumido.p} goal={meta.p} color="var(--success)" />
+          <MacroBar label="Carboidratos" value={consumido.c} goal={meta.c} color="var(--chart-3)" />
+          <MacroBar label="Gorduras" value={consumido.g} goal={meta.g} color="var(--destructive)" />
+        </div>
+      </Card>
+
+      <Accordion type="multiple" className="space-y-3" value={openItems} onValueChange={setOpenItems}>
         {plano.plano_alimentar.map((r, i) => {
           const macros = r.alimentos.reduce(
             (a, al) => ({
@@ -89,18 +184,33 @@ function Dieta() {
             }),
             { p: 0, c: 0, g: 0 },
           );
+          const feita = !!refeicoesFeitas[i];
           return (
-            <Card key={i} className="overflow-hidden">
+            <Card
+              key={i}
+              className={`overflow-hidden transition-all ${feita ? "border-success/60 bg-success/5" : ""}`}
+              style={feita ? { borderColor: "color-mix(in oklab, var(--success) 60%, transparent)" } : undefined}
+            >
               <AccordionItem value={`item-${i}`} className="border-0">
                 <AccordionTrigger className="px-4 hover:no-underline">
-                  <div className="flex items-center justify-between w-full pr-3">
-                    <div className="text-left">
-                      <div className="font-semibold">{r.refeicao}</div>
-                      <div className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> {r.horario}
+                  <div className="flex items-center justify-between w-full pr-3 gap-2">
+                    <div className="text-left flex items-center gap-2 min-w-0">
+                      {feita && (
+                        <span
+                          className="w-5 h-5 rounded-full flex items-center justify-center shrink-0"
+                          style={{ background: "var(--success)" }}
+                        >
+                          <Check className="w-3 h-3 text-white" />
+                        </span>
+                      )}
+                      <div className="min-w-0">
+                        <div className="font-semibold truncate">{r.refeicao}</div>
+                        <div className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> {r.horario}
+                        </div>
                       </div>
                     </div>
-                    <div className="text-sm font-bold text-primary">{r.total_calorias} kcal</div>
+                    <div className="text-sm font-bold text-primary shrink-0">{r.total_calorias} kcal</div>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
@@ -165,6 +275,35 @@ function Dieta() {
                     <span>C: {Math.round(macros.c)}g</span>
                     <span>G: {Math.round(macros.g)}g</span>
                   </div>
+
+                  <div className="mt-4 pt-3 border-t border-border">
+                    {feita ? (
+                      <div className="flex items-center justify-between gap-2">
+                        <div
+                          className="flex items-center gap-2 text-sm font-medium"
+                          style={{ color: "var(--success)" }}
+                        >
+                          <Check className="w-4 h-4" /> Feita
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => toggleRefeicao(i)}
+                          className="text-muted-foreground"
+                        >
+                          <RotateCcw className="w-3.5 h-3.5 mr-1" /> Desfazer
+                        </Button>
+                      </div>
+                    ) : (
+                      <Button
+                        onClick={() => toggleRefeicao(i)}
+                        className="w-full pulse-success"
+                        style={{ background: "var(--success)", color: "white" }}
+                      >
+                        <Check className="w-4 h-4 mr-1" /> Marcar como feita
+                      </Button>
+                    )}
+                  </div>
                 </AccordionContent>
               </AccordionItem>
             </Card>
@@ -179,6 +318,26 @@ function Dieta() {
           <div className="text-center"><div className="text-muted-foreground">C</div><div className="font-bold">{Math.round(totals.c)}g</div></div>
           <div className="text-center"><div className="text-muted-foreground">G</div><div className="font-bold">{Math.round(totals.g)}g</div></div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+function MacroBar({ label, value, goal, color }: { label: string; value: number; goal: number; color: string }) {
+  const pct = Math.min(100, goal ? Math.round((value / goal) * 100) : 0);
+  return (
+    <div>
+      <div className="flex justify-between items-baseline text-xs mb-1.5">
+        <span className="font-semibold text-foreground">{label}</span>
+        <span className="text-muted-foreground">
+          <span className="font-bold text-foreground">{Math.round(value)}g</span> / {Math.round(goal)}g
+        </span>
+      </div>
+      <div className="h-2 bg-secondary rounded-full overflow-hidden">
+        <div
+          className="h-full rounded-full transition-all duration-500"
+          style={{ width: `${pct}%`, background: color }}
+        />
       </div>
     </div>
   );
