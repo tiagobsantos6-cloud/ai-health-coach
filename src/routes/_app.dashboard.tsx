@@ -109,7 +109,7 @@ function Dashboard() {
       <div className="grid grid-cols-2 gap-3">
         <QuickCard icon={<Droplet className="w-4 h-4" />} title="Água" value={`${aguaTotal}ml`} sub={`${aguaPct}% da meta`} />
         <QuickCard icon={<Dumbbell className="w-4 h-4" />} title="Treino do dia" value={treinoHoje} />
-        <QuickCard icon={<Moon className="w-4 h-4" />} title="Sono" value={`${dados?.sono_horas || 8}h`} sub="meta diária" />
+        <QuickCard icon={<Moon className="w-4 h-4" />} title="Sono" value={`${dados?.sono ?? 8}h`} sub="meta diária" />
         <QuickCard icon={<Scale className="w-4 h-4" />} title="Peso atual" value={`${dados?.peso || "—"}kg`} />
       </div>
 
