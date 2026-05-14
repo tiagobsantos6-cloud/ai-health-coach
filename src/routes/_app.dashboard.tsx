@@ -2,12 +2,16 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo } from "react";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
-import { Flame, Beef, Wheat, Droplet, Moon } from "lucide-react";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip } from "recharts";
+import { Droplet, Dumbbell, Moon, Scale } from "lucide-react";
 
 export const Route = createFileRoute("/_app/dashboard")({
   component: Dashboard,
 });
+
+const cleanNum = (val: string | number) => {
+  if (typeof val === "number") return val;
+  return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
+};
 
 function Dashboard() {
   const plano = useStore((s) => s.plano);
@@ -15,125 +19,147 @@ function Dashboard() {
   const checklist = useStore((s) => s.checklist);
   const toggle = useStore((s) => s.toggleChecklist);
   const resetCheck = useStore((s) => s.resetChecklistIfNewDay);
+  const agua = useStore((s) => s.agua);
+  const resetAgua = useStore((s) => s.resetAguaIfNewDay);
 
-  useEffect(() => {
-    resetCheck();
-  }, [resetCheck]);
+  useEffect(() => { resetCheck(); resetAgua(); }, [resetCheck, resetAgua]);
 
   const macros = useMemo(() => {
-    if (!plano) return [];
-    const cleanValue = (val: string | number) => {
-      if (typeof val === "number") return val;
-      return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
+    if (!plano) return null;
+    return {
+      kcal: cleanNum(plano.resumo.meta_calorica),
+      p: cleanNum(plano.resumo.proteinas_g),
+      c: cleanNum(plano.resumo.carboidratos_g),
+      g: cleanNum(plano.resumo.gorduras_g),
+      agua: cleanNum(plano.resumo.agua_diaria_ml),
     };
-    const p = cleanValue(plano.resumo.proteinas_g);
-    const c = cleanValue(plano.resumo.carboidratos_g);
-    const g = cleanValue(plano.resumo.gorduras_g);
-    return [
-      { name: "Proteínas", value: p, color: "var(--chart-1)" },
-      { name: "Carboidratos", value: c, color: "var(--chart-3)" },
-      { name: "Gorduras", value: g, color: "var(--chart-5)" },
-    ];
   }, [plano]);
 
-  if (!plano) return null;
-  const total = macros.reduce((a, b) => a + b.value, 0);
+  if (!plano || !macros) return null;
+
+  // For demo we don't track consumed calories yet; show meta as both consumed/goal placeholder
+  const consumed = 0;
+  const kcalPct = Math.min(100, Math.round((consumed / macros.kcal) * 100));
+
   const items = plano.disciplina.checklist || [];
   const done = items.filter((i) => checklist[i]).length;
-  const pct = items.length ? Math.round((done / items.length) * 100) : 0;
+  const checkPct = items.length ? Math.round((done / items.length) * 100) : 0;
+
+  const aguaTotal = agua.reduce((a, r) => a + r.ml, 0);
+  const aguaPct = Math.min(100, Math.round((aguaTotal / macros.agua) * 100));
+
+  const hora = new Date().getHours();
+  const saudacao = hora < 12 ? "Bom dia" : hora < 18 ? "Boa tarde" : "Boa noite";
+  const nome = dados?.nome?.split(" ")[0] || "";
+  const iniciais = (dados?.nome || "U")
+    .split(" ").filter(Boolean).slice(0, 2).map((s) => s[0]?.toUpperCase()).join("");
+
+  const treinoHoje = (() => {
+    const dia = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][new Date().getDay()];
+    return plano.rotina_semanal.find((d) => d.dia_semana?.toLowerCase().startsWith(dia.toLowerCase().slice(0,3)))?.treino || "Descanso";
+  })();
+
+  // SVG ring
+  const r = 90;
+  const c = 2 * Math.PI * r;
+  const offset = c - (Math.max(kcalPct, 1) / 100) * c;
+  const restante = Math.max(0, macros.kcal - consumed);
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Olá, {dados?.nome?.split(" ")[0]} 👋</h1>
-        <p className="text-muted-foreground">Aqui está o seu plano de hoje</p>
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-sm text-muted-foreground">{saudacao},</p>
+          <h1 className="text-2xl font-bold">{nome} 👋</h1>
+        </div>
+        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
+          {iniciais}
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard 
-          icon={<Flame className="w-4 h-4" />} 
-          label="Meta calórica" 
-          value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} 
-        />
-        <StatCard 
-          icon={<Beef className="w-4 h-4" />} 
-          label="Proteínas" 
-          value={`${plano.resumo.proteinas_g.toString().replace(/ g/gi, "")} g`} 
-        />
-        <StatCard 
-          icon={<Wheat className="w-4 h-4" />} 
-          label="Carboidratos" 
-          value={`${plano.resumo.carboidratos_g.toString().replace(/ g/gi, "")} g`} 
-        />
-        <StatCard 
-          icon={<Droplet className="w-4 h-4" />} 
-          label="Água" 
-          value={`${plano.resumo.agua_diaria_ml.toString().replace(/ ml/gi, "")} ml`} 
-        />
+      {/* Calories ring */}
+      <Card className="p-6 flex flex-col items-center bg-card border-border rounded-2xl">
+        <p className="card-title mb-3">Calorias do dia</p>
+        <div className="relative">
+          <svg width="220" height="220" viewBox="0 0 220 220" className="-rotate-90">
+            <circle cx="110" cy="110" r={r} fill="none" stroke="var(--muted)" strokeWidth="14" />
+            <circle
+              cx="110" cy="110" r={r} fill="none"
+              stroke="var(--primary)" strokeWidth="14" strokeLinecap="round"
+              strokeDasharray={c} style={{ strokeDashoffset: offset, transition: "stroke-dashoffset 0.7s ease" }}
+            />
+          </svg>
+          <div className="absolute inset-0 flex flex-col items-center justify-center">
+            <div className="text-4xl font-bold">{restante}</div>
+            <div className="text-xs text-muted-foreground mt-1">kcal restantes</div>
+            <div className="text-[11px] text-muted-foreground mt-2">{consumed} / {macros.kcal}</div>
+          </div>
+        </div>
+
+        {/* Macro pills */}
+        <div className="grid grid-cols-3 gap-3 w-full mt-6">
+          <MacroPill label="Proteínas" value={macros.p} unit="g" color="var(--success)" />
+          <MacroPill label="Carbos" value={macros.c} unit="g" color="var(--chart-3)" />
+          <MacroPill label="Gorduras" value={macros.g} unit="g" color="var(--destructive)" />
+        </div>
+      </Card>
+
+      {/* Quick stats grid 2x2 */}
+      <div className="grid grid-cols-2 gap-3">
+        <QuickCard icon={<Droplet className="w-4 h-4" />} title="Água" value={`${aguaTotal}ml`} sub={`${aguaPct}% da meta`} />
+        <QuickCard icon={<Dumbbell className="w-4 h-4" />} title="Treino do dia" value={treinoHoje} />
+        <QuickCard icon={<Moon className="w-4 h-4" />} title="Sono" value={`${dados?.sono_horas || 8}h`} sub="meta diária" />
+        <QuickCard icon={<Scale className="w-4 h-4" />} title="Peso atual" value={`${dados?.peso || "—"}kg`} />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
-        <Card className="p-5">
-          <h3 className="font-semibold mb-3">Distribuição de macros</h3>
-          <div className="h-56">
-            <ResponsiveContainer>
-              <PieChart>
-                <Pie data={macros} dataKey="value" nameKey="name" innerRadius={50} outerRadius={80} paddingAngle={2}>
-                  {macros.map((m, i) => (
-                    <Cell key={i} fill={m.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }}
-                  formatter={(v: number, n: string) => [`${v}g (${total ? Math.round((v / total) * 100) : 0}%)`, n]}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="flex justify-center gap-4 text-xs">
-            {macros.map((m) => (
-              <div key={m.name} className="flex items-center gap-1.5">
-                <div className="w-3 h-3 rounded" style={{ background: m.color }} />
-                {m.name}
-              </div>
-            ))}
-          </div>
-        </Card>
+      {/* Checklist */}
+      <Card className="p-5 bg-card border-border rounded-2xl">
+        <div className="flex justify-between items-center mb-4">
+          <p className="card-title">Checklist do dia</p>
+          <span className="text-sm text-primary font-bold">{checkPct}%</span>
+        </div>
+        <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-4">
+          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${checkPct}%` }} />
+        </div>
+        <div className="space-y-1">
+          {items.length === 0 && <p className="text-sm text-muted-foreground">Nenhum item</p>}
+          {items.map((it) => {
+            const checked = !!checklist[it];
+            return (
+              <button
+                key={it}
+                onClick={() => toggle(it)}
+                className={`flex items-center gap-3 w-full text-left p-2.5 rounded-xl hover:bg-secondary/50 ${checked ? "pulse-success" : ""}`}
+              >
+                <span
+                  className={`w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 ${
+                    checked ? "bg-primary border-primary" : "border-muted-foreground/40"
+                  }`}
+                >
+                  {checked && (
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3">
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                  )}
+                </span>
+                <span className={`text-sm ${checked ? "line-through text-muted-foreground" : "text-foreground"}`}>
+                  {it}
+                </span>
+              </button>
+            );
+          })}
+        </div>
+      </Card>
 
-        <Card className="p-5">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="font-semibold">Checklist do dia</h3>
-            <span className="text-sm text-primary font-semibold">{pct}%</span>
-          </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden mb-4">
-            <div className="h-full bg-primary transition-all" style={{ width: `${pct}%` }} />
-          </div>
-          <div className="space-y-2 max-h-56 overflow-y-auto">
-            {items.length === 0 && <p className="text-sm text-muted-foreground">Nenhum item de checklist</p>}
-            {items.map((it) => (
-              <label key={it} className="flex items-start gap-2 text-sm cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={!!checklist[it]}
-                  onChange={() => toggle(it)}
-                  className="mt-0.5 accent-primary"
-                />
-                <span className={checklist[it] ? "line-through text-muted-foreground" : ""}>{it}</span>
-              </label>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <Card className="p-5">
-        <h3 className="font-semibold mb-3 flex items-center gap-2">
-          <Moon className="w-4 h-4" /> Rotina semanal
-        </h3>
-        <div className="grid grid-cols-7 gap-2">
+      {/* Weekly routine */}
+      <Card className="p-5 bg-card border-border rounded-2xl">
+        <p className="card-title mb-3">Rotina da semana</p>
+        <div className="grid grid-cols-7 gap-1.5">
           {plano.rotina_semanal.map((d, i) => (
-            <div key={i} className="p-2 rounded-lg bg-muted text-center">
+            <div key={i} className="p-2 rounded-xl bg-secondary text-center">
               <div className="text-[10px] font-bold uppercase text-muted-foreground">{d.dia_semana.slice(0, 3)}</div>
-              <div className="text-xs mt-1 truncate">{d.treino || "Descanso"}</div>
+              <div className="text-[11px] mt-1 truncate text-foreground">{d.treino || "Off"}</div>
             </div>
           ))}
         </div>
@@ -142,14 +168,27 @@ function Dashboard() {
   );
 }
 
-function StatCard({ icon, label, value }: { icon: React.ReactNode; label: string; value: string }) {
+function MacroPill({ label, value, unit, color }: { label: string; value: number; unit: string; color: string }) {
   return (
-    <Card className="p-4">
-      <div className="flex items-center gap-2 text-muted-foreground text-xs mb-1">
-        {icon}
-        {label}
+    <div className="bg-secondary rounded-xl p-3 text-center">
+      <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
+      <div className="text-lg font-bold mt-1">{value}<span className="text-xs text-muted-foreground">{unit}</span></div>
+      <div className="h-1 mt-2 rounded-full overflow-hidden bg-background/40">
+        <div className="h-full rounded-full" style={{ width: "100%", background: color }} />
       </div>
-      <div className="text-lg md:text-xl font-bold">{value}</div>
+    </div>
+  );
+}
+
+function QuickCard({ icon, title, value, sub }: { icon: React.ReactNode; title: string; value: string; sub?: string }) {
+  return (
+    <Card className="p-4 bg-card border-border rounded-2xl">
+      <div className="flex items-center gap-2 text-muted-foreground text-[11px] uppercase tracking-wider font-semibold">
+        <span className="text-primary">{icon}</span>
+        {title}
+      </div>
+      <div className="text-xl font-bold mt-2 truncate">{value}</div>
+      {sub && <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>}
     </Card>
   );
 }
