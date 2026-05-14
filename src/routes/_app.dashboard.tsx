@@ -21,8 +21,10 @@ function Dashboard() {
   const resetCheck = useStore((s) => s.resetChecklistIfNewDay);
   const agua = useStore((s) => s.agua);
   const resetAgua = useStore((s) => s.resetAguaIfNewDay);
+  const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
+  const resetRefeicoes = useStore((s) => s.resetRefeicoesIfNewDay);
 
-  useEffect(() => { resetCheck(); resetAgua(); }, [resetCheck, resetAgua]);
+  useEffect(() => { resetCheck(); resetAgua(); resetRefeicoes(); }, [resetCheck, resetAgua, resetRefeicoes]);
 
   const macros = useMemo(() => {
     if (!plano) return null;
@@ -35,10 +37,28 @@ function Dashboard() {
     };
   }, [plano]);
 
+  const consumido = useMemo(() => {
+    if (!plano) return { kcal: 0, p: 0, c: 0, g: 0 };
+    return plano.plano_alimentar.reduce(
+      (acc, r, i) => {
+        if (!refeicoesFeitas[i]) return acc;
+        const macros = r.alimentos.reduce(
+          (a, al) => ({
+            p: a.p + (al.proteinas_g || 0),
+            c: a.c + (al.carboidratos_g || 0),
+            g: a.g + (al.gorduras_g || 0),
+          }),
+          { p: 0, c: 0, g: 0 },
+        );
+        return { kcal: acc.kcal + (r.total_calorias || 0), p: acc.p + macros.p, c: acc.c + macros.c, g: acc.g + macros.g };
+      },
+      { kcal: 0, p: 0, c: 0, g: 0 },
+    );
+  }, [plano, refeicoesFeitas]);
+
   if (!plano || !macros) return null;
 
-  // For demo we don't track consumed calories yet; show meta as both consumed/goal placeholder
-  const consumed = 0;
+  const consumed = Math.round(consumido.kcal);
   const kcalPct = Math.min(100, Math.round((consumed / macros.kcal) * 100));
 
   const items = plano.disciplina.checklist || [];
