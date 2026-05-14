@@ -115,6 +115,8 @@ type State = {
   evolucao: RegistroEvolucao[];
   checklist: Record<string, boolean>;
   checklistData: string;
+  refeicoesFeitas: Record<number, boolean>;
+  refeicoesData: string;
   tema: "dark" | "light";
   planoAssinatura: PlanoAssinatura;
   hidratado: boolean;
