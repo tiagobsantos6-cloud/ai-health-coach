@@ -58,10 +58,10 @@ function LoginPage() {
     <div className="min-h-screen flex items-center justify-center px-4 bg-background">
       <Card className="w-full max-w-sm p-6 space-y-5 rounded-2xl">
         <div className="flex items-center gap-2 justify-center">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/30">
             <Sparkles className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg">VitaIA</span>
+          <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">VitaIA</span>
         </div>
         <div className="text-center">
           <h1 className="text-xl font-semibold">Entrar</h1>
