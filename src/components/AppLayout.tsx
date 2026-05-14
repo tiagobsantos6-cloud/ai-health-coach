@@ -1,6 +1,6 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
