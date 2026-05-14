@@ -199,7 +199,17 @@ export const useStore = create<State>()(
         if (s.checklistData !== today()) set({ checklist: {}, checklistData: today() });
       },
       setTema: (t) => set({ tema: t }),
-      reset: () => set({ dados: null, plano: null, agua: [], evolucao: [], checklist: {} }),
+      toggleRefeicaoFeita: (idx) => {
+        const s = get();
+        const t = today();
+        const cur = s.refeicoesData === t ? s.refeicoesFeitas : {};
+        set({ refeicoesFeitas: { ...cur, [idx]: !cur[idx] }, refeicoesData: t });
+      },
+      resetRefeicoesIfNewDay: () => {
+        const s = get();
+        if (s.refeicoesData !== today()) set({ refeicoesFeitas: {}, refeicoesData: today() });
+      },
+      reset: () => set({ dados: null, plano: null, agua: [], evolucao: [], checklist: {}, refeicoesFeitas: {} }),
     }),
     {
       name: "vita-store",
@@ -209,6 +219,8 @@ export const useStore = create<State>()(
         evolucao: s.evolucao,
         checklist: s.checklist,
         checklistData: s.checklistData,
+        refeicoesFeitas: s.refeicoesFeitas,
+        refeicoesData: s.refeicoesData,
         tema: s.tema,
         // dados, plano, planoAssinatura intentionally NOT persisted — server is source of truth.
       }),
