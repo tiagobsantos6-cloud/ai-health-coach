@@ -118,7 +118,7 @@ function Dieta() {
     g: cleanNum(plano.resumo.gorduras_g),
   };
 
-  const pct = (v: number, m: number) => Math.min(100, m ? Math.round((v / m) * 100) : 0);
+  
 
   return (
     <div className="space-y-6 pb-24">
