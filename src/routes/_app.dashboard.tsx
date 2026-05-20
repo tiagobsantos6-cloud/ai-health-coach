@@ -51,24 +51,31 @@ function Dashboard() {
     return plano.plano_alimentar.reduce(
       (acc, r, i) => {
         if (!refeicoesFeitas[i]) return acc;
-        const macros = r.alimentos.reduce(
+        const m = r.alimentos.reduce(
           (a, al) => ({
-            p: a.p + (al.proteinas_g || 0),
-            c: a.c + (al.carboidratos_g || 0),
-            g: a.g + (al.gorduras_g || 0),
+            kcal: a.kcal + (Number(al.calorias) || 0),
+            p: a.p + (Number(al.proteinas_g) || 0),
+            c: a.c + (Number(al.carboidratos_g) || 0),
+            g: a.g + (Number(al.gorduras_g) || 0),
           }),
-          { p: 0, c: 0, g: 0 },
+          { kcal: 0, p: 0, c: 0, g: 0 },
         );
-        return { kcal: acc.kcal + (r.total_calorias || 0), p: acc.p + macros.p, c: acc.c + macros.c, g: acc.g + macros.g };
+        return { kcal: acc.kcal + m.kcal, p: acc.p + m.p, c: acc.c + m.c, g: acc.g + m.g };
       },
       { kcal: 0, p: 0, c: 0, g: 0 },
     );
   }, [plano, refeicoesFeitas]);
 
+  useEffect(() => {
+    if (!macros) return;
+    // eslint-disable-next-line no-console
+    console.debug("[Dashboard] meta:", macros, "consumido:", consumido);
+  }, [macros, consumido]);
+
   if (!plano || !macros) return null;
 
   const consumed = Math.round(consumido.kcal);
-  const kcalPct = Math.min(100, Math.round((consumed / macros.kcal) * 100));
+  const kcalPct = Math.min(100, Math.max(0, Math.round((consumed / Math.max(1, macros.kcal)) * 100)));
 
   const items = plano.disciplina.checklist || [];
   const done = items.filter((i) => checklist[i]).length;
@@ -91,7 +98,7 @@ function Dashboard() {
   // SVG ring
   const r = 90;
   const c = 2 * Math.PI * r;
-  const offset = c - (Math.max(kcalPct, 1) / 100) * c;
+  const offset = c - (kcalPct / 100) * c;
   const restante = Math.max(0, macros.kcal - consumed);
 
   return (
