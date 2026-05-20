@@ -14,8 +14,17 @@ import { gerarAjustes } from "@/lib/gemini";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/evolucao")({
+  head: () => ({
+    meta: [
+      { title: "Evolução — VitaIA" },
+      { name: "description", content: "Acompanhe sua evolução de peso, medidas e progresso em relação à meta com gráficos e ajustes da IA." },
+      { property: "og:title", content: "Evolução — VitaIA" },
+      { property: "og:description", content: "Gráficos de evolução, progresso da meta e ajustes inteligentes do plano." },
+    ],
+  }),
   component: Evolucao,
 });
+
 
 function Evolucao() {
   const plano = useStore((s) => s.plano);
@@ -63,7 +72,7 @@ function Evolucao() {
       </div>
 
       <Card className="p-5 space-y-4">
-        <h3 className="font-semibold">Novo registro semanal</h3>
+        <h2 className="font-semibold">Novo registro semanal</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <Label>Peso atual (kg)</Label>
@@ -136,7 +145,7 @@ function Evolucao() {
         return (
           <Card className="p-5 space-y-4">
             <div className="flex items-baseline justify-between flex-wrap gap-2">
-              <h3 className="font-semibold">Progresso da meta</h3>
+              <h2 className="font-semibold">Progresso da meta</h2>
               <span className="text-sm text-muted-foreground">
                 {pesoAtual.toFixed(1)}kg → {meta.peso_desejado}kg
               </span>
@@ -178,7 +187,7 @@ function Evolucao() {
 
       {evolucao.length > 0 && (
         <Card className="p-5">
-          <h3 className="font-semibold mb-3">Evolução do peso</h3>
+          <h2 className="font-semibold mb-3">Evolução do peso</h2>
           <div className="h-64">
             <ResponsiveContainer>
               <LineChart data={evolucao}>
@@ -195,7 +204,7 @@ function Evolucao() {
 
       <Card className="p-5">
         <div className="flex justify-between items-center mb-3">
-          <h3 className="font-semibold">Ajustes inteligentes</h3>
+          <h2 className="font-semibold">Ajustes inteligentes</h2>
           {podeAjustesIA ? (
             <Button onClick={gerar} disabled={loading || evolucao.length === 0} size="sm">
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
@@ -224,7 +233,7 @@ function Evolucao() {
 
       {evolucao.length > 0 && (
         <Card className="p-5 overflow-x-auto">
-          <h3 className="font-semibold mb-3">Histórico</h3>
+          <h2 className="font-semibold mb-3">Histórico</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-muted-foreground border-b border-border">

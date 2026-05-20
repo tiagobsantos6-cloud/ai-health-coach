@@ -8,8 +8,17 @@ import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/signup")({
+  head: () => ({
+    meta: [
+      { title: "Criar conta — VitaIA" },
+      { name: "description", content: "Crie sua conta no VitaIA e receba um plano personalizado de nutrição e treino gerado por IA." },
+      { property: "og:title", content: "Criar conta — VitaIA" },
+      { property: "og:description", content: "Cadastre-se no VitaIA e comece seu plano personalizado." },
+    ],
+  }),
   component: SignupPage,
 });
+
 
 function SignupPage() {
   const navigate = useNavigate();

@@ -6,8 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Droplet } from "lucide-react";
 
 export const Route = createFileRoute("/_app/agua")({
+  head: () => ({
+    meta: [
+      { title: "Hidratação — VitaIA" },
+      { name: "description", content: "Acompanhe sua meta diária de hidratação com registros rápidos e progresso visual." },
+      { property: "og:title", content: "Hidratação — VitaIA" },
+      { property: "og:description", content: "Registre sua ingestão de água e acompanhe a meta diária." },
+    ],
+  }),
   component: Agua,
 });
+
 
 function Agua() {
   const plano = useStore((s) => s.plano);
@@ -69,7 +78,7 @@ function Agua() {
       </div>
 
       <Card className="p-5">
-        <h3 className="font-semibold mb-3">Histórico de hoje</h3>
+        <h2 className="font-semibold mb-3">Histórico de hoje</h2>
         {agua.length === 0 && <p className="text-sm text-muted-foreground">Nenhum registro ainda</p>}
         <div className="space-y-2">
           {[...agua].reverse().map((r, i) => (

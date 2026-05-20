@@ -12,8 +12,17 @@ import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 import { medidaCaseira } from "@/lib/medidaCaseira";
 
 export const Route = createFileRoute("/_app/dieta")({
+  head: () => ({
+    meta: [
+      { title: "Dieta — VitaIA" },
+      { name: "description", content: "Seu plano alimentar do dia: refeições, macros, substituições e progresso de calorias." },
+      { property: "og:title", content: "Dieta — VitaIA" },
+      { property: "og:description", content: "Plano alimentar personalizado com macros e substituições inteligentes." },
+    ],
+  }),
   component: Dieta,
 });
+
 
 const cleanNum = (val: string | number) => {
   if (typeof val === "number") return val;
@@ -159,7 +168,7 @@ function Dieta() {
       {/* Resumo diário */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex items-end justify-between mb-4">
-          <p className="card-title">Resumo do dia</p>
+          <h2 className="card-title">Resumo do dia</h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-primary leading-none">
               {Math.round(consumido.kcal)}

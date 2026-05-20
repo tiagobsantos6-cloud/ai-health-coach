@@ -19,6 +19,14 @@ const biotipoDesc: Record<string, string> = {
 };
 
 export const Route = createFileRoute("/onboarding")({
+  head: () => ({
+    meta: [
+      { title: "Personalização do seu Plano — VitaIA" },
+      { name: "description", content: "Responda algumas perguntas para que a IA gere seu plano personalizado de nutrição e treino." },
+      { property: "og:title", content: "Personalização do seu Plano — VitaIA" },
+      { property: "og:description", content: "Conte-nos sobre você para criarmos um plano sob medida." },
+    ],
+  }),
   beforeLoad: async ({ location }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
@@ -26,6 +34,7 @@ export const Route = createFileRoute("/onboarding")({
   },
   component: Onboarding,
 });
+
 
 const objetivos = ["Hipertrofia", "Emagrecimento", "Definição", "Performance", "Corrida", "Saúde", "Reeducação Alimentar"];
 const restricoesList = ["Lactose", "Glúten", "Vegano", "Vegetariano", "Outro"];
@@ -70,8 +79,10 @@ function Onboarding() {
         <span className="font-bold text-lg">VitaIA</span>
       </header>
 
-      <div className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
+      <main className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
+        <h1 className="sr-only">Personalização do seu Plano</h1>
         <div className="mb-8">
+
           <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
             <span>Etapa {step} de 5</span>
             <span>{Math.round((step / 5) * 100)}%</span>
@@ -377,7 +388,8 @@ function Onboarding() {
             </Button>
           )}
         </div>
-      </div>
+      </main>
     </div>
+
   );
 }

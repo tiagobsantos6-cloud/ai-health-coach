@@ -9,8 +9,17 @@ import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink } fro
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 
 export const Route = createFileRoute("/_app/treino")({
+  head: () => ({
+    meta: [
+      { title: "Treino — VitaIA" },
+      { name: "description", content: "Acompanhe seu plano de treino personalizado, séries, repetições e tempo de descanso." },
+      { property: "og:title", content: "Treino — VitaIA" },
+      { property: "og:description", content: "Plano de treino personalizado com timer e demonstração de execução." },
+    ],
+  }),
   component: Treino,
 });
+
 
 function Treino() {
   const plano = useStore((s) => s.plano);
@@ -113,12 +122,13 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
         <div className="mt-3 p-3 rounded-lg bg-primary/10 flex items-center justify-between">
           <div className="text-2xl font-bold text-primary tabular-nums">{timer}s</div>
           <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setRunning(!running)}>
+            <Button size="sm" variant="outline" onClick={() => setRunning(!running)} aria-label={running ? "Pausar" : "Retomar"}>
               {running ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
             </Button>
-            <Button size="sm" variant="outline" onClick={() => { setTimer(0); setRunning(false); }}>
+            <Button size="sm" variant="outline" onClick={() => { setTimer(0); setRunning(false); }} aria-label="Reiniciar">
               <RotateCcw className="w-4 h-4" />
             </Button>
+
           </div>
         </div>
       )}

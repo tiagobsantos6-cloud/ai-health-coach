@@ -15,8 +15,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/perfil")({
+  head: () => ({
+    meta: [
+      { title: "Perfil — VitaIA" },
+      { name: "description", content: "Gerencie seus dados, plano atual, chave da IA e configurações da conta no VitaIA." },
+      { property: "og:title", content: "Perfil — VitaIA" },
+      { property: "og:description", content: "Dados pessoais, plano e configurações da sua conta VitaIA." },
+    ],
+  }),
   component: Perfil,
 });
+
 
 const GEMINI_KEY_STORAGE = "gemini_api_key";
 
@@ -144,7 +153,7 @@ function Perfil() {
         {/* Meus dados */}
         <Card className="p-5 space-y-4">
           <div>
-            <h3 className="font-semibold">Meus dados</h3>
+            <h2 className="font-semibold">Meus dados</h2>
             <p className="text-xs text-muted-foreground">Atualize seus dados pessoais</p>
           </div>
           <div className="space-y-3">
@@ -172,9 +181,9 @@ function Perfil() {
         <Card className="p-5 space-y-4">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <h3 className="font-semibold flex items-center gap-2">
+              <h2 className="font-semibold flex items-center gap-2">
                 <Sparkles className="w-4 h-4 text-primary" /> Configuração da IA
-              </h3>
+              </h2>
               <p className="text-xs text-muted-foreground">Chave opcional do Google Gemini</p>
             </div>
             <div className="flex items-center gap-1.5 text-xs">
@@ -211,7 +220,7 @@ function Perfil() {
         <Card className="p-5 space-y-4 md:col-span-2">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="font-semibold">Meu plano</h3>
+              <h2 className="font-semibold">Meu plano</h2>
               <p className="text-xs text-muted-foreground">Resumo do plano gerado</p>
             </div>
             <Button variant="outline" size="sm" onClick={refazer}>
@@ -233,7 +242,7 @@ function Perfil() {
 
         {/* Ações */}
         <Card className="p-5 space-y-3 md:col-span-2">
-          <h3 className="font-semibold">Ações</h3>
+          <h2 className="font-semibold">Ações</h2>
           <div className="flex flex-wrap gap-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
