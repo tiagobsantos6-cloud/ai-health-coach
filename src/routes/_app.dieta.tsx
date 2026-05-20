@@ -71,53 +71,50 @@ function Dieta() {
   if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
 
-  const totals = useMemo(
+  // Compute per-meal kcal/macros from the food list (single source of truth).
+  const refeicoesCalc = useMemo(
     () =>
-      plano.plano_alimentar.reduce(
-        (acc, r) => {
-          const macros = r.alimentos.reduce(
-            (a, al) => ({
-              p: a.p + (al.proteinas_g || 0),
-              c: a.c + (al.carboidratos_g || 0),
-              g: a.g + (al.gorduras_g || 0),
-            }),
-            { p: 0, c: 0, g: 0 },
-          );
-          return {
-            kcal: acc.kcal + (r.total_calorias || 0),
-            p: acc.p + macros.p,
-            c: acc.c + macros.c,
-            g: acc.g + macros.g,
-          };
-        },
-        { kcal: 0, p: 0, c: 0, g: 0 },
-      ),
+      plano.plano_alimentar.map((r) => {
+        const acc = r.alimentos.reduce(
+          (a, al) => ({
+            kcal: a.kcal + (Number(al.calorias) || 0),
+            p: a.p + (Number(al.proteinas_g) || 0),
+            c: a.c + (Number(al.carboidratos_g) || 0),
+            g: a.g + (Number(al.gorduras_g) || 0),
+          }),
+          { kcal: 0, p: 0, c: 0, g: 0 },
+        );
+        return { kcal: Math.round(acc.kcal), p: acc.p, c: acc.c, g: acc.g };
+      }),
     [plano],
   );
 
-  const consumido = useMemo(
+  // Daily planned totals: sum of ALL meals.
+  const totals = useMemo(
     () =>
-      plano.plano_alimentar.reduce(
-        (acc, r, i) => {
-          if (!refeicoesFeitas[i]) return acc;
-          const macros = r.alimentos.reduce(
-            (a, al) => ({
-              p: a.p + (al.proteinas_g || 0),
-              c: a.c + (al.carboidratos_g || 0),
-              g: a.g + (al.gorduras_g || 0),
-            }),
-            { p: 0, c: 0, g: 0 },
-          );
-          return {
-            kcal: acc.kcal + (r.total_calorias || 0),
-            p: acc.p + macros.p,
-            c: acc.c + macros.c,
-            g: acc.g + macros.g,
-          };
-        },
+      refeicoesCalc.reduce(
+        (acc, m) => ({
+          kcal: acc.kcal + m.kcal,
+          p: acc.p + m.p,
+          c: acc.c + m.c,
+          g: acc.g + m.g,
+        }),
         { kcal: 0, p: 0, c: 0, g: 0 },
       ),
-    [plano, refeicoesFeitas],
+    [refeicoesCalc],
+  );
+
+  // Consumido: only meals marked as done.
+  const consumido = useMemo(
+    () =>
+      refeicoesCalc.reduce(
+        (acc, m, i) =>
+          refeicoesFeitas[i]
+            ? { kcal: acc.kcal + m.kcal, p: acc.p + m.p, c: acc.c + m.c, g: acc.g + m.g }
+            : acc,
+        { kcal: 0, p: 0, c: 0, g: 0 },
+      ),
+    [refeicoesCalc, refeicoesFeitas],
   );
 
   const meta = {
@@ -126,6 +123,11 @@ function Dieta() {
     c: cleanNum(plano.resumo.carboidratos_g),
     g: cleanNum(plano.resumo.gorduras_g),
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.debug("[Dieta] meta:", meta, "planejado:", totals, "consumido:", consumido);
+  }, [meta.kcal, totals.kcal, consumido.kcal]);
 
   
 
@@ -167,32 +169,31 @@ function Dieta() {
 
       {/* Resumo diário */}
       <Card className="p-5 bg-card border-border rounded-2xl">
-        <div className="flex items-end justify-between mb-4">
+        <div className="flex items-end justify-between mb-1">
           <h2 className="card-title">Resumo do dia</h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-primary leading-none">
-              {Math.round(consumido.kcal)}
+              {totals.kcal}
               <span className="text-sm text-muted-foreground font-medium"> / {meta.kcal} kcal</span>
+            </div>
+            <div className="text-[11px] text-muted-foreground mt-1">
+              Consumido: <span className="text-foreground font-semibold">{Math.round(consumido.kcal)}</span> kcal
+              {" · "}Restante: <span className="text-foreground font-semibold">{Math.max(0, meta.kcal - Math.round(consumido.kcal))}</span> kcal
             </div>
           </div>
         </div>
-        <div className="space-y-3">
-          <MacroBar label="Proteínas" value={consumido.p} goal={meta.p} color="var(--success)" />
-          <MacroBar label="Carboidratos" value={consumido.c} goal={meta.c} color="var(--chart-3)" />
-          <MacroBar label="Gorduras" value={consumido.g} goal={meta.g} color="var(--destructive)" />
+        <div className="space-y-3 mt-4">
+          <MacroBar label="Proteínas" value={totals.p} goal={meta.p} color="var(--success)" />
+          <MacroBar label="Carboidratos" value={totals.c} goal={meta.c} color="var(--chart-3)" />
+          <MacroBar label="Gorduras" value={totals.g} goal={meta.g} color="var(--destructive)" />
         </div>
       </Card>
 
+
       <Accordion type="multiple" className="space-y-3" value={openItems} onValueChange={setOpenItems}>
         {plano.plano_alimentar.map((r, i) => {
-          const macros = r.alimentos.reduce(
-            (a, al) => ({
-              p: a.p + (al.proteinas_g || 0),
-              c: a.c + (al.carboidratos_g || 0),
-              g: a.g + (al.gorduras_g || 0),
-            }),
-            { p: 0, c: 0, g: 0 },
-          );
+          const macros = { p: refeicoesCalc[i].p, c: refeicoesCalc[i].c, g: refeicoesCalc[i].g };
+          const mealKcal = refeicoesCalc[i].kcal;
           const feita = !!refeicoesFeitas[i];
           return (
             <Card
@@ -219,7 +220,7 @@ function Dieta() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm font-bold text-primary shrink-0">{r.total_calorias} kcal</div>
+                    <div className="text-sm font-bold text-primary shrink-0">{mealKcal} kcal</div>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
