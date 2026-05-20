@@ -192,14 +192,8 @@ function Dieta() {
 
       <Accordion type="multiple" className="space-y-3" value={openItems} onValueChange={setOpenItems}>
         {plano.plano_alimentar.map((r, i) => {
-          const macros = r.alimentos.reduce(
-            (a, al) => ({
-              p: a.p + (al.proteinas_g || 0),
-              c: a.c + (al.carboidratos_g || 0),
-              g: a.g + (al.gorduras_g || 0),
-            }),
-            { p: 0, c: 0, g: 0 },
-          );
+          const macros = { p: refeicoesCalc[i].p, c: refeicoesCalc[i].c, g: refeicoesCalc[i].g };
+          const mealKcal = refeicoesCalc[i].kcal;
           const feita = !!refeicoesFeitas[i];
           return (
             <Card
