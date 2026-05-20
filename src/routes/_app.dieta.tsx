@@ -71,53 +71,50 @@ function Dieta() {
   if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
 
-  const totals = useMemo(
+  // Compute per-meal kcal/macros from the food list (single source of truth).
+  const refeicoesCalc = useMemo(
     () =>
-      plano.plano_alimentar.reduce(
-        (acc, r) => {
-          const macros = r.alimentos.reduce(
-            (a, al) => ({
-              p: a.p + (al.proteinas_g || 0),
-              c: a.c + (al.carboidratos_g || 0),
-              g: a.g + (al.gorduras_g || 0),
-            }),
-            { p: 0, c: 0, g: 0 },
-          );
-          return {
-            kcal: acc.kcal + (r.total_calorias || 0),
-            p: acc.p + macros.p,
-            c: acc.c + macros.c,
-            g: acc.g + macros.g,
-          };
-        },
-        { kcal: 0, p: 0, c: 0, g: 0 },
-      ),
+      plano.plano_alimentar.map((r) => {
+        const acc = r.alimentos.reduce(
+          (a, al) => ({
+            kcal: a.kcal + (Number(al.calorias) || 0),
+            p: a.p + (Number(al.proteinas_g) || 0),
+            c: a.c + (Number(al.carboidratos_g) || 0),
+            g: a.g + (Number(al.gorduras_g) || 0),
+          }),
+          { kcal: 0, p: 0, c: 0, g: 0 },
+        );
+        return { kcal: Math.round(acc.kcal), p: acc.p, c: acc.c, g: acc.g };
+      }),
     [plano],
   );
 
-  const consumido = useMemo(
+  // Daily planned totals: sum of ALL meals.
+  const totals = useMemo(
     () =>
-      plano.plano_alimentar.reduce(
-        (acc, r, i) => {
-          if (!refeicoesFeitas[i]) return acc;
-          const macros = r.alimentos.reduce(
-            (a, al) => ({
-              p: a.p + (al.proteinas_g || 0),
-              c: a.c + (al.carboidratos_g || 0),
-              g: a.g + (al.gorduras_g || 0),
-            }),
-            { p: 0, c: 0, g: 0 },
-          );
-          return {
-            kcal: acc.kcal + (r.total_calorias || 0),
-            p: acc.p + macros.p,
-            c: acc.c + macros.c,
-            g: acc.g + macros.g,
-          };
-        },
+      refeicoesCalc.reduce(
+        (acc, m) => ({
+          kcal: acc.kcal + m.kcal,
+          p: acc.p + m.p,
+          c: acc.c + m.c,
+          g: acc.g + m.g,
+        }),
         { kcal: 0, p: 0, c: 0, g: 0 },
       ),
-    [plano, refeicoesFeitas],
+    [refeicoesCalc],
+  );
+
+  // Consumido: only meals marked as done.
+  const consumido = useMemo(
+    () =>
+      refeicoesCalc.reduce(
+        (acc, m, i) =>
+          refeicoesFeitas[i]
+            ? { kcal: acc.kcal + m.kcal, p: acc.p + m.p, c: acc.c + m.c, g: acc.g + m.g }
+            : acc,
+        { kcal: 0, p: 0, c: 0, g: 0 },
+      ),
+    [refeicoesCalc, refeicoesFeitas],
   );
 
   const meta = {
@@ -126,6 +123,11 @@ function Dieta() {
     c: cleanNum(plano.resumo.carboidratos_g),
     g: cleanNum(plano.resumo.gorduras_g),
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line no-console
+    console.debug("[Dieta] meta:", meta, "planejado:", totals, "consumido:", consumido);
+  }, [meta.kcal, totals.kcal, consumido.kcal]);
 
   
 
