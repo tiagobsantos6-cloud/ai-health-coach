@@ -125,7 +125,7 @@ function Planos() {
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-lg leading-tight">{t.nome}</h3>
+                    <h2 className="font-bold text-lg leading-tight">{t.nome}</h2>
                     <p className="text-xs text-muted-foreground">{t.periodo}</p>
                   </div>
                 </div>

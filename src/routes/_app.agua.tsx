@@ -69,7 +69,7 @@ function Agua() {
       </div>
 
       <Card className="p-5">
-        <h3 className="font-semibold mb-3">Histórico de hoje</h3>
+        <h2 className="font-semibold mb-3">Histórico de hoje</h2>
         {agua.length === 0 && <p className="text-sm text-muted-foreground">Nenhum registro ainda</p>}
         <div className="space-y-2">
           {[...agua].reverse().map((r, i) => (
