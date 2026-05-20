@@ -159,7 +159,7 @@ function Dieta() {
       {/* Resumo diário */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex items-end justify-between mb-4">
-          <p className="card-title">Resumo do dia</p>
+          <h2 className="card-title">Resumo do dia</h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-primary leading-none">
               {Math.round(consumido.kcal)}

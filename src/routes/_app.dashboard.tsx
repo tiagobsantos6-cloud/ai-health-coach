@@ -109,7 +109,7 @@ function Dashboard() {
 
       {/* Calories ring */}
       <Card className="p-6 flex flex-col items-center bg-card border-border rounded-2xl">
-        <p className="card-title mb-3">Calorias do dia</p>
+        <h2 className="card-title mb-3">Calorias do dia</h2>
         <div className="relative">
           <svg width="220" height="220" viewBox="0 0 220 220" className="-rotate-90">
             <circle cx="110" cy="110" r={r} fill="none" stroke="var(--muted)" strokeWidth="14" />
@@ -183,7 +183,7 @@ function Dashboard() {
 
       {/* Weekly routine */}
       <Card className="p-5 bg-card border-border rounded-2xl">
-        <p className="card-title mb-3">Rotina da semana</p>
+        <h2 className="card-title mb-3">Rotina da semana</h2>
         <div className="grid grid-cols-7 gap-1.5">
           {plano.rotina_semanal.map((d, i) => (
             <div key={i} className="p-2 rounded-xl bg-secondary text-center">
