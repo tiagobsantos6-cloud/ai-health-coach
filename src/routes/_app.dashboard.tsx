@@ -204,13 +204,17 @@ function Dashboard() {
   );
 }
 
-function MacroPill({ label, value, unit, color }: { label: string; value: number; unit: string; color: string }) {
+function MacroPill({ label, value, goal, unit, color }: { label: string; value: number; goal: number; unit: string; color: string }) {
+  const pct = Math.min(100, Math.max(0, goal ? Math.round((value / goal) * 100) : 0));
   return (
     <div className="bg-secondary rounded-xl p-3 text-center">
       <div className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">{label}</div>
-      <div className="text-lg font-bold mt-1">{value}<span className="text-xs text-muted-foreground">{unit}</span></div>
+      <div className="text-lg font-bold mt-1">
+        {Math.round(value)}
+        <span className="text-xs text-muted-foreground">/{Math.round(goal)}{unit}</span>
+      </div>
       <div className="h-1 mt-2 rounded-full overflow-hidden bg-background/40">
-        <div className="h-full rounded-full" style={{ width: "100%", background: color }} />
+        <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, background: color }} />
       </div>
     </div>
   );
