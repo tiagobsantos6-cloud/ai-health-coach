@@ -5,8 +5,17 @@ import { Card } from "@/components/ui/card";
 import { Droplet, Dumbbell, Moon, Scale } from "lucide-react";
 
 export const Route = createFileRoute("/_app/dashboard")({
+  head: () => ({
+    meta: [
+      { title: "Dashboard — VitaIA" },
+      { name: "description", content: "Resumo diário do seu plano: calorias, macros, água, treino e checklist de disciplina." },
+      { property: "og:title", content: "Dashboard — VitaIA" },
+      { property: "og:description", content: "Acompanhe suas metas diárias de nutrição, treino e hidratação." },
+    ],
+  }),
   component: Dashboard,
 });
+
 
 const cleanNum = (val: string | number) => {
   if (typeof val === "number") return val;
@@ -91,7 +100,7 @@ function Dashboard() {
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm text-muted-foreground">{saudacao},</p>
-          <h1 className="text-2xl font-bold">{nome} 👋</h1>
+          <h1 className="text-2xl font-bold">Painel de {nome || "você"} — Resumo Diário</h1>
         </div>
         <div className="w-11 h-11 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
           {iniciais}
@@ -136,7 +145,7 @@ function Dashboard() {
       {/* Checklist */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex justify-between items-center mb-4">
-          <p className="card-title">Checklist do dia</p>
+          <h2 className="card-title">Checklist do dia</h2>
           <span className="text-sm text-primary font-bold">{checkPct}%</span>
         </div>
         <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-4">

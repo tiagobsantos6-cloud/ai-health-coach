@@ -150,9 +150,10 @@ export function AppLayout() {
             </div>
             <span className="font-bold">VitaIA</span>
           </div>
-          <Link to="/perfil" className="text-muted-foreground hover:text-foreground">
+          <Link to="/perfil" aria-label="Perfil" className="text-muted-foreground hover:text-foreground">
             <User className="w-5 h-5" />
           </Link>
+
         </header>
         <div className="p-4 md:p-8 max-w-6xl mx-auto">
           <Outlet />
