@@ -135,9 +135,9 @@ function Dashboard() {
 
         {/* Macro pills */}
         <div className="grid grid-cols-3 gap-3 w-full mt-6">
-          <MacroPill label="Proteínas" value={macros.p} unit="g" color="var(--success)" />
-          <MacroPill label="Carbos" value={macros.c} unit="g" color="var(--chart-3)" />
-          <MacroPill label="Gorduras" value={macros.g} unit="g" color="var(--destructive)" />
+          <MacroPill label="Proteínas" value={consumido.p} goal={macros.p} unit="g" color="var(--success)" />
+          <MacroPill label="Carbos" value={consumido.c} goal={macros.c} unit="g" color="var(--chart-3)" />
+          <MacroPill label="Gorduras" value={consumido.g} goal={macros.g} unit="g" color="var(--destructive)" />
         </div>
       </Card>
 
