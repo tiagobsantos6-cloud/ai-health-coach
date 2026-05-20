@@ -6,8 +6,17 @@ import { Check, Sparkles, Crown, Zap, Gift } from "lucide-react";
 import { motion } from "framer-motion";
 
 export const Route = createFileRoute("/_app/planos")({
+  head: () => ({
+    meta: [
+      { title: "Planos — VitaIA" },
+      { name: "description", content: "Conheça os planos do VitaIA e desbloqueie recursos avançados de IA para nutrição e treino." },
+      { property: "og:title", content: "Planos — VitaIA" },
+      { property: "og:description", content: "Escolha o plano ideal para o seu acompanhamento de saúde com IA." },
+    ],
+  }),
   component: Planos,
 });
+
 
 type Tier = {
   id: PlanoAssinatura;

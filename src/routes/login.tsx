@@ -9,8 +9,17 @@ import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/login")({
+  head: () => ({
+    meta: [
+      { title: "Entrar — VitaIA" },
+      { name: "description", content: "Acesse sua conta VitaIA para continuar seu plano personalizado de nutrição e treino." },
+      { property: "og:title", content: "Entrar — VitaIA" },
+      { property: "og:description", content: "Faça login no VitaIA e continue seu acompanhamento de saúde." },
+    ],
+  }),
   component: LoginPage,
 });
+
 
 function LoginPage() {
   const navigate = useNavigate();

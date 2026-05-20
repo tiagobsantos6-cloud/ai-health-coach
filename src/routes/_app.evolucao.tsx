@@ -14,8 +14,17 @@ import { gerarAjustes } from "@/lib/gemini";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/evolucao")({
+  head: () => ({
+    meta: [
+      { title: "Evolução — VitaIA" },
+      { name: "description", content: "Acompanhe sua evolução de peso, medidas e progresso em relação à meta com gráficos e ajustes da IA." },
+      { property: "og:title", content: "Evolução — VitaIA" },
+      { property: "og:description", content: "Gráficos de evolução, progresso da meta e ajustes inteligentes do plano." },
+    ],
+  }),
   component: Evolucao,
 });
+
 
 function Evolucao() {
   const plano = useStore((s) => s.plano);

@@ -12,8 +12,17 @@ import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
 import { medidaCaseira } from "@/lib/medidaCaseira";
 
 export const Route = createFileRoute("/_app/dieta")({
+  head: () => ({
+    meta: [
+      { title: "Dieta — VitaIA" },
+      { name: "description", content: "Seu plano alimentar do dia: refeições, macros, substituições e progresso de calorias." },
+      { property: "og:title", content: "Dieta — VitaIA" },
+      { property: "og:description", content: "Plano alimentar personalizado com macros e substituições inteligentes." },
+    ],
+  }),
   component: Dieta,
 });
+
 
 const cleanNum = (val: string | number) => {
   if (typeof val === "number") return val;

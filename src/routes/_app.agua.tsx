@@ -6,8 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Droplet } from "lucide-react";
 
 export const Route = createFileRoute("/_app/agua")({
+  head: () => ({
+    meta: [
+      { title: "Hidratação — VitaIA" },
+      { name: "description", content: "Acompanhe sua meta diária de hidratação com registros rápidos e progresso visual." },
+      { property: "og:title", content: "Hidratação — VitaIA" },
+      { property: "og:description", content: "Registre sua ingestão de água e acompanhe a meta diária." },
+    ],
+  }),
   component: Agua,
 });
+
 
 function Agua() {
   const plano = useStore((s) => s.plano);

@@ -8,6 +8,14 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/gerando")({
+  head: () => ({
+    meta: [
+      { title: "Gerando seu Plano — VitaIA" },
+      { name: "description", content: "Estamos criando seu plano personalizado de nutrição e treino com inteligência artificial." },
+      { property: "og:title", content: "Gerando seu Plano — VitaIA" },
+      { property: "og:description", content: "Sua IA está montando seu plano sob medida." },
+    ],
+  }),
   beforeLoad: async ({ location }) => {
     if (typeof window === "undefined") return;
     const { data } = await supabase.auth.getSession();
@@ -15,6 +23,7 @@ export const Route = createFileRoute("/gerando")({
   },
   component: Gerando,
 });
+
 
 const mensagens = [
   "Calculando suas necessidades calóricas...",
@@ -86,7 +95,7 @@ function Gerando() {
           <Sparkles className="w-12 h-12 text-primary-foreground" />
         </motion.div>
         <div>
-          <h2 className="text-2xl font-bold mb-3">Criando seu plano com IA</h2>
+          <h1 className="text-2xl font-bold mb-3">Gerando seu Plano de Saúde</h1>
           <motion.p
             key={msgIdx}
             initial={{ opacity: 0, y: 10 }}

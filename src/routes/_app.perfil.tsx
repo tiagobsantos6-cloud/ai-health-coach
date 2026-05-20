@@ -15,8 +15,17 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_app/perfil")({
+  head: () => ({
+    meta: [
+      { title: "Perfil — VitaIA" },
+      { name: "description", content: "Gerencie seus dados, plano atual, chave da IA e configurações da conta no VitaIA." },
+      { property: "og:title", content: "Perfil — VitaIA" },
+      { property: "og:description", content: "Dados pessoais, plano e configurações da sua conta VitaIA." },
+    ],
+  }),
   component: Perfil,
 });
+
 
 const GEMINI_KEY_STORAGE = "gemini_api_key";
 
