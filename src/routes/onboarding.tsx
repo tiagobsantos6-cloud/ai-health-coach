@@ -79,8 +79,10 @@ function Onboarding() {
         <span className="font-bold text-lg">VitaIA</span>
       </header>
 
-      <div className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
+      <main className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
+        <h1 className="sr-only">Personalização do seu Plano</h1>
         <div className="mb-8">
+
           <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
             <span>Etapa {step} de 5</span>
             <span>{Math.round((step / 5) * 100)}%</span>
