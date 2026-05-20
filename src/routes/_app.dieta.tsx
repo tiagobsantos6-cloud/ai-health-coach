@@ -220,7 +220,7 @@ function Dieta() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-sm font-bold text-primary shrink-0">{r.total_calorias} kcal</div>
+                    <div className="text-sm font-bold text-primary shrink-0">{mealKcal} kcal</div>
                   </div>
                 </AccordionTrigger>
                 <AccordionContent className="px-4 pb-4">
