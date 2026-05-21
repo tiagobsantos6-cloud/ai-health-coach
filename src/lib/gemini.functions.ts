@@ -28,7 +28,15 @@ O JSON deve ter exatamente esta estrutura:
 
 IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado (perda_semanal_kg ≈ déficit calórico necessário). Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.
 
-OBRIGATÓRIO — CALORIAS DAS REFEIÇÕES: A soma total das calorias de todas as refeições do plano_alimentar DEVE ser igual ao valor de resumo.meta_calorica. Distribua as calorias entre as refeições de forma que a soma bata exatamente com a meta. Se o usuário pediu 3 refeições e a meta é 3266 kcal, cada refeição deve ter calorias suficientes para atingir esse total (ex.: 1100 + 1100 + 1066). As mesmas regras valem proporcionalmente para proteinas_g, carboidratos_g e gorduras_g.`;
+REGRA CRÍTICA: A soma de total_calorias de TODAS as refeições em plano_alimentar DEVE ser EXATAMENTE igual ao valor de meta_calorica em resumo. Se a meta_calorica for 3266 kcal e houver 3 refeições, distribua assim: Café da Manhã ~25% (816 kcal), Almoço ~40% (1306 kcal), Jantar ~35% (1144 kcal). Ajuste os alimentos e quantidades para atingir esses valores. O mesmo vale para proteínas, carboidratos e gorduras: a soma dos macros de todas as refeições deve bater com proteinas_g, carboidratos_g e gorduras_g do resumo.
+
+DISTRIBUIÇÃO PADRÃO POR NÚMERO DE REFEIÇÕES (use exatamente estes percentuais da meta_calorica):
+- 3 refeições: 25% / 40% / 35%
+- 4 refeições: 20% / 35% / 15% / 30%
+- 5 refeições: 20% / 30% / 10% / 25% / 15%
+- 6 refeições: 15% / 25% / 10% / 20% / 15% / 15%
+
+Aplique a mesma proporção para proteinas_g, carboidratos_g e gorduras_g em cada refeição. Antes de retornar o JSON, confira mentalmente que a soma bate com a meta.`;
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
@@ -226,7 +234,7 @@ function completarPlano(plano: unknown): Plano {
   // Se não bater, ajusta proporcionalmente calorias e macros de cada alimento.
   const metaKcal = Number(String(p.resumo?.meta_calorica ?? "").replace(/[^0-9.]/g, "")) || 0;
   const somaKcal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
-  if (metaKcal > 0 && somaKcal > 0 && Math.abs(somaKcal - metaKcal) > 100) {
+  if (metaKcal > 0 && somaKcal > 0 && Math.abs(somaKcal - metaKcal) > 150) {
     const fator = metaKcal / somaKcal;
     console.warn(
       `[gerarPlano] Soma das refeições (${somaKcal} kcal) difere da meta (${metaKcal} kcal). Ajustando por fator ${fator.toFixed(3)}.`,
