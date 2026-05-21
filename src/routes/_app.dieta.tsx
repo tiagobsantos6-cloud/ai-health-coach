@@ -116,12 +116,16 @@ function Dieta() {
     [refeicoesCalc, refeicoesFeitas],
   );
 
+  // Meta calórica = soma real das refeições do plano (fonte da verdade).
+  // Macros mantêm a meta do resumo do plano.
   const meta = {
-    kcal: cleanNum(plano.resumo.meta_calorica),
+    kcal: totals.kcal,
     p: cleanNum(plano.resumo.proteinas_g),
     c: cleanNum(plano.resumo.carboidratos_g),
     g: cleanNum(plano.resumo.gorduras_g),
   };
+  const metaResumo = cleanNum(plano.resumo.meta_calorica);
+  const diferenca = totals.kcal - metaResumo;
 
   useEffect(() => {
     // eslint-disable-next-line no-console
