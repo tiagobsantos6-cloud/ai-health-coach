@@ -238,6 +238,7 @@ export const useStore = create<State>()(
         const t = today();
         const cur = s.refeicoesData === t ? s.refeicoesFeitas : {};
         const refeicoesFeitas = { ...cur, [idx]: !cur[idx] };
+        if (!refeicoesFeitas[idx]) delete refeicoesFeitas[idx];
         salvarRefeicoesFeitasHoje(refeicoesFeitas);
         set({ refeicoesFeitas, refeicoesData: t });
       },
