@@ -29,26 +29,21 @@ const cleanNum = (val: string | number) => {
   return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
 };
 
-const today = () => new Date().toISOString().slice(0, 10);
-const storageKey = (d: string) => `refeicoes_feitas_${d}`;
-
 function Dieta() {
   const plano = useStore((s) => s.plano);
   const planoAss = useStore((s) => s.planoAssinatura);
   const trocarAlimento = useStore((s) => s.trocarAlimento);
   const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
   const toggleRefeicao = useStore((s) => s.toggleRefeicaoFeita);
+  const carregarRefeicoesFeitasHoje = useStore((s) => s.carregarRefeicoesFeitasHoje);
   const [openSub, setOpenSub] = useState(false);
   const [openItems, setOpenItems] = useState<string[]>(["item-0"]);
 
-  // Ao entrar na página /dieta, refeições começam SEMPRE desmarcadas.
-  // Só ficam marcadas quando o usuário clicar em "Marcar como feita" nesta sessão.
+  // Ao entrar na página /dieta, restaura as refeições marcadas no dia atual.
+  // Chaves antigas são limpas automaticamente no store.
   useEffect(() => {
-    useStore.setState({ refeicoesFeitas: {}, refeicoesData: today() });
-    try {
-      localStorage.removeItem(storageKey(today()));
-    } catch {}
-  }, []);
+    carregarRefeicoesFeitasHoje();
+  }, [carregarRefeicoesFeitasHoje]);
 
 
 
