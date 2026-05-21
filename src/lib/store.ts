@@ -266,7 +266,7 @@ export const useStore = create<State>()(
         checklist: s.checklist,
         checklistData: s.checklistData,
         tema: s.tema,
-        // refeicoesFeitas intentionally NOT persisted — sempre começa em branco ao abrir /dieta.
+        // refeicoesFeitas fica em chave diária separada: refeicoes_feitas_YYYY-MM-DD.
         // dados, plano, planoAssinatura intentionally NOT persisted — server is source of truth.
       }),
     },
