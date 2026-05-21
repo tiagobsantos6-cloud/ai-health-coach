@@ -244,8 +244,8 @@ export const useStore = create<State>()(
       },
       resetRefeicoesIfNewDay: () => {
         const s = get();
+        limparRefeicoesAntigas();
         if (s.refeicoesData !== today()) {
-          limparRefeicoesAntigas();
           set({ refeicoesFeitas: {}, refeicoesData: today() });
         }
       },
