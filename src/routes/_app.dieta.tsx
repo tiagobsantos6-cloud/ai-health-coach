@@ -166,25 +166,25 @@ function Dieta() {
         )}
       </div>
 
-      {/* Resumo diário */}
+      {/* Resumo diário — começa em zero, acumula apenas ao marcar refeição como feita */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex items-end justify-between mb-1">
           <h2 className="card-title">Resumo do dia</h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-primary leading-none">
-              {totals.kcal}
+              {Math.round(consumido.kcal)}
               <span className="text-sm text-muted-foreground font-medium"> / {meta.kcal} kcal</span>
             </div>
             <div className="text-[11px] text-muted-foreground mt-1">
-              Consumido: <span className="text-foreground font-semibold">{Math.round(consumido.kcal)}</span> kcal
+              Planejado: <span className="text-foreground font-semibold">{totals.kcal}</span> kcal
               {" · "}Restante: <span className="text-foreground font-semibold">{Math.max(0, meta.kcal - Math.round(consumido.kcal))}</span> kcal
             </div>
           </div>
         </div>
         <div className="space-y-3 mt-4">
-          <MacroBar label="Proteínas" value={totals.p} goal={meta.p} color="var(--success)" />
-          <MacroBar label="Carboidratos" value={totals.c} goal={meta.c} color="var(--chart-3)" />
-          <MacroBar label="Gorduras" value={totals.g} goal={meta.g} color="var(--destructive)" />
+          <MacroBar label="Proteínas" value={consumido.p} goal={meta.p} color="var(--success)" />
+          <MacroBar label="Carboidratos" value={consumido.c} goal={meta.c} color="var(--chart-3)" />
+          <MacroBar label="Gorduras" value={consumido.g} goal={meta.g} color="var(--destructive)" />
         </div>
       </Card>
 
