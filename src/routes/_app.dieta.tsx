@@ -29,8 +29,8 @@ const cleanNum = (val: string | number) => {
   return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
 };
 
-const STORAGE_KEY = "refeicoes_hoje";
 const today = () => new Date().toISOString().slice(0, 10);
+const storageKey = (d: string) => `refeicoes_feitas_${d}`;
 
 function Dieta() {
   const plano = useStore((s) => s.plano);
@@ -42,31 +42,30 @@ function Dieta() {
   const [openSub, setOpenSub] = useState(false);
   const [openItems, setOpenItems] = useState<string[]>(["item-0"]);
 
-  // Reset at new day + hydrate from 'refeicoes_hoje'
+  // Reset at new day + hydrate from per-day key 'refeicoes_feitas_YYYY-MM-DD'
   useEffect(() => {
     resetRefeicoes();
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const key = storageKey(today());
+      const raw = localStorage.getItem(key);
       if (raw) {
-        const parsed = JSON.parse(raw) as { data: string; feitas: Record<number, boolean> };
-        if (parsed?.data === today() && parsed.feitas) {
-          // Sync to store if differs
-          Object.keys(parsed.feitas).forEach((k) => {
-            const idx = Number(k);
-            if (!!refeicoesFeitas[idx] !== !!parsed.feitas[idx]) toggleRefeicao(idx);
-          });
-        }
+        const feitas = JSON.parse(raw) as Record<string, boolean>;
+        Object.keys(feitas).forEach((k) => {
+          const idx = Number(k);
+          if (!!refeicoesFeitas[idx] !== !!feitas[idx]) toggleRefeicao(idx);
+        });
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mirror to localStorage with required key
+  // Mirror to per-day localStorage key so each day starts at zero automatically.
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: today(), feitas: refeicoesFeitas }));
+      localStorage.setItem(storageKey(today()), JSON.stringify(refeicoesFeitas));
     } catch {}
   }, [refeicoesFeitas]);
+
 
   if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
