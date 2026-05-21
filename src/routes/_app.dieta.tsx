@@ -350,19 +350,29 @@ function Dieta() {
 }
 
 function MacroBar({ label, value, goal, color }: { label: string; value: number; goal: number; color: string }) {
+  const rounded = Math.round(value);
+  const goalR = Math.round(goal);
   const pct = Math.min(100, goal ? Math.round((value / goal) * 100) : 0);
+  const over = goal > 0 && rounded > goalR;
+  const exact = goal > 0 && rounded === goalR;
+  const numColor = over ? "#f59e0b" : exact ? "var(--success)" : "var(--foreground)";
+  const barColor = over ? "#f59e0b" : color;
   return (
     <div>
       <div className="flex justify-between items-baseline text-xs mb-1.5">
         <span className="font-semibold text-foreground">{label}</span>
-        <span className="text-muted-foreground">
-          <span className="font-bold text-foreground">{Math.round(value)}g</span> / {Math.round(goal)}g
+        <span className="text-muted-foreground inline-flex items-center gap-1">
+          <span className="font-bold" style={{ color: numColor }}>
+            {rounded}g
+          </span>
+          {over && <span aria-hidden>⚠️</span>}
+          <span>/ {goalR}g</span>
         </span>
       </div>
       <div className="h-2 bg-secondary rounded-full overflow-hidden">
         <div
           className="h-full rounded-full transition-all duration-500"
-          style={{ width: `${pct}%`, background: color }}
+          style={{ width: `${pct}%`, background: barColor }}
         />
       </div>
     </div>
