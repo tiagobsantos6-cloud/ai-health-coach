@@ -2,8 +2,19 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { useStore, type Alimento } from "@/lib/store";
 import { Card } from "@/components/ui/card";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Clock, Replace, Lock, ArrowLeftRight, Check, RotateCcw } from "lucide-react";
@@ -15,22 +26,25 @@ export const Route = createFileRoute("/_app/dieta")({
   head: () => ({
     meta: [
       { title: "Dieta — VitaIA" },
-      { name: "description", content: "Seu plano alimentar do dia: refeições, macros, substituições e progresso de calorias." },
+      {
+        name: "description",
+        content:
+          "Seu plano alimentar do dia: refeições, macros, substituições e progresso de calorias.",
+      },
       { property: "og:title", content: "Dieta — VitaIA" },
-      { property: "og:description", content: "Plano alimentar personalizado com macros e substituições inteligentes." },
+      {
+        property: "og:description",
+        content: "Plano alimentar personalizado com macros e substituições inteligentes.",
+      },
     ],
   }),
   component: Dieta,
 });
 
-
 const cleanNum = (val: string | number) => {
   if (typeof val === "number") return val;
   return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
 };
-
-const today = () => new Date().toISOString().slice(0, 10);
-const storageKey = (d: string) => `refeicoes_feitas_${d}`;
 
 function Dieta() {
   const plano = useStore((s) => s.plano);
@@ -38,27 +52,22 @@ function Dieta() {
   const trocarAlimento = useStore((s) => s.trocarAlimento);
   const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
   const toggleRefeicao = useStore((s) => s.toggleRefeicaoFeita);
+  const carregarRefeicoesFeitasHoje = useStore((s) => s.carregarRefeicoesFeitasHoje);
   const [openSub, setOpenSub] = useState(false);
   const [openItems, setOpenItems] = useState<string[]>(["item-0"]);
 
-  // Ao entrar na página /dieta, refeições começam SEMPRE desmarcadas.
-  // Só ficam marcadas quando o usuário clicar em "Marcar como feita" nesta sessão.
+  // Ao entrar na página /dieta, restaura as refeições marcadas no dia atual.
+  // Chaves antigas são limpas automaticamente no store.
   useEffect(() => {
-    useStore.setState({ refeicoesFeitas: {}, refeicoesData: today() });
-    try {
-      localStorage.removeItem(storageKey(today()));
-    } catch {}
-  }, []);
+    carregarRefeicoesFeitasHoje();
+  }, [carregarRefeicoesFeitasHoje]);
 
-
-
-  if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
 
   // Compute per-meal kcal/macros from the food list (single source of truth).
   const refeicoesCalc = useMemo(
     () =>
-      plano.plano_alimentar.map((r) => {
+      (plano?.plano_alimentar ?? []).map((r) => {
         const acc = r.alimentos.reduce(
           (a, al) => ({
             kcal: a.kcal + (Number(al.calorias) || 0),
@@ -105,19 +114,14 @@ function Dieta() {
   // Macros mantêm a meta do resumo do plano.
   const meta = {
     kcal: totals.kcal,
-    p: cleanNum(plano.resumo.proteinas_g),
-    c: cleanNum(plano.resumo.carboidratos_g),
-    g: cleanNum(plano.resumo.gorduras_g),
+    p: cleanNum(plano?.resumo.proteinas_g ?? 0),
+    c: cleanNum(plano?.resumo.carboidratos_g ?? 0),
+    g: cleanNum(plano?.resumo.gorduras_g ?? 0),
   };
-  const metaResumo = cleanNum(plano.resumo.meta_calorica);
+  const metaResumo = cleanNum(plano?.resumo.meta_calorica ?? 0);
   const diferenca = totals.kcal - metaResumo;
 
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.debug("[Dieta] meta:", meta, "planejado:", totals, "consumido:", consumido);
-  }, [meta.kcal, totals.kcal, consumido.kcal]);
-
-  
+  if (!plano) return null;
 
   return (
     <div className="space-y-6 pb-24">
@@ -149,8 +153,15 @@ function Dieta() {
             </DialogContent>
           </Dialog>
         ) : (
-          <Button asChild variant="outline" size="sm" title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.substituicoes_alimentares]}`}>
-            <Link to="/planos"><Lock className="w-4 h-4 mr-1" /> Substituições</Link>
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.substituicoes_alimentares]}`}
+          >
+            <Link to="/planos">
+              <Lock className="w-4 h-4 mr-1" /> Substituições
+            </Link>
           </Button>
         )}
       </div>
@@ -166,7 +177,11 @@ function Dieta() {
             </div>
             <div className="text-[11px] text-muted-foreground mt-1">
               Planejado: <span className="text-foreground font-semibold">{totals.kcal}</span> kcal
-              {" · "}Restante: <span className="text-foreground font-semibold">{Math.max(0, meta.kcal - Math.round(consumido.kcal))}</span> kcal
+              {" · "}Restante:{" "}
+              <span className="text-foreground font-semibold">
+                {Math.max(0, meta.kcal - Math.round(consumido.kcal))}
+              </span>{" "}
+              kcal
             </div>
           </div>
         </div>
@@ -177,8 +192,12 @@ function Dieta() {
         </div>
       </Card>
 
-
-      <Accordion type="multiple" className="space-y-3" value={openItems} onValueChange={setOpenItems}>
+      <Accordion
+        type="multiple"
+        className="space-y-3"
+        value={openItems}
+        onValueChange={setOpenItems}
+      >
         {plano.plano_alimentar.map((r, i) => {
           const macros = { p: refeicoesCalc[i].p, c: refeicoesCalc[i].c, g: refeicoesCalc[i].g };
           const mealKcal = refeicoesCalc[i].kcal;
@@ -187,7 +206,11 @@ function Dieta() {
             <Card
               key={i}
               className={`overflow-hidden transition-all ${feita ? "border-success/60 bg-success/5" : ""}`}
-              style={feita ? { borderColor: "color-mix(in oklab, var(--success) 60%, transparent)" } : undefined}
+              style={
+                feita
+                  ? { borderColor: "color-mix(in oklab, var(--success) 60%, transparent)" }
+                  : undefined
+              }
             >
               <AccordionItem value={`item-${i}`} className="border-0">
                 <AccordionTrigger className="px-4 hover:no-underline">
@@ -218,7 +241,10 @@ function Dieta() {
                         (o) => o && o.nome && o.nome.toLowerCase() !== a.nome.toLowerCase(),
                       );
                       return (
-                        <div key={j} className="flex justify-between items-center gap-2 py-2 border-b border-border last:border-0">
+                        <div
+                          key={j}
+                          className="flex justify-between items-center gap-2 py-2 border-b border-border last:border-0"
+                        >
                           <div className="min-w-0 flex-1">
                             <div className="text-sm font-medium flex items-center gap-1.5">
                               <span className="truncate">{a.nome}</span>
@@ -245,12 +271,21 @@ function Dieta() {
                                           onClick={() => trocarAlimento(i, j, o as Alimento)}
                                           className="w-full text-left p-2 rounded-md hover:bg-muted text-xs"
                                         >
-                                          <div className="font-medium text-foreground">{o.nome}</div>
-                                          <div className="text-muted-foreground">
-                                            {o.quantidade_g}g — {medidaCaseira(o.nome, o.quantidade_g, o.medida_caseira)}
+                                          <div className="font-medium text-foreground">
+                                            {o.nome}
                                           </div>
                                           <div className="text-muted-foreground">
-                                            {o.calorias} kcal · P {Math.round(o.proteinas_g || 0)}g · C {Math.round(o.carboidratos_g || 0)}g · G {Math.round(o.gorduras_g || 0)}g
+                                            {o.quantidade_g}g —{" "}
+                                            {medidaCaseira(
+                                              o.nome,
+                                              o.quantidade_g,
+                                              o.medida_caseira,
+                                            )}
+                                          </div>
+                                          <div className="text-muted-foreground">
+                                            {o.calorias} kcal · P {Math.round(o.proteinas_g || 0)}g
+                                            · C {Math.round(o.carboidratos_g || 0)}g · G{" "}
+                                            {Math.round(o.gorduras_g || 0)}g
                                           </div>
                                         </button>
                                       ))}
@@ -260,10 +295,13 @@ function Dieta() {
                               )}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              {a.quantidade_g}g — {medidaCaseira(a.nome, a.quantidade_g, a.medida_caseira)}
+                              {a.quantidade_g}g —{" "}
+                              {medidaCaseira(a.nome, a.quantidade_g, a.medida_caseira)}
                             </div>
                           </div>
-                          <div className="text-xs text-muted-foreground shrink-0">{a.calorias} kcal</div>
+                          <div className="text-xs text-muted-foreground shrink-0">
+                            {a.calorias} kcal
+                          </div>
                         </div>
                       );
                     })}
@@ -323,9 +361,12 @@ function Dieta() {
             <div className="text-muted-foreground">Diferença</div>
             <div
               className="font-bold"
-              style={{ color: Math.abs(diferenca) <= 100 ? "var(--success)" : "var(--destructive)" }}
+              style={{
+                color: Math.abs(diferenca) <= 100 ? "var(--success)" : "var(--destructive)",
+              }}
             >
-              {diferenca >= 0 ? "+" : ""}{diferenca} kcal
+              {diferenca >= 0 ? "+" : ""}
+              {diferenca} kcal
             </div>
           </div>
         </div>
@@ -334,7 +375,17 @@ function Dieta() {
   );
 }
 
-function MacroBar({ label, value, goal, color }: { label: string; value: number; goal: number; color: string }) {
+function MacroBar({
+  label,
+  value,
+  goal,
+  color,
+}: {
+  label: string;
+  value: number;
+  goal: number;
+  color: string;
+}) {
   const rounded = Math.round(value);
   const goalR = Math.round(goal);
   const pct = Math.min(100, goal ? Math.round((value / goal) * 100) : 0);
