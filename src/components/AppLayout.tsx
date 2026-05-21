@@ -7,6 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getMyTierFn } from "@/lib/subscription.functions";
 import { getMyDataFn, saveMyDataFn } from "@/lib/userdata.functions";
+import { LoadingPlano } from "@/components/LoadingPlano";
 
 const sideItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
