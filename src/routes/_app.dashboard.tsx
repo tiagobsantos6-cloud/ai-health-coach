@@ -37,8 +37,13 @@ function Dashboard() {
 
   const macros = useMemo(() => {
     if (!plano) return null;
+    // Meta calórica = soma real das refeições do plano (fonte da verdade).
+    const kcalSum = plano.plano_alimentar.reduce((acc, r) => {
+      const m = r.alimentos.reduce((a, al) => a + (Number(al.calorias) || 0), 0);
+      return acc + m;
+    }, 0);
     return {
-      kcal: cleanNum(plano.resumo.meta_calorica),
+      kcal: Math.round(kcalSum),
       p: cleanNum(plano.resumo.proteinas_g),
       c: cleanNum(plano.resumo.carboidratos_g),
       g: cleanNum(plano.resumo.gorduras_g),

@@ -116,12 +116,16 @@ function Dieta() {
     [refeicoesCalc, refeicoesFeitas],
   );
 
+  // Meta calórica = soma real das refeições do plano (fonte da verdade).
+  // Macros mantêm a meta do resumo do plano.
   const meta = {
-    kcal: cleanNum(plano.resumo.meta_calorica),
+    kcal: totals.kcal,
     p: cleanNum(plano.resumo.proteinas_g),
     c: cleanNum(plano.resumo.carboidratos_g),
     g: cleanNum(plano.resumo.gorduras_g),
   };
+  const metaResumo = cleanNum(plano.resumo.meta_calorica);
+  const diferenca = totals.kcal - metaResumo;
 
   useEffect(() => {
     // eslint-disable-next-line no-console
@@ -321,11 +325,24 @@ function Dieta() {
       </Accordion>
 
       <div className="fixed bottom-16 md:bottom-4 left-4 right-4 md:left-auto md:right-8 md:w-auto bg-card border border-border rounded-xl shadow-lg p-3 z-30">
-        <div className="flex justify-around md:gap-6 text-xs">
-          <div className="text-center"><div className="text-muted-foreground">kcal</div><div className="font-bold text-primary">{Math.round(consumido.kcal)}</div></div>
-          <div className="text-center"><div className="text-muted-foreground">P</div><div className="font-bold">{Math.round(consumido.p)}g</div></div>
-          <div className="text-center"><div className="text-muted-foreground">C</div><div className="font-bold">{Math.round(consumido.c)}g</div></div>
-          <div className="text-center"><div className="text-muted-foreground">G</div><div className="font-bold">{Math.round(consumido.g)}g</div></div>
+        <div className="flex justify-around md:gap-6 text-xs items-center">
+          <div className="text-center">
+            <div className="text-muted-foreground">Total do plano</div>
+            <div className="font-bold text-primary">{totals.kcal} kcal</div>
+          </div>
+          <div className="text-center">
+            <div className="text-muted-foreground">Meta</div>
+            <div className="font-bold">{metaResumo} kcal</div>
+          </div>
+          <div className="text-center">
+            <div className="text-muted-foreground">Diferença</div>
+            <div
+              className="font-bold"
+              style={{ color: Math.abs(diferenca) <= 100 ? "var(--success)" : "var(--destructive)" }}
+            >
+              {diferenca >= 0 ? "+" : ""}{diferenca} kcal
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -26,7 +26,9 @@ O JSON deve ter exatamente esta estrutura:
   "metas": { "peso_desejado": 0, "prazo_semanas": 0, "perda_semanal_kg": 0, "perda_mensal_kg": 0 }
 }
 
-IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado (perda_semanal_kg ≈ déficit calórico necessário). Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.`;
+IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado (perda_semanal_kg ≈ déficit calórico necessário). Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.
+
+OBRIGATÓRIO — CALORIAS DAS REFEIÇÕES: A soma total das calorias de todas as refeições do plano_alimentar DEVE ser igual ao valor de resumo.meta_calorica. Distribua as calorias entre as refeições de forma que a soma bata exatamente com a meta. Se o usuário pediu 3 refeições e a meta é 3266 kcal, cada refeição deve ter calorias suficientes para atingir esse total (ex.: 1100 + 1100 + 1066). As mesmas regras valem proporcionalmente para proteinas_g, carboidratos_g e gorduras_g.`;
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
@@ -219,6 +221,36 @@ function completarPlano(plano: unknown): Plano {
     };
   });
   p.substituicoes = substituicoes;
+
+  // Validação: soma das refeições deve bater com meta_calorica (±100 kcal).
+  // Se não bater, ajusta proporcionalmente calorias e macros de cada alimento.
+  const metaKcal = Number(String(p.resumo?.meta_calorica ?? "").replace(/[^0-9.]/g, "")) || 0;
+  const somaKcal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
+  if (metaKcal > 0 && somaKcal > 0 && Math.abs(somaKcal - metaKcal) > 100) {
+    const fator = metaKcal / somaKcal;
+    console.warn(
+      `[gerarPlano] Soma das refeições (${somaKcal} kcal) difere da meta (${metaKcal} kcal). Ajustando por fator ${fator.toFixed(3)}.`,
+    );
+    p.plano_alimentar = p.plano_alimentar.map((r) => {
+      const alimentos = r.alimentos.map((a) => ({
+        ...a,
+        calorias: Math.round((a.calorias || 0) * fator),
+        proteinas_g: Math.round(((a.proteinas_g || 0) * fator) * 10) / 10,
+        carboidratos_g: Math.round(((a.carboidratos_g || 0) * fator) * 10) / 10,
+        gorduras_g: Math.round(((a.gorduras_g || 0) * fator) * 10) / 10,
+      }));
+      return {
+        ...r,
+        alimentos,
+        total_calorias: Math.round(alimentos.reduce((acc, a) => acc + (a.calorias || 0), 0)),
+      };
+    });
+  }
+
+  // Sincroniza resumo.meta_calorica com a soma real das refeições (fonte da verdade).
+  const somaFinal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
+  p.resumo = { ...p.resumo, meta_calorica: String(somaFinal) };
+
   return p;
 }
 
