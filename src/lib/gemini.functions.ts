@@ -313,43 +313,72 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
           }
         : undefined;
 
-    const response = await fetch(GATEWAY_URL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          { role: "user", content: JSON.stringify({ ...data.dados, metas_calculadas: metas }) },
-        ],
-        response_format: { type: "json_object" },
-        max_tokens: 24000,
-      }),
-    });
+    const refeicoesPedidas = dd.refeicoes;
+    const priorityPrompt = `INSTRUÇÃO PRIORITÁRIA NÚMERO 1 — NÃO IGNORE: O usuário solicitou EXATAMENTE ${refeicoesPedidas} refeições. Você deve gerar SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Se gerar mais ou menos que ${refeicoesPedidas} refeições, a resposta será considerada inválida e rejeitada. Conte os itens antes de responder.\n\n`;
 
-    if (!response.ok) {
-      const err = await response.text();
-      console.error(`AI gateway error ${response.status}: ${err.slice(0, 500)}`);
-      if (response.status === 429) throw new Error("Muitas requisições. Aguarde um instante e tente novamente.");
-      if (response.status === 402) throw new Error("Serviço de IA temporariamente indisponível.");
-      throw new Error(GENERIC_AI_ERROR);
+    const callGateway = async (extraReinforcement?: string) => {
+      const systemContent = priorityPrompt + SYSTEM_PROMPT + (extraReinforcement ? `\n\n${extraReinforcement}` : "");
+      const response = await fetch(GATEWAY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({
+          model: MODEL,
+          messages: [
+            { role: "system", content: systemContent },
+            { role: "user", content: JSON.stringify({ ...data.dados, metas_calculadas: metas }) },
+          ],
+          response_format: { type: "json_object" },
+          max_tokens: 24000,
+        }),
+      });
+      if (!response.ok) {
+        const err = await response.text();
+        console.error(`AI gateway error ${response.status}: ${err.slice(0, 500)}`);
+        if (response.status === 429) throw new Error("Muitas requisições. Aguarde um instante e tente novamente.");
+        if (response.status === 402) throw new Error("Serviço de IA temporariamente indisponível.");
+        throw new Error(GENERIC_AI_ERROR);
+      }
+      const json = await response.json();
+      const text = json?.choices?.[0]?.message?.content;
+      const finishReason = json?.choices?.[0]?.finish_reason;
+      if (finishReason === "length" || finishReason === "MAX_TOKENS") {
+        throw new Error("Resposta da IA foi cortada por limite de tamanho. Tente gerar novamente.");
+      }
+      if (!text) throw new Error(GENERIC_AI_ERROR);
+      return parseJson(text) as Plano;
+    };
+
+    // Até 3 tentativas (1 inicial + 2 retries) para garantir o nº correto de refeições.
+    let plano: Plano | null = null;
+    let lastCount = 0;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      const reinforcement =
+        attempt > 1
+          ? `⚠️ TENTATIVA ${attempt}: Na resposta anterior você gerou ${lastCount} refeições, mas o usuário pediu EXATAMENTE ${refeicoesPedidas}. Gere SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Conte antes de responder.`
+          : undefined;
+      const raw = await callGateway(reinforcement);
+      lastCount = raw?.plano_alimentar?.length ?? 0;
+      if (lastCount === refeicoesPedidas) {
+        plano = raw;
+        break;
+      }
+      console.warn(
+        `[gerarPlano] tentativa ${attempt}: recebeu ${lastCount} refeições, esperava ${refeicoesPedidas}. ${attempt < 3 ? "Tentando novamente..." : "Limite atingido."}`,
+      );
     }
-    const json = await response.json();
-    const text = json?.choices?.[0]?.message?.content;
-    const finishReason = json?.choices?.[0]?.finish_reason;
-    if (finishReason === "length" || finishReason === "MAX_TOKENS") {
-      throw new Error("Resposta da IA foi cortada por limite de tamanho. Tente gerar novamente.");
+    if (!plano) {
+      throw new Error(
+        `Não foi possível gerar um plano com ${refeicoesPedidas} refeições após 3 tentativas. Por favor, tente novamente.`,
+      );
     }
-    if (!text) {
-      throw new Error(GENERIC_AI_ERROR);
-    }
-    const plano = completarPlano(parseJson(text));
-    if (metas) plano.metas = metas;
-    return { json: JSON.stringify(plano) };
+    const planoFinal = completarPlano(plano);
+    if (metas) planoFinal.metas = metas;
+    return { json: JSON.stringify(planoFinal) };
   });
+
 
 export const gerarAjustesFn = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
