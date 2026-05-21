@@ -133,11 +133,45 @@ type State = {
   resetChecklistIfNewDay: () => void;
   toggleRefeicaoFeita: (idx: number) => void;
   resetRefeicoesIfNewDay: () => void;
+  setRefeicoesFeitasHoje: (refeicoes: Record<number, boolean>) => void;
+  carregarRefeicoesFeitasHoje: () => void;
   setTema: (t: "dark" | "light") => void;
   reset: () => void;
 };
 
 const today = () => new Date().toISOString().slice(0, 10);
+const REFEICOES_STORAGE_PREFIX = "refeicoes_feitas_";
+const refeicoesStorageKey = (date = today()) => `${REFEICOES_STORAGE_PREFIX}${date}`;
+
+const storageDisponivel = () => typeof window !== "undefined" && !!window.localStorage;
+
+const limparRefeicoesAntigas = () => {
+  if (!storageDisponivel()) return;
+  const hoje = today();
+  Object.keys(localStorage)
+    .filter((k) => k.startsWith(REFEICOES_STORAGE_PREFIX) && !k.includes(hoje))
+    .forEach((k) => localStorage.removeItem(k));
+};
+
+const lerRefeicoesFeitasHoje = () => {
+  if (!storageDisponivel()) return {};
+  limparRefeicoesAntigas();
+  const salvo = localStorage.getItem(refeicoesStorageKey());
+  if (!salvo) return {};
+  try {
+    const parsed = JSON.parse(salvo);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    localStorage.removeItem(refeicoesStorageKey());
+    return {};
+  }
+};
+
+const salvarRefeicoesFeitasHoje = (refeicoes: Record<number, boolean>) => {
+  if (!storageDisponivel()) return;
+  limparRefeicoesAntigas();
+  localStorage.setItem(refeicoesStorageKey(), JSON.stringify(refeicoes));
+};
 
 export const useStore = create<State>()(
   persist(
@@ -203,11 +237,23 @@ export const useStore = create<State>()(
         const s = get();
         const t = today();
         const cur = s.refeicoesData === t ? s.refeicoesFeitas : {};
-        set({ refeicoesFeitas: { ...cur, [idx]: !cur[idx] }, refeicoesData: t });
+        const refeicoesFeitas = { ...cur, [idx]: !cur[idx] };
+        salvarRefeicoesFeitasHoje(refeicoesFeitas);
+        set({ refeicoesFeitas, refeicoesData: t });
       },
       resetRefeicoesIfNewDay: () => {
         const s = get();
-        if (s.refeicoesData !== today()) set({ refeicoesFeitas: {}, refeicoesData: today() });
+        if (s.refeicoesData !== today()) {
+          limparRefeicoesAntigas();
+          set({ refeicoesFeitas: {}, refeicoesData: today() });
+        }
+      },
+      setRefeicoesFeitasHoje: (refeicoes) => {
+        salvarRefeicoesFeitasHoje(refeicoes);
+        set({ refeicoesFeitas: refeicoes, refeicoesData: today() });
+      },
+      carregarRefeicoesFeitasHoje: () => {
+        set({ refeicoesFeitas: lerRefeicoesFeitasHoje(), refeicoesData: today() });
       },
       reset: () => set({ dados: null, plano: null, agua: [], evolucao: [], checklist: {}, refeicoesFeitas: {} }),
     }),
