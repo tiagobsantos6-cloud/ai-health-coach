@@ -322,10 +322,10 @@ function Dieta() {
 
       <div className="fixed bottom-16 md:bottom-4 left-4 right-4 md:left-auto md:right-8 md:w-auto bg-card border border-border rounded-xl shadow-lg p-3 z-30">
         <div className="flex justify-around md:gap-6 text-xs">
-          <div className="text-center"><div className="text-muted-foreground">kcal</div><div className="font-bold text-primary">{Math.round(totals.kcal)}</div></div>
-          <div className="text-center"><div className="text-muted-foreground">P</div><div className="font-bold">{Math.round(totals.p)}g</div></div>
-          <div className="text-center"><div className="text-muted-foreground">C</div><div className="font-bold">{Math.round(totals.c)}g</div></div>
-          <div className="text-center"><div className="text-muted-foreground">G</div><div className="font-bold">{Math.round(totals.g)}g</div></div>
+          <div className="text-center"><div className="text-muted-foreground">kcal</div><div className="font-bold text-primary">{Math.round(consumido.kcal)}</div></div>
+          <div className="text-center"><div className="text-muted-foreground">P</div><div className="font-bold">{Math.round(consumido.p)}g</div></div>
+          <div className="text-center"><div className="text-muted-foreground">C</div><div className="font-bold">{Math.round(consumido.c)}g</div></div>
+          <div className="text-center"><div className="text-muted-foreground">G</div><div className="font-bold">{Math.round(consumido.g)}g</div></div>
         </div>
       </div>
     </div>
