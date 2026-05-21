@@ -41,27 +41,40 @@ function Treino() {
             </TabsTrigger>
           ))}
         </TabsList>
-        {dias.map((d, i) => (
-          <TabsContent key={i} value={d.dia ?? String(i)} className="space-y-3 mt-4">
-            <div className="text-sm text-muted-foreground">Foco: <span className="text-foreground font-medium">{d.foco}</span></div>
-            {d.exercicios.map((ex, j) => (
-              <ExercicioCard key={j} ex={ex} />
-            ))}
-            {d.cardio?.tipo && (
-              <Card className="p-4 border-primary/30 bg-primary/5">
-                <div className="flex items-center gap-2 mb-1">
-                  <Activity className="w-4 h-4 text-primary" />
-                  <span className="font-semibold">Cardio</span>
-                </div>
-                <div className="flex gap-2 flex-wrap">
-                  <Badge variant="secondary">{d.cardio.tipo}</Badge>
-                  <Badge variant="secondary">{d.cardio.duracao_min} min</Badge>
-                  <Badge variant="secondary">{d.cardio.intensidade}</Badge>
-                </div>
-              </Card>
-            )}
-          </TabsContent>
-        ))}
+        {dias.map((d, i) => {
+          const semExercicios = !d.exercicios || d.exercicios.length === 0;
+          return (
+            <TabsContent key={i} value={d.dia ?? String(i)} className="space-y-3 mt-4">
+              {semExercicios ? (
+                <Card className="p-8 text-center">
+                  <div className="text-3xl mb-2">💪</div>
+                  <div className="font-semibold">Dia de descanso</div>
+                  <div className="text-sm text-muted-foreground mt-1">Aproveite para recuperar!</div>
+                </Card>
+              ) : (
+                <>
+                  <div className="text-sm text-muted-foreground">Foco: <span className="text-foreground font-medium">{d.foco}</span></div>
+                  {d.exercicios.map((ex, j) => (
+                    <ExercicioCard key={j} ex={ex} />
+                  ))}
+                  {d.cardio?.tipo && (
+                    <Card className="p-4 border-primary/30 bg-primary/5">
+                      <div className="flex items-center gap-2 mb-1">
+                        <Activity className="w-4 h-4 text-primary" />
+                        <span className="font-semibold">Cardio</span>
+                      </div>
+                      <div className="flex gap-2 flex-wrap">
+                        <Badge variant="secondary">{d.cardio.tipo}</Badge>
+                        <Badge variant="secondary">{d.cardio.duracao_min} min</Badge>
+                        <Badge variant="secondary">{d.cardio.intensidade}</Badge>
+                      </div>
+                    </Card>
+                  )}
+                </>
+              )}
+            </TabsContent>
+          );
+        })}
       </Tabs>
     </div>
   );
