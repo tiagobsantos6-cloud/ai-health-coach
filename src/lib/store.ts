@@ -213,7 +213,16 @@ export const useStore = create<State>()(
         const t = today();
         const arr = s.aguaData === t ? s.agua : [];
         set({
-          agua: [...arr, { ml, horario: new Date().toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" }) }],
+          agua: [
+            ...arr,
+            {
+              ml,
+              horario: new Date().toLocaleTimeString("pt-BR", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }),
+            },
+          ],
           aguaData: t,
         });
       },
@@ -256,7 +265,15 @@ export const useStore = create<State>()(
       carregarRefeicoesFeitasHoje: () => {
         set({ refeicoesFeitas: lerRefeicoesFeitasHoje(), refeicoesData: today() });
       },
-      reset: () => set({ dados: null, plano: null, agua: [], evolucao: [], checklist: {}, refeicoesFeitas: {} }),
+      reset: () =>
+        set({
+          dados: null,
+          plano: null,
+          agua: [],
+          evolucao: [],
+          checklist: {},
+          refeicoesFeitas: {},
+        }),
     }),
     {
       name: "vita-store",
