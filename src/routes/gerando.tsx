@@ -6,6 +6,8 @@ import { gerarPlano } from "@/lib/gemini";
 import { Sparkles, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { saveMyDataFn } from "@/lib/userdata.functions";
 
 export const Route = createFileRoute("/gerando")({
   head: () => ({
