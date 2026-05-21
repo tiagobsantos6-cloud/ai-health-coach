@@ -29,8 +29,8 @@ const cleanNum = (val: string | number) => {
   return Number(val.toString().replace(/[^0-9.]/g, "")) || 0;
 };
 
-const STORAGE_KEY = "refeicoes_hoje";
 const today = () => new Date().toISOString().slice(0, 10);
+const storageKey = (d: string) => `refeicoes_feitas_${d}`;
 
 function Dieta() {
   const plano = useStore((s) => s.plano);
@@ -42,31 +42,30 @@ function Dieta() {
   const [openSub, setOpenSub] = useState(false);
   const [openItems, setOpenItems] = useState<string[]>(["item-0"]);
 
-  // Reset at new day + hydrate from 'refeicoes_hoje'
+  // Reset at new day + hydrate from per-day key 'refeicoes_feitas_YYYY-MM-DD'
   useEffect(() => {
     resetRefeicoes();
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
+      const key = storageKey(today());
+      const raw = localStorage.getItem(key);
       if (raw) {
-        const parsed = JSON.parse(raw) as { data: string; feitas: Record<number, boolean> };
-        if (parsed?.data === today() && parsed.feitas) {
-          // Sync to store if differs
-          Object.keys(parsed.feitas).forEach((k) => {
-            const idx = Number(k);
-            if (!!refeicoesFeitas[idx] !== !!parsed.feitas[idx]) toggleRefeicao(idx);
-          });
-        }
+        const feitas = JSON.parse(raw) as Record<string, boolean>;
+        Object.keys(feitas).forEach((k) => {
+          const idx = Number(k);
+          if (!!refeicoesFeitas[idx] !== !!feitas[idx]) toggleRefeicao(idx);
+        });
       }
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mirror to localStorage with required key
+  // Mirror to per-day localStorage key so each day starts at zero automatically.
   useEffect(() => {
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify({ data: today(), feitas: refeicoesFeitas }));
+      localStorage.setItem(storageKey(today()), JSON.stringify(refeicoesFeitas));
     } catch {}
   }, [refeicoesFeitas]);
+
 
   if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
@@ -167,25 +166,25 @@ function Dieta() {
         )}
       </div>
 
-      {/* Resumo diário */}
+      {/* Resumo diário — começa em zero, acumula apenas ao marcar refeição como feita */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex items-end justify-between mb-1">
           <h2 className="card-title">Resumo do dia</h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-primary leading-none">
-              {totals.kcal}
+              {Math.round(consumido.kcal)}
               <span className="text-sm text-muted-foreground font-medium"> / {meta.kcal} kcal</span>
             </div>
             <div className="text-[11px] text-muted-foreground mt-1">
-              Consumido: <span className="text-foreground font-semibold">{Math.round(consumido.kcal)}</span> kcal
+              Planejado: <span className="text-foreground font-semibold">{totals.kcal}</span> kcal
               {" · "}Restante: <span className="text-foreground font-semibold">{Math.max(0, meta.kcal - Math.round(consumido.kcal))}</span> kcal
             </div>
           </div>
         </div>
         <div className="space-y-3 mt-4">
-          <MacroBar label="Proteínas" value={totals.p} goal={meta.p} color="var(--success)" />
-          <MacroBar label="Carboidratos" value={totals.c} goal={meta.c} color="var(--chart-3)" />
-          <MacroBar label="Gorduras" value={totals.g} goal={meta.g} color="var(--destructive)" />
+          <MacroBar label="Proteínas" value={consumido.p} goal={meta.p} color="var(--success)" />
+          <MacroBar label="Carboidratos" value={consumido.c} goal={meta.c} color="var(--chart-3)" />
+          <MacroBar label="Gorduras" value={consumido.g} goal={meta.g} color="var(--destructive)" />
         </div>
       </Card>
 
@@ -323,10 +322,10 @@ function Dieta() {
 
       <div className="fixed bottom-16 md:bottom-4 left-4 right-4 md:left-auto md:right-8 md:w-auto bg-card border border-border rounded-xl shadow-lg p-3 z-30">
         <div className="flex justify-around md:gap-6 text-xs">
-          <div className="text-center"><div className="text-muted-foreground">kcal</div><div className="font-bold text-primary">{Math.round(totals.kcal)}</div></div>
-          <div className="text-center"><div className="text-muted-foreground">P</div><div className="font-bold">{Math.round(totals.p)}g</div></div>
-          <div className="text-center"><div className="text-muted-foreground">C</div><div className="font-bold">{Math.round(totals.c)}g</div></div>
-          <div className="text-center"><div className="text-muted-foreground">G</div><div className="font-bold">{Math.round(totals.g)}g</div></div>
+          <div className="text-center"><div className="text-muted-foreground">kcal</div><div className="font-bold text-primary">{Math.round(consumido.kcal)}</div></div>
+          <div className="text-center"><div className="text-muted-foreground">P</div><div className="font-bold">{Math.round(consumido.p)}g</div></div>
+          <div className="text-center"><div className="text-muted-foreground">C</div><div className="font-bold">{Math.round(consumido.c)}g</div></div>
+          <div className="text-center"><div className="text-muted-foreground">G</div><div className="font-bold">{Math.round(consumido.g)}g</div></div>
         </div>
       </div>
     </div>
