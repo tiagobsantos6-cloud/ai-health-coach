@@ -219,9 +219,8 @@ export const useStore = create<State>()(
         evolucao: s.evolucao,
         checklist: s.checklist,
         checklistData: s.checklistData,
-        refeicoesFeitas: s.refeicoesFeitas,
-        refeicoesData: s.refeicoesData,
         tema: s.tema,
+        // refeicoesFeitas intentionally NOT persisted — sempre começa em branco ao abrir /dieta.
         // dados, plano, planoAssinatura intentionally NOT persisted — server is source of truth.
       }),
     },
