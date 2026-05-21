@@ -38,33 +38,18 @@ function Dieta() {
   const trocarAlimento = useStore((s) => s.trocarAlimento);
   const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
   const toggleRefeicao = useStore((s) => s.toggleRefeicaoFeita);
-  const resetRefeicoes = useStore((s) => s.resetRefeicoesIfNewDay);
   const [openSub, setOpenSub] = useState(false);
   const [openItems, setOpenItems] = useState<string[]>(["item-0"]);
 
-  // Reset at new day + hydrate from per-day key 'refeicoes_feitas_YYYY-MM-DD'
+  // Ao entrar na página /dieta, refeições começam SEMPRE desmarcadas.
+  // Só ficam marcadas quando o usuário clicar em "Marcar como feita" nesta sessão.
   useEffect(() => {
-    resetRefeicoes();
+    useStore.setState({ refeicoesFeitas: {}, refeicoesData: today() });
     try {
-      const key = storageKey(today());
-      const raw = localStorage.getItem(key);
-      if (raw) {
-        const feitas = JSON.parse(raw) as Record<string, boolean>;
-        Object.keys(feitas).forEach((k) => {
-          const idx = Number(k);
-          if (!!refeicoesFeitas[idx] !== !!feitas[idx]) toggleRefeicao(idx);
-        });
-      }
+      localStorage.removeItem(storageKey(today()));
     } catch {}
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Mirror to per-day localStorage key so each day starts at zero automatically.
-  useEffect(() => {
-    try {
-      localStorage.setItem(storageKey(today()), JSON.stringify(refeicoesFeitas));
-    } catch {}
-  }, [refeicoesFeitas]);
 
 
   if (!plano) return null;

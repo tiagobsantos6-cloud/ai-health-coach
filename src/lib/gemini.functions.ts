@@ -13,6 +13,8 @@ const SYSTEM_PROMPT = `Você é um especialista em nutrição esportiva, persona
 
 Mantenha o JSON compacto: frases curtas, no máximo 5 alimentos por refeição e no máximo 6 exercícios por dia. NÃO inclua arrays "opcoes" dentro dos alimentos e NÃO preencha "substituicoes"; o sistema adicionará as substituições equivalentes automaticamente. No objeto "resumo", envie apenas números em string (ex: "2500" em vez de "2500 kcal").
 
+⚠️ OBRIGATÓRIO — QUANTIDADE DE REFEIÇÕES: gere EXATAMENTE o número de refeições que o usuário informou no campo "refeicoes". Se o usuário pediu 3 refeições, gere apenas 3. Se pediu 4, gere 4. Se pediu 5, gere 5. NUNCA gere mais nem menos que o solicitado. plano_alimentar.length DEVE ser igual a refeicoes.
+
 O JSON deve ter exatamente esta estrutura:
 
 {
@@ -26,17 +28,17 @@ O JSON deve ter exatamente esta estrutura:
   "metas": { "peso_desejado": 0, "prazo_semanas": 0, "perda_semanal_kg": 0, "perda_mensal_kg": 0 }
 }
 
-IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado (perda_semanal_kg ≈ déficit calórico necessário). Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.
+IMPORTANTE: Quando o usuário informar peso_desejado e prazo_semanas (objetivos de Emagrecimento ou Definição), calibre a meta calórica, distribuição de macros e intensidade do treino para suportar exatamente o ritmo de perda informado. Não recomende perda acima de 1kg/semana. Repita os valores recebidos no campo "metas" do JSON.
 
-REGRA CRÍTICA: A soma de total_calorias de TODAS as refeições em plano_alimentar DEVE ser EXATAMENTE igual ao valor de meta_calorica em resumo. Se a meta_calorica for 3266 kcal e houver 3 refeições, distribua assim: Café da Manhã ~25% (816 kcal), Almoço ~40% (1306 kcal), Jantar ~35% (1144 kcal). Ajuste os alimentos e quantidades para atingir esses valores. O mesmo vale para proteínas, carboidratos e gorduras: a soma dos macros de todas as refeições deve bater com proteinas_g, carboidratos_g e gorduras_g do resumo.
+REGRA CRÍTICA: A soma de total_calorias de TODAS as refeições em plano_alimentar DEVE ser EXATAMENTE igual ao valor de meta_calorica em resumo. Da mesma forma, a soma de proteinas_g, carboidratos_g e gorduras_g de TODOS os alimentos de TODAS as refeições deve bater EXATAMENTE com os valores de proteinas_g, carboidratos_g e gorduras_g do resumo.
 
-DISTRIBUIÇÃO PADRÃO POR NÚMERO DE REFEIÇÕES (use exatamente estes percentuais da meta_calorica):
+DISTRIBUIÇÃO PADRÃO POR NÚMERO DE REFEIÇÕES (use estes percentuais da meta_calorica E aplique a MESMA proporção para cada macro: proteínas, carboidratos e gorduras):
 - 3 refeições: 25% / 40% / 35%
 - 4 refeições: 20% / 35% / 15% / 30%
 - 5 refeições: 20% / 30% / 10% / 25% / 15%
 - 6 refeições: 15% / 25% / 10% / 20% / 15% / 15%
 
-Aplique a mesma proporção para proteinas_g, carboidratos_g e gorduras_g em cada refeição. Antes de retornar o JSON, confira mentalmente que a soma bate com a meta.`;
+Antes de retornar o JSON, confira: (a) número de refeições é exatamente o solicitado, (b) soma das calorias bate com meta_calorica, (c) soma de cada macro bate com o respectivo valor no resumo.`;
 
 const GATEWAY_URL = "https://ai.gateway.lovable.dev/v1/chat/completions";
 const MODEL = "google/gemini-2.5-flash";
@@ -230,8 +232,7 @@ function completarPlano(plano: unknown): Plano {
   });
   p.substituicoes = substituicoes;
 
-  // Validação: soma das refeições deve bater com meta_calorica (±100 kcal).
-  // Se não bater, ajusta proporcionalmente calorias e macros de cada alimento.
+  // Validação: soma das calorias das refeições deve bater com meta_calorica (±150 kcal).
   const metaKcal = Number(String(p.resumo?.meta_calorica ?? "").replace(/[^0-9.]/g, "")) || 0;
   const somaKcal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
   if (metaKcal > 0 && somaKcal > 0 && Math.abs(somaKcal - metaKcal) > 150) {
@@ -243,9 +244,6 @@ function completarPlano(plano: unknown): Plano {
       const alimentos = r.alimentos.map((a) => ({
         ...a,
         calorias: Math.round((a.calorias || 0) * fator),
-        proteinas_g: Math.round(((a.proteinas_g || 0) * fator) * 10) / 10,
-        carboidratos_g: Math.round(((a.carboidratos_g || 0) * fator) * 10) / 10,
-        gorduras_g: Math.round(((a.gorduras_g || 0) * fator) * 10) / 10,
       }));
       return {
         ...r,
@@ -254,6 +252,31 @@ function completarPlano(plano: unknown): Plano {
       };
     });
   }
+
+  // Validação proporcional de cada macro (proteínas, carboidratos, gorduras):
+  // a soma do macro em todas as refeições deve bater com o alvo do resumo.
+  // Se diferir mais que 10g, ajusta cada alimento proporcionalmente.
+  const macroKeys = ["proteinas_g", "carboidratos_g", "gorduras_g"] as const;
+  macroKeys.forEach((key) => {
+    const alvo = Number(String((p.resumo as Record<string, string>)?.[key] ?? "").replace(/[^0-9.]/g, "")) || 0;
+    const soma = p.plano_alimentar.reduce(
+      (acc, r) => acc + r.alimentos.reduce((a, al) => a + (Number(al[key]) || 0), 0),
+      0,
+    );
+    if (alvo > 0 && soma > 0 && Math.abs(soma - alvo) > 10) {
+      const fator = alvo / soma;
+      console.warn(
+        `[gerarPlano] ${key}: soma ${soma.toFixed(1)}g difere do alvo ${alvo}g. Ajustando por fator ${fator.toFixed(3)}.`,
+      );
+      p.plano_alimentar = p.plano_alimentar.map((r) => ({
+        ...r,
+        alimentos: r.alimentos.map((a) => ({
+          ...a,
+          [key]: Math.round(((Number(a[key]) || 0) * fator) * 10) / 10,
+        })),
+      }));
+    }
+  });
 
   // Sincroniza resumo.meta_calorica com a soma real das refeições (fonte da verdade).
   const somaFinal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
