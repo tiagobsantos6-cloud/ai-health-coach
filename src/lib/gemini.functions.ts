@@ -221,6 +221,36 @@ function completarPlano(plano: unknown): Plano {
     };
   });
   p.substituicoes = substituicoes;
+
+  // Validação: soma das refeições deve bater com meta_calorica (±100 kcal).
+  // Se não bater, ajusta proporcionalmente calorias e macros de cada alimento.
+  const metaKcal = Number(String(p.resumo?.meta_calorica ?? "").replace(/[^0-9.]/g, "")) || 0;
+  const somaKcal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
+  if (metaKcal > 0 && somaKcal > 0 && Math.abs(somaKcal - metaKcal) > 100) {
+    const fator = metaKcal / somaKcal;
+    console.warn(
+      `[gerarPlano] Soma das refeições (${somaKcal} kcal) difere da meta (${metaKcal} kcal). Ajustando por fator ${fator.toFixed(3)}.`,
+    );
+    p.plano_alimentar = p.plano_alimentar.map((r) => {
+      const alimentos = r.alimentos.map((a) => ({
+        ...a,
+        calorias: Math.round((a.calorias || 0) * fator),
+        proteinas_g: Math.round(((a.proteinas_g || 0) * fator) * 10) / 10,
+        carboidratos_g: Math.round(((a.carboidratos_g || 0) * fator) * 10) / 10,
+        gorduras_g: Math.round(((a.gorduras_g || 0) * fator) * 10) / 10,
+      }));
+      return {
+        ...r,
+        alimentos,
+        total_calorias: Math.round(alimentos.reduce((acc, a) => acc + (a.calorias || 0), 0)),
+      };
+    });
+  }
+
+  // Sincroniza resumo.meta_calorica com a soma real das refeições (fonte da verdade).
+  const somaFinal = p.plano_alimentar.reduce((acc, r) => acc + (r.total_calorias || 0), 0);
+  p.resumo = { ...p.resumo, meta_calorica: String(somaFinal) };
+
   return p;
 }
 
