@@ -121,11 +121,6 @@ function Dieta() {
   const metaResumo = cleanNum(plano?.resumo.meta_calorica ?? 0);
   const diferenca = totals.kcal - metaResumo;
 
-  useEffect(() => {
-    // eslint-disable-next-line no-console
-    console.debug("[Dieta] meta:", meta, "planejado:", totals, "consumido:", consumido);
-  }, [meta.kcal, totals.kcal, consumido.kcal]);
-
   if (!plano) return null;
 
   return (
