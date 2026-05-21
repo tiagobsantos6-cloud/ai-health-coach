@@ -8,14 +8,14 @@ export const getMyDataFn = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { data, error } = await context.supabase
       .from("user_data")
-      .select("dados, plano")
+      .select("dados, plano, updated_at")
       .eq("user_id", context.userId)
       .maybeSingle();
     if (error) {
       console.error("[user_data] read error", error);
       throw new Error("Não foi possível carregar seus dados.");
     }
-    return { dados: data?.dados ?? null, plano: data?.plano ?? null };
+    return { dados: data?.dados ?? null, plano: data?.plano ?? null, updatedAt: data?.updated_at ?? null };
   });
 
 const payloadSchema = z.object({
