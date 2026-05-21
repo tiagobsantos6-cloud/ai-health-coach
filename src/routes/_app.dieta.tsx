@@ -62,13 +62,12 @@ function Dieta() {
     carregarRefeicoesFeitasHoje();
   }, [carregarRefeicoesFeitasHoje]);
 
-  if (!plano) return null;
   const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
 
   // Compute per-meal kcal/macros from the food list (single source of truth).
   const refeicoesCalc = useMemo(
     () =>
-      plano.plano_alimentar.map((r) => {
+      (plano?.plano_alimentar ?? []).map((r) => {
         const acc = r.alimentos.reduce(
           (a, al) => ({
             kcal: a.kcal + (Number(al.calorias) || 0),
@@ -115,17 +114,19 @@ function Dieta() {
   // Macros mantêm a meta do resumo do plano.
   const meta = {
     kcal: totals.kcal,
-    p: cleanNum(plano.resumo.proteinas_g),
-    c: cleanNum(plano.resumo.carboidratos_g),
-    g: cleanNum(plano.resumo.gorduras_g),
+    p: cleanNum(plano?.resumo.proteinas_g ?? 0),
+    c: cleanNum(plano?.resumo.carboidratos_g ?? 0),
+    g: cleanNum(plano?.resumo.gorduras_g ?? 0),
   };
-  const metaResumo = cleanNum(plano.resumo.meta_calorica);
+  const metaResumo = cleanNum(plano?.resumo.meta_calorica ?? 0);
   const diferenca = totals.kcal - metaResumo;
 
   useEffect(() => {
     // eslint-disable-next-line no-console
     console.debug("[Dieta] meta:", meta, "planejado:", totals, "consumido:", consumido);
   }, [meta.kcal, totals.kcal, consumido.kcal]);
+
+  if (!plano) return null;
 
   return (
     <div className="space-y-6 pb-24">
