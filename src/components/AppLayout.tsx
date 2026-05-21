@@ -105,6 +105,11 @@ export function AppLayout() {
     navigate({ to: "/login" });
   };
 
+  // Show loading screen while fetching server data — never expose an empty dashboard.
+  if (userId && !hidratado && (dataQuery.isLoading || dataQuery.isFetching) && path !== "/onboarding") {
+    return <LoadingPlano mensagem="Carregando seu plano..." />;
+  }
+
   return (
     <div className="min-h-screen flex w-full bg-background text-foreground">
       <aside className="hidden md:flex flex-col w-[220px] border-r border-border bg-sidebar p-4 sticky top-0 h-screen">
