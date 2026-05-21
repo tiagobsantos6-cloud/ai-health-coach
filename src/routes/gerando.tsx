@@ -6,6 +6,8 @@ import { gerarPlano } from "@/lib/gemini";
 import { Sparkles, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useServerFn } from "@tanstack/react-start";
+import { saveMyDataFn } from "@/lib/userdata.functions";
 
 export const Route = createFileRoute("/gerando")({
   head: () => ({
@@ -38,6 +40,7 @@ function Gerando() {
   const navigate = useNavigate();
   const dados = useStore((s) => s.dados);
   const setPlano = useStore((s) => s.setPlano);
+  const saveData = useServerFn(saveMyDataFn);
   const [msgIdx, setMsgIdx] = useState(0);
   const [erro, setErro] = useState<string | null>(null);
 
@@ -55,6 +58,12 @@ function Gerando() {
     try {
       const plano = await gerarPlano(dados);
       setPlano(plano);
+      // Persist to server BEFORE navigating so dashboard never appears empty.
+      try {
+        await saveData({ data: { dados, plano } });
+      } catch (e) {
+        console.error("[gerando] failed to persist plano", e);
+      }
       navigate({ to: "/dashboard" });
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Erro desconhecido";

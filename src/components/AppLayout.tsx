@@ -7,6 +7,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery } from "@tanstack/react-query";
 import { getMyTierFn } from "@/lib/subscription.functions";
 import { getMyDataFn, saveMyDataFn } from "@/lib/userdata.functions";
+import { LoadingPlano } from "@/components/LoadingPlano";
 
 const sideItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -103,6 +104,11 @@ export function AppLayout() {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
   };
+
+  // Show loading screen while fetching server data — never expose an empty dashboard.
+  if (userId && !hidratado && (dataQuery.isLoading || dataQuery.isFetching) && path !== "/onboarding") {
+    return <LoadingPlano mensagem="Carregando seu plano..." />;
+  }
 
   return (
     <div className="min-h-screen flex w-full bg-background text-foreground">
