@@ -314,7 +314,10 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
         : undefined;
 
     const refeicoesPedidas = dd.refeicoes;
-    const priorityPrompt = `INSTRUÇÃO PRIORITÁRIA NÚMERO 1 — NÃO IGNORE: O usuário solicitou EXATAMENTE ${refeicoesPedidas} refeições. Você deve gerar SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Se gerar mais ou menos que ${refeicoesPedidas} refeições, a resposta será considerada inválida e rejeitada. Conte os itens antes de responder.\n\n`;
+    const diasTreinoPedidos = dd.diasTreino;
+    const priorityPrompt =
+      `REGRA OBRIGATÓRIA DE TREINO: O usuário selecionou ${diasTreinoPedidos} dias de treino por semana. Gere EXATAMENTE ${diasTreinoPedidos} objetos no array treino.dias. Cada objeto deve ter um dia da semana diferente (Segunda, Terça, Quarta, Quinta, Sexta, Sábado ou Domingo) com exercícios reais. NÃO gere dias vazios, NÃO gere dias de descanso no array, NÃO repita dias. Se dias_treino=5, gere 5 objetos com 5 dias diferentes, todos com exercícios.\n\n` +
+      `INSTRUÇÃO PRIORITÁRIA NÚMERO 1 — NÃO IGNORE: O usuário solicitou EXATAMENTE ${refeicoesPedidas} refeições. Você deve gerar SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Se gerar mais ou menos que ${refeicoesPedidas} refeições, a resposta será considerada inválida e rejeitada. Conte os itens antes de responder.\n\n`;
 
     const callGateway = async (extraReinforcement?: string) => {
       const systemContent = priorityPrompt + SYSTEM_PROMPT + (extraReinforcement ? `\n\n${extraReinforcement}` : "");
@@ -351,27 +354,52 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       return parseJson(text) as Plano;
     };
 
-    // Até 3 tentativas (1 inicial + 2 retries) para garantir o nº correto de refeições.
+    // Até 3 tentativas (1 inicial + 2 retries) para garantir nº correto de refeições E dias de treino.
     let plano: Plano | null = null;
-    let lastCount = 0;
+    let lastMealCount = 0;
+    let lastTrainingIssue = "";
     for (let attempt = 1; attempt <= 3; attempt++) {
-      const reinforcement =
-        attempt > 1
-          ? `⚠️ TENTATIVA ${attempt}: Na resposta anterior você gerou ${lastCount} refeições, mas o usuário pediu EXATAMENTE ${refeicoesPedidas}. Gere SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Conte antes de responder.`
-          : undefined;
+      const reinforcementParts: string[] = [];
+      if (attempt > 1 && lastMealCount !== refeicoesPedidas) {
+        reinforcementParts.push(
+          `⚠️ TENTATIVA ${attempt}: Na resposta anterior você gerou ${lastMealCount} refeições, mas o usuário pediu EXATAMENTE ${refeicoesPedidas}. Gere SOMENTE ${refeicoesPedidas} itens no array plano_alimentar.`,
+        );
+      }
+      if (attempt > 1 && lastTrainingIssue) {
+        reinforcementParts.push(
+          `⚠️ TENTATIVA ${attempt} — TREINO: ${lastTrainingIssue}. Gere EXATAMENTE ${diasTreinoPedidos} dias diferentes em treino.dias, todos com exercícios reais.`,
+        );
+      }
+      const reinforcement = reinforcementParts.length ? reinforcementParts.join("\n\n") : undefined;
       const raw = await callGateway(reinforcement);
-      lastCount = raw?.plano_alimentar?.length ?? 0;
-      if (lastCount === refeicoesPedidas) {
+      lastMealCount = raw?.plano_alimentar?.length ?? 0;
+
+      // Validação dupla dos dias de treino.
+      const dias = raw?.treino?.dias ?? [];
+      lastTrainingIssue = "";
+      if (dias.length !== diasTreinoPedidos) {
+        lastTrainingIssue = `recebeu ${dias.length} dias mas esperava ${diasTreinoPedidos}`;
+      } else if (dias.some((d) => !d?.exercicios || d.exercicios.length === 0)) {
+        lastTrainingIssue = "havia dias com array de exercícios vazio";
+      } else {
+        const nomesDias = dias.map((d) => (d.dia || "").trim().toLowerCase());
+        const unicos = new Set(nomesDias);
+        if (unicos.size !== diasTreinoPedidos) {
+          lastTrainingIssue = "havia dias duplicados";
+        }
+      }
+
+      if (lastMealCount === refeicoesPedidas && !lastTrainingIssue) {
         plano = raw;
         break;
       }
       console.warn(
-        `[gerarPlano] tentativa ${attempt}: recebeu ${lastCount} refeições, esperava ${refeicoesPedidas}. ${attempt < 3 ? "Tentando novamente..." : "Limite atingido."}`,
+        `[gerarPlano] tentativa ${attempt}: refeições=${lastMealCount}/${refeicoesPedidas}, treino=${lastTrainingIssue || "ok"}. ${attempt < 3 ? "Tentando novamente..." : "Limite atingido."}`,
       );
     }
     if (!plano) {
       throw new Error(
-        `Não foi possível gerar um plano com ${refeicoesPedidas} refeições após 3 tentativas. Por favor, tente novamente.`,
+        `Não foi possível gerar um plano válido após 3 tentativas. Por favor, tente novamente.`,
       );
     }
     const planoFinal = completarPlano(plano);
