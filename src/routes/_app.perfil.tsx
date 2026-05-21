@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,25 +9,24 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LogOut, ExternalLink, Save, RefreshCw, Trash2, Sparkles } from "lucide-react";
+import { LogOut, Save, RefreshCw, Trash2 } from "lucide-react";
 import { NOMES_PLANOS } from "@/lib/planos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useServerFn } from "@tanstack/react-start";
+import { getMyDataFn } from "@/lib/userdata.functions";
 
 export const Route = createFileRoute("/_app/perfil")({
   head: () => ({
     meta: [
       { title: "Perfil — VitaIA" },
-      { name: "description", content: "Gerencie seus dados, plano atual, chave da IA e configurações da conta no VitaIA." },
+      { name: "description", content: "Gerencie seus dados, plano atual e configurações da conta no VitaIA." },
       { property: "og:title", content: "Perfil — VitaIA" },
       { property: "og:description", content: "Dados pessoais, plano e configurações da sua conta VitaIA." },
     ],
   }),
   component: Perfil,
 });
-
-
-const GEMINI_KEY_STORAGE = "gemini_api_key";
 
 function iniciais(nome: string) {
   if (!nome) return "?";
@@ -48,9 +47,11 @@ function Perfil() {
   const planoAss = useStore((s) => s.planoAssinatura);
   const setDados = useStore((s) => s.setDados);
   const reset = useStore((s) => s.reset);
+  const fetchMyData = useServerFn(getMyDataFn);
 
   const [email, setEmail] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
+  const [planoCriadoEm, setPlanoCriadoEm] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
@@ -58,6 +59,15 @@ function Perfil() {
       setCreatedAt(data.user?.created_at ?? null);
     });
   }, []);
+
+  // Busca data de geração do plano direto do Supabase (user_data.updated_at).
+  useEffect(() => {
+    let cancelled = false;
+    fetchMyData()
+      .then((res) => { if (!cancelled) setPlanoCriadoEm(res?.updatedAt ?? null); })
+      .catch(() => { if (!cancelled) setPlanoCriadoEm(null); });
+    return () => { cancelled = true; };
+  }, [fetchMyData, plano]);
 
   // Editable fields
   const [nome, setNome] = useState(dados?.nome ?? "");
@@ -81,24 +91,6 @@ function Perfil() {
     toast.success("Dados atualizados!");
   };
 
-  // Gemini API key
-  const [apiKey, setApiKey] = useState("");
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setApiKey(localStorage.getItem(GEMINI_KEY_STORAGE) ?? "");
-    }
-  }, []);
-  const apiConfigurada = apiKey.trim().length > 0;
-  const salvarApiKey = () => {
-    localStorage.setItem(GEMINI_KEY_STORAGE, apiKey.trim());
-    toast.success(apiKey.trim() ? "Chave salva." : "Chave removida.");
-  };
-
-  const planoCriadoEm = useMemo(() => {
-    if (typeof window === "undefined") return null;
-    return localStorage.getItem("plano_gerado_em");
-  }, [plano]);
-
   const refazer = () => {
     reset();
     navigate({ to: "/onboarding" });
@@ -119,7 +111,7 @@ function Perfil() {
     <div className="space-y-5">
       <div>
         <h1 className="text-2xl md:text-3xl font-bold">Perfil</h1>
-        <p className="text-sm text-muted-foreground">Seus dados, IA e plano</p>
+        <p className="text-sm text-muted-foreground">Seus dados e plano</p>
       </div>
 
       {/* Identidade */}
@@ -177,58 +169,19 @@ function Perfil() {
           </Button>
         </Card>
 
-        {/* Configuração da IA */}
-        <Card className="p-5 space-y-4">
-          <div className="flex items-start justify-between gap-3">
-            <div>
-              <h2 className="font-semibold flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-primary" /> Configuração da IA
-              </h2>
-              <p className="text-xs text-muted-foreground">Chave opcional do Google Gemini</p>
-            </div>
-            <div className="flex items-center gap-1.5 text-xs">
-              <span className={`w-2.5 h-2.5 rounded-full ${apiConfigurada ? "bg-green-500" : "bg-red-500"}`} />
-              <span className="text-muted-foreground">{apiConfigurada ? "Configurada" : "Não configurada"}</span>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="apikey">Chave da API Google Gemini</Label>
-            <Input
-              id="apikey"
-              type="password"
-              placeholder="AIza..."
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              autoComplete="off"
-            />
-            <a
-              href="https://aistudio.google.com/apikey"
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-            >
-              Obter chave gratuita → aistudio.google.com/apikey
-              <ExternalLink className="w-3 h-3" />
-            </a>
-          </div>
-          <Button onClick={salvarApiKey} variant="outline" className="w-full">
-            <Save className="w-4 h-4 mr-2" /> Salvar chave
-          </Button>
-        </Card>
-
         {/* Meu plano */}
-        <Card className="p-5 space-y-4 md:col-span-2">
+        <Card className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="font-semibold">Meu plano</h2>
               <p className="text-xs text-muted-foreground">Resumo do plano gerado</p>
             </div>
             <Button variant="outline" size="sm" onClick={refazer}>
-              <RefreshCw className="w-4 h-4 mr-2" /> Regenerar plano
+              <RefreshCw className="w-4 h-4 mr-2" /> Regenerar
             </Button>
           </div>
           {plano && dados ? (
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Info label="Objetivo" value={dados.objetivo} />
               <Info label="Gerado em" value={formatDate(planoCriadoEm)} />
               <Info label="TMB" value={plano.resumo.tmb} />
@@ -254,7 +207,7 @@ function Perfil() {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Isso vai apagar seu plano, registros e a chave da API. Não dá pra desfazer.
+                    Isso vai apagar seu plano e seus registros locais. Não dá pra desfazer.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -281,3 +234,4 @@ function Info({ label, value }: { label: string; value: string }) {
     </div>
   );
 }
+
