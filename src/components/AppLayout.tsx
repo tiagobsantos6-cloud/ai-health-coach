@@ -25,6 +25,11 @@ const bottomItems = [
   { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
   { to: "/treino", label: "Treino", icon: Dumbbell },
   { to: "/agua", label: "Água", icon: Droplets },
+] as const;
+
+const menuItems = [
+  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
+  { to: "/planos", label: "Planos", icon: Crown },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
