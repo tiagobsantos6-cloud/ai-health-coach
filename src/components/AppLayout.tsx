@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut, Menu } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMyTierFn } from "@/lib/subscription.functions";
 import { getMyDataFn, saveMyDataFn } from "@/lib/userdata.functions";
 import { LoadingPlano } from "@/components/LoadingPlano";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const sideItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +25,11 @@ const bottomItems = [
   { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
   { to: "/treino", label: "Treino", icon: Dumbbell },
   { to: "/agua", label: "Água", icon: Droplets },
+] as const;
+
+const menuItems = [
+  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
+  { to: "/planos", label: "Planos", icon: Crown },
   { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
@@ -35,6 +41,7 @@ export function AppLayout() {
   const dados = useStore((s) => s.dados);
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Track auth session — gate all server fns on this
   const [userId, setUserId] = useState<string | null>(null);
@@ -184,6 +191,50 @@ export function AppLayout() {
               </Link>
             );
           })}
+          <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
+            <SheetTrigger asChild>
+              <button
+                className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
+                  menuItems.some((m) => m.to === path) ? "text-primary" : "text-muted-foreground"
+                }`}
+                aria-label="Mais opções"
+              >
+                <Menu className="w-[22px] h-[22px]" />
+                Menu
+              </button>
+            </SheetTrigger>
+            <SheetContent side="bottom" className="rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
+              <SheetHeader>
+                <SheetTitle>Mais opções</SheetTitle>
+              </SheetHeader>
+              <div className="flex flex-col gap-1 mt-4">
+                {menuItems.map((it) => {
+                  const active = path === it.to;
+                  const Icon = it.icon;
+                  return (
+                    <Link
+                      key={it.to}
+                      to={it.to}
+                      onClick={() => setMenuOpen(false)}
+                      className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium ${
+                        active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                      }`}
+                    >
+                      <Icon className="w-5 h-5" />
+                      {it.label}
+                    </Link>
+                  );
+                })}
+                <button
+                  onClick={() => { setMenuOpen(false); logout(); }}
+                  className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
+                >
+                  <LogOut className="w-5 h-5" />
+                  Sair
+                </button>
+              </div>
+            </SheetContent>
+          </Sheet>
         </div>
       </nav>
     </div>
