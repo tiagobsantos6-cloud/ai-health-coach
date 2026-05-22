@@ -41,6 +41,7 @@ export function AppLayout() {
   const dados = useStore((s) => s.dados);
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Track auth session — gate all server fns on this
   const [userId, setUserId] = useState<string | null>(null);
