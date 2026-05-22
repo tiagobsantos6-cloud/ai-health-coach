@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut, Menu } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
@@ -8,6 +8,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getMyTierFn } from "@/lib/subscription.functions";
 import { getMyDataFn, saveMyDataFn } from "@/lib/userdata.functions";
 import { LoadingPlano } from "@/components/LoadingPlano";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 
 const sideItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
