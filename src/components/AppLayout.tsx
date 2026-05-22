@@ -148,7 +148,7 @@ export function AppLayout() {
         </button>
       </aside>
 
-      <main className="flex-1 pb-24 md:pb-0 overflow-x-hidden">
+      <main className="flex-1 pb-20 md:pb-0 overflow-x-hidden">
         <header className="md:hidden flex items-center justify-between px-4 h-14 border-b border-border sticky top-0 bg-background/90 backdrop-blur z-30">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-accent flex items-center justify-center">
