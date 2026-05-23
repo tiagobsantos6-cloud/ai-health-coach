@@ -315,7 +315,18 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
 
     const refeicoesPedidas = dd.refeicoes;
     const diasTreinoPedidos = dd.diasTreino;
+    const MAPA_DIAS: Record<number, string[]> = {
+      1: ["Segunda"],
+      2: ["Segunda", "Quinta"],
+      3: ["Segunda", "Quarta", "Sexta"],
+      4: ["Segunda", "Terça", "Quinta", "Sexta"],
+      5: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"],
+      6: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"],
+      7: ["Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado", "Domingo"],
+    };
+    const diasEsperados = MAPA_DIAS[diasTreinoPedidos] ?? MAPA_DIAS[5];
     const priorityPrompt =
+      `MAPEAMENTO OBRIGATÓRIO DE DIAS: Para ${diasTreinoPedidos} dias de treino, use EXATAMENTE estes dias nesta ordem: ${diasEsperados.join(", ")}. Não use outros dias da semana.\n\n` +
       `REGRA OBRIGATÓRIA DE TREINO: O usuário selecionou ${diasTreinoPedidos} dias de treino por semana. Gere EXATAMENTE ${diasTreinoPedidos} objetos no array treino.dias. Cada objeto deve ter um dia da semana diferente (Segunda, Terça, Quarta, Quinta, Sexta, Sábado ou Domingo) com exercícios reais. NÃO gere dias vazios, NÃO gere dias de descanso no array, NÃO repita dias. Se dias_treino=5, gere 5 objetos com 5 dias diferentes, todos com exercícios.\n\n` +
       `INSTRUÇÃO PRIORITÁRIA NÚMERO 1 — NÃO IGNORE: O usuário solicitou EXATAMENTE ${refeicoesPedidas} refeições. Você deve gerar SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Se gerar mais ou menos que ${refeicoesPedidas} refeições, a resposta será considerada inválida e rejeitada. Conte os itens antes de responder.\n\n`;
 
@@ -386,6 +397,12 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
         const unicos = new Set(nomesDias);
         if (unicos.size !== diasTreinoPedidos) {
           lastTrainingIssue = "havia dias duplicados";
+        } else {
+          const diasRecebidos = dias.map((d) => (d.dia || "").trim());
+          const diasCorretos = diasEsperados.every((d, i) => diasRecebidos[i] === d);
+          if (!diasCorretos) {
+            lastTrainingIssue = `dias incorretos: recebeu [${diasRecebidos.join(", ")}] mas esperava [${diasEsperados.join(", ")}]`;
+          }
         }
       }
 
