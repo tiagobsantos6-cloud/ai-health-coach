@@ -60,7 +60,7 @@ function Dieta() {
     carregarRefeicoesFeitasHoje();
   }, [carregarRefeicoesFeitasHoje]);
 
-  const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
+  
 
   // Compute per-meal kcal/macros from the food list (single source of truth).
   const refeicoesCalc = useMemo(
