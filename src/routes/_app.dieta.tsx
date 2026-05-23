@@ -17,9 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Clock, Replace, Lock, ArrowLeftRight, Check, RotateCcw } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
+import { Clock, Replace, ArrowLeftRight, Check, RotateCcw } from "lucide-react";
 import { medidaCaseira } from "@/lib/medidaCaseira";
 
 export const Route = createFileRoute("/_app/dieta")({
@@ -48,7 +46,7 @@ const cleanNum = (val: string | number) => {
 
 function Dieta() {
   const plano = useStore((s) => s.plano);
-  const planoAss = useStore((s) => s.planoAssinatura);
+  
   const trocarAlimento = useStore((s) => s.trocarAlimento);
   const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
   const toggleRefeicao = useStore((s) => s.toggleRefeicaoFeita);
@@ -62,7 +60,7 @@ function Dieta() {
     carregarRefeicoesFeitasHoje();
   }, [carregarRefeicoesFeitasHoje]);
 
-  const podeSubstituir = temAcesso(planoAss, "substituicoes_alimentares");
+  
 
   // Compute per-meal kcal/macros from the food list (single source of truth).
   const refeicoesCalc = useMemo(
@@ -130,40 +128,27 @@ function Dieta() {
           <h1 className="text-2xl md:text-3xl font-bold">Plano alimentar</h1>
           <p className="text-muted-foreground">Suas refeições do dia</p>
         </div>
-        {podeSubstituir ? (
-          <Dialog open={openSub} onOpenChange={setOpenSub}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm">
-                <Replace className="w-4 h-4 mr-1" /> Substituições
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-h-[80vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Substituições equivalentes</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-2">
-                {plano.substituicoes.map((s, i) => (
-                  <div key={i} className="p-3 rounded-lg border border-border">
-                    <div className="font-medium text-sm">{s.original}</div>
-                    <div className="text-xs text-muted-foreground">→ {s.substituto}</div>
-                    <div className="text-xs text-primary mt-1">{s.equivalencia}</div>
-                  </div>
-                ))}
-              </div>
-            </DialogContent>
-          </Dialog>
-        ) : (
-          <Button
-            asChild
-            variant="outline"
-            size="sm"
-            title={`Disponível no plano ${NOMES_PLANOS[RECURSO_MIN.substituicoes_alimentares]}`}
-          >
-            <Link to="/planos">
-              <Lock className="w-4 h-4 mr-1" /> Substituições
-            </Link>
-          </Button>
-        )}
+        <Dialog open={openSub} onOpenChange={setOpenSub}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Replace className="w-4 h-4 mr-1" /> Substituições
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Substituições equivalentes</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-2">
+              {plano.substituicoes.map((s, i) => (
+                <div key={i} className="p-3 rounded-lg border border-border">
+                  <div className="font-medium text-sm">{s.original}</div>
+                  <div className="text-xs text-muted-foreground">→ {s.substituto}</div>
+                  <div className="text-xs text-primary mt-1">{s.equivalencia}</div>
+                </div>
+              ))}
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Resumo diário — começa em zero, acumula apenas ao marcar refeição como feita */}
