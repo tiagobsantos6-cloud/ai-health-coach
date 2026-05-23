@@ -46,7 +46,7 @@ const cleanNum = (val: string | number) => {
 
 function Dieta() {
   const plano = useStore((s) => s.plano);
-  const planoAss = useStore((s) => s.planoAssinatura);
+  
   const trocarAlimento = useStore((s) => s.trocarAlimento);
   const refeicoesFeitas = useStore((s) => s.refeicoesFeitas);
   const toggleRefeicao = useStore((s) => s.toggleRefeicaoFeita);
