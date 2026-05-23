@@ -397,6 +397,12 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
         const unicos = new Set(nomesDias);
         if (unicos.size !== diasTreinoPedidos) {
           lastTrainingIssue = "havia dias duplicados";
+        } else {
+          const diasRecebidos = dias.map((d) => (d.dia || "").trim());
+          const diasCorretos = diasEsperados.every((d, i) => diasRecebidos[i] === d);
+          if (!diasCorretos) {
+            lastTrainingIssue = `dias incorretos: recebeu [${diasRecebidos.join(", ")}] mas esperava [${diasEsperados.join(", ")}]`;
+          }
         }
       }
 
