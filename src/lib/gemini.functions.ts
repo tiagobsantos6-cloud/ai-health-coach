@@ -418,21 +418,6 @@ export const gerarAjustesFn = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     rateLimit();
 
-    // Server-side subscription tier gate (matches `ajustes_ia_evolucao` recurso).
-    const { data: sub, error: subErr } = await context.supabase
-      .from("subscriptions")
-      .select("tier")
-      .eq("user_id", context.userId)
-      .maybeSingle();
-    if (subErr) {
-      console.error("[subscription] read error", subErr);
-      throw new Error(SERVICE_UNAVAILABLE);
-    }
-    const tier = sub?.tier ?? "gratuito";
-    if (tier !== "intermediario" && tier !== "completo") {
-      throw new Error("Recurso disponível apenas nos planos Intermediário ou Completo.");
-    }
-
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) {
       console.error("LOVABLE_API_KEY missing on server");
