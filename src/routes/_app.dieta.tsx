@@ -17,9 +17,7 @@ import {
 } from "@/components/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { Clock, Replace, Lock, ArrowLeftRight, Check, RotateCcw } from "lucide-react";
-import { Link } from "@tanstack/react-router";
-import { temAcesso, NOMES_PLANOS, RECURSO_MIN } from "@/lib/planos";
+import { Clock, Replace, ArrowLeftRight, Check, RotateCcw } from "lucide-react";
 import { medidaCaseira } from "@/lib/medidaCaseira";
 
 export const Route = createFileRoute("/_app/dieta")({
