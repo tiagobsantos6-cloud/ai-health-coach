@@ -104,8 +104,9 @@ export function AppLayout() {
 
   useEffect(() => {
     if (!hidratado) return;
+    if (dataQuery.isLoading || dataQuery.isFetching) return;
     if (!dados && !plano && path !== "/onboarding") navigate({ to: "/onboarding" });
-  }, [hidratado, dados, plano, path, navigate]);
+  }, [hidratado, dados, plano, path, navigate, dataQuery.isLoading, dataQuery.isFetching]);
 
   const logout = async () => {
     await supabase.auth.signOut();
@@ -113,7 +114,7 @@ export function AppLayout() {
   };
 
   // Show loading screen while fetching server data — never expose an empty dashboard.
-  if (userId && !hidratado && (dataQuery.isLoading || dataQuery.isFetching) && path !== "/onboarding") {
+  if (authReady && userId && (!hidratado || dataQuery.isLoading || dataQuery.isFetching) && path !== "/onboarding" && path !== "/gerando") {
     return <LoadingPlano mensagem="Carregando seu plano..." />;
   }
 
