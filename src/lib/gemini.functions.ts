@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { medidaCaseira } from "./medidaCaseira";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-header.middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { Alimento, Plano } from "./store";
 
 const GENERIC_AI_ERROR = "Erro ao contactar serviço de IA. Tente novamente.";
