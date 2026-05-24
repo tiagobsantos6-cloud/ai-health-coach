@@ -1,9 +1,9 @@
 import { createServerFn } from "@tanstack/react-start";
-import { getRequestHeader } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { medidaCaseira } from "./medidaCaseira";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-header.middleware";
+import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import type { Alimento, Plano } from "./store";
 
 const GENERIC_AI_ERROR = "Erro ao contactar serviço de IA. Tente novamente.";
@@ -99,27 +99,39 @@ const historicoSchema = z
   )
   .max(60);
 
-// Lightweight in-memory per-IP rate limiter. Best-effort mitigation; not a
-// substitute for real auth (see security memory).
+// Supabase-backed per-user rate limiter. Janela fixa de 1 minuto, máx 5 req.
+// Best-effort em ambiente serverless: usa upsert atômico em row única por usuário.
 const RATE_WINDOW_MS = 60_000;
 const RATE_MAX = 5;
-const hits = new Map<string, number[]>();
-function rateLimit() {
-  const ip =
-    getRequestHeader("cf-connecting-ip") ||
-    getRequestHeader("x-forwarded-for")?.split(",")[0]?.trim() ||
-    "unknown";
-  const now = Date.now();
-  const arr = (hits.get(ip) || []).filter((t) => now - t < RATE_WINDOW_MS);
-  if (arr.length >= RATE_MAX) {
+
+async function rateLimit(userId: string) {
+  const now = new Date();
+  const { data: existing, error: selErr } = await supabaseAdmin
+    .from("rate_limits")
+    .select("hits, window_start")
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (selErr) {
+    console.error("rate_limits select error", selErr);
+    return; // fail-open para não derrubar a feature por erro de infra
+  }
+
+  const windowStart = existing?.window_start ? new Date(existing.window_start) : null;
+  const dentroDaJanela = windowStart && now.getTime() - windowStart.getTime() < RATE_WINDOW_MS;
+
+  if (dentroDaJanela && (existing?.hits ?? 0) >= RATE_MAX) {
     throw new Error("Muitas requisições. Aguarde um minuto e tente novamente.");
   }
-  arr.push(now);
-  hits.set(ip, arr);
-  if (hits.size > 1000) {
-    // basic cleanup
-    for (const [k, v] of hits) if (!v.some((t) => now - t < RATE_WINDOW_MS)) hits.delete(k);
-  }
+
+  const novoRegistro = dentroDaJanela
+    ? { user_id: userId, hits: (existing!.hits ?? 0) + 1, window_start: existing!.window_start }
+    : { user_id: userId, hits: 1, window_start: now.toISOString() };
+
+  const { error: upErr } = await supabaseAdmin
+    .from("rate_limits")
+    .upsert(novoRegistro, { onConflict: "user_id" });
+  if (upErr) console.error("rate_limits upsert error", upErr);
 }
 
 function repairJson(s: string): string {
@@ -290,8 +302,8 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
   .inputValidator((data: { dados: unknown }) => ({
     dados: dadosSchema.parse((data as { dados: unknown }).dados),
   }))
-  .handler(async ({ data }) => {
-    rateLimit();
+  .handler(async ({ data, context }) => {
+    await rateLimit(context.userId);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) {
       console.error("LOVABLE_API_KEY missing on server");
@@ -433,7 +445,7 @@ export const gerarAjustesFn = createServerFn({ method: "POST" })
     historico: historicoSchema.parse(data.historico),
   }))
   .handler(async ({ data, context }) => {
-    rateLimit();
+    await rateLimit(context.userId);
 
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) {
