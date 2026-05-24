@@ -302,8 +302,8 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
   .inputValidator((data: { dados: unknown }) => ({
     dados: dadosSchema.parse((data as { dados: unknown }).dados),
   }))
-  .handler(async ({ data }) => {
-    rateLimit();
+  .handler(async ({ data, context }) => {
+    await rateLimit(context.userId);
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) {
       console.error("LOVABLE_API_KEY missing on server");
