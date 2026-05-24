@@ -108,6 +108,9 @@ export function AppLayout() {
     if (!dados && !plano && path !== "/onboarding") navigate({ to: "/onboarding" });
   }, [hidratado, dados, plano, path, navigate, dataQuery.isLoading, dataQuery.isFetching]);
 
+  // Close the bottom-sheet menu whenever the route changes.
+  useEffect(() => { setMenuOpen(false); }, [path]);
+
   const logout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
