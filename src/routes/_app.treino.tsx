@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink, ChevronDown, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_app/treino")({
   head: () => ({
@@ -80,7 +79,17 @@ function Treino() {
   );
 }
 
-function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: number; repeticoes: string; descanso_s: number } }) {
+type Exercicio = {
+  nome: string;
+  musculo: string;
+  series: number;
+  repeticoes: string;
+  descanso_s: number;
+  execucao?: string;
+  erros_comuns?: string;
+};
+
+function ExercicioCard({ ex }: { ex: Exercicio }) {
   const [timer, setTimer] = useState(0);
   const [running, setRunning] = useState(false);
   const ref = useRef<number | null>(null);
@@ -112,6 +121,8 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
     setRunning(true);
   };
 
+  const progresso = ex.descanso_s > 0 ? (timer / ex.descanso_s) * 100 : 0;
+
   return (
     <Card className="p-4">
       <div className="flex items-start justify-between gap-2">
@@ -128,20 +139,27 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
       </div>
 
       <div className="mt-3">
-        <ExecucaoModal nome={ex.nome} />
+        <ExecucaoPanel ex={ex} onStartTimer={startTimer} />
       </div>
 
       {(timer > 0 || running) && (
-        <div className="mt-3 p-3 rounded-lg bg-primary/10 flex items-center justify-between">
-          <div className="text-2xl font-bold text-primary tabular-nums">{timer}s</div>
-          <div className="flex gap-2">
-            <Button size="sm" variant="outline" onClick={() => setRunning(!running)} aria-label={running ? "Pausar" : "Retomar"}>
-              {running ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-            </Button>
-            <Button size="sm" variant="outline" onClick={() => { setTimer(0); setRunning(false); }} aria-label="Reiniciar">
-              <RotateCcw className="w-4 h-4" />
-            </Button>
-
+        <div className="mt-3 p-3 rounded-lg bg-primary/10 space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="text-2xl font-bold text-primary tabular-nums">{timer}s</div>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setRunning(!running)} aria-label={running ? "Pausar" : "Retomar"}>
+                {running ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+              </Button>
+              <Button size="sm" variant="outline" onClick={() => { setTimer(0); setRunning(false); }} aria-label="Reiniciar">
+                <RotateCcw className="w-4 h-4" />
+              </Button>
+            </div>
+          </div>
+          <div className="h-2 w-full rounded-full bg-primary/20 overflow-hidden">
+            <div
+              className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+              style={{ width: `${progresso}%` }}
+            />
           </div>
         </div>
       )}
@@ -149,59 +167,61 @@ function ExercicioCard({ ex }: { ex: { nome: string; musculo: string; series: nu
   );
 }
 
-function ExecucaoModal({ nome }: { nome: string }) {
+function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () => void }) {
   const [open, setOpen] = useState(false);
-  const query = encodeURIComponent(`${nome} execução correta`);
-  const searchUrl = `https://www.youtube.com/results?search_query=${query}`;
-  const embedUrl = `https://www.youtube.com/embed?listType=search&list=${query}`;
-  const gifUrl = `https://raw.githubusercontent.com/yuhonas/free-exercise-db/main/exercises/${nome
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_|_$/g, "")}/images/0.jpg`;
-  const [gifOk, setGifOk] = useState(true);
+  const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.nome + " execução correta")}`;
 
   return (
     <div className="space-y-2">
-      {gifOk && (
-        <img
-          src={gifUrl}
-          alt={`Execução: ${nome}`}
-          loading="lazy"
-          onError={() => setGifOk(false)}
-          className="w-full max-h-48 object-contain rounded-md bg-muted"
-        />
-      )}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogTrigger asChild>
-          <Button size="sm" variant="outline" className="w-full">
-            <PlayCircle className="w-4 h-4 mr-2" /> Ver execução
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="text-base">{nome}</DialogTitle>
-          </DialogHeader>
-          <div className="aspect-video w-full rounded-md overflow-hidden bg-black">
-            <iframe
-              src={embedUrl}
-              title={`YouTube: ${nome}`}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              className="w-full h-full"
-            />
-          </div>
+      <Button
+        size="sm"
+        variant="outline"
+        className="w-full"
+        onClick={() => setOpen((v) => !v)}
+        aria-expanded={open}
+      >
+        <PlayCircle className="w-4 h-4 mr-2" />
+        Ver execução
+        <ChevronDown className={`w-4 h-4 ml-auto transition-transform ${open ? "rotate-180" : ""}`} />
+      </Button>
+
+      {open && (
+        <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-3 text-sm">
           <a
             href={searchUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:underline"
+            className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
           >
-            <ExternalLink className="w-4 h-4" /> Abrir busca no YouTube
+            <ExternalLink className="w-4 h-4" /> Ver no YouTube
           </a>
-        </DialogContent>
-      </Dialog>
+
+          {ex.execucao ? (
+            <div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Como executar</div>
+              <p className="whitespace-pre-line leading-relaxed">{ex.execucao}</p>
+            </div>
+          ) : (
+            <p className="text-muted-foreground text-xs">
+              Clique em &quot;Ver no YouTube&quot; para ver a execução correta deste exercício.
+            </p>
+          )}
+
+          {ex.erros_comuns && (
+            <div>
+              <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-destructive mb-1">
+                <AlertTriangle className="w-3.5 h-3.5" /> Erros comuns
+              </div>
+              <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{ex.erros_comuns}</p>
+            </div>
+          )}
+
+          <Button size="sm" variant="secondary" className="w-full" onClick={onStartTimer}>
+            <Timer className="w-4 h-4 mr-2" /> Iniciar descanso ({ex.descanso_s}s)
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
+
