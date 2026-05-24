@@ -9,7 +9,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LogOut, Save, RefreshCw, Trash2 } from "lucide-react";
+import { LogOut, Save, RefreshCw, Trash2, Moon, Sun } from "lucide-react";
 import { NOMES_PLANOS } from "@/lib/planos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -47,6 +47,8 @@ function Perfil() {
   const planoAss = useStore((s) => s.planoAssinatura);
   const setDados = useStore((s) => s.setDados);
   const reset = useStore((s) => s.reset);
+  const tema = useStore((s) => s.tema);
+  const setTema = useStore((s) => s.setTema);
   const fetchMyData = useServerFn(getMyDataFn);
 
   const [email, setEmail] = useState<string | null>(null);
@@ -197,6 +199,10 @@ function Perfil() {
         <Card className="p-5 space-y-3 md:col-span-2">
           <h2 className="font-semibold">Ações</h2>
           <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setTema(tema === "dark" ? "light" : "dark")}>
+              {tema === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+              {tema === "dark" ? "Tema claro" : "Tema escuro"}
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline">

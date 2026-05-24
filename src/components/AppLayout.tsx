@@ -99,8 +99,18 @@ export function AppLayout() {
     saveData({ data: { dados, plano } }).catch((e) => console.error("save user data", e));
   }, [dados, plano, hidratado, userId, saveData]);
 
-  // Force dark theme — MyFitnessPal-inspired design
-  useEffect(() => { document.documentElement.classList.add("dark"); }, []);
+  // Respect the user's saved theme preference.
+  const tema = useStore((s) => s.tema);
+  useEffect(() => {
+    const root = document.documentElement;
+    if (tema === "dark") {
+      root.classList.add("dark");
+      root.classList.remove("light");
+    } else {
+      root.classList.remove("dark");
+      root.classList.add("light");
+    }
+  }, [tema]);
 
   useEffect(() => {
     if (!hidratado) return;
