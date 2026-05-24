@@ -227,7 +227,7 @@ export function AppLayout() {
                       to={it.to}
                       onClick={() => setMenuOpen(false)}
                       className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium ${
-                        active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                        active ? "border-l-2 border-primary bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"
                       }`}
                     >
                       <Icon className="w-5 h-5" />
