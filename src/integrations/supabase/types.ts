@@ -35,6 +35,24 @@ export type Database = {
         }
         Relationships: []
       }
+      rate_limits: {
+        Row: {
+          hits: number
+          user_id: string
+          window_start: string
+        }
+        Insert: {
+          hits?: number
+          user_id: string
+          window_start?: string
+        }
+        Update: {
+          hits?: number
+          user_id?: string
+          window_start?: string
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           tier: Database["public"]["Enums"]["subscription_tier"]
