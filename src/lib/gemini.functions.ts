@@ -445,7 +445,7 @@ export const gerarAjustesFn = createServerFn({ method: "POST" })
     historico: historicoSchema.parse(data.historico),
   }))
   .handler(async ({ data, context }) => {
-    rateLimit();
+    await rateLimit(context.userId);
 
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) {
