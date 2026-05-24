@@ -108,6 +108,9 @@ export function AppLayout() {
     if (!dados && !plano && path !== "/onboarding") navigate({ to: "/onboarding" });
   }, [hidratado, dados, plano, path, navigate, dataQuery.isLoading, dataQuery.isFetching]);
 
+  // Close the bottom-sheet menu whenever the route changes.
+  useEffect(() => { setMenuOpen(false); }, [path]);
+
   const logout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
@@ -194,15 +197,21 @@ export function AppLayout() {
           })}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
-              <button
-                className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
-                  menuItems.some((m) => m.to === path) ? "text-primary" : "text-muted-foreground"
-                }`}
-                aria-label="Mais opções"
-              >
-                <Menu className="w-[22px] h-[22px]" />
-                Menu
-              </button>
+              {(() => {
+                const activeMenuItem = menuItems.find((m) => m.to === path);
+                const isMenuActive = !!activeMenuItem;
+                return (
+                  <button
+                    className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
+                      isMenuActive ? "text-primary" : "text-muted-foreground"
+                    }`}
+                    aria-label="Mais opções"
+                  >
+                    <Menu className={`w-[22px] h-[22px] ${isMenuActive ? "scale-110" : ""} transition-transform`} />
+                    {activeMenuItem ? activeMenuItem.label : "Menu"}
+                  </button>
+                );
+              })()}
             </SheetTrigger>
             <SheetContent side="bottom" className="rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
               <SheetHeader>
@@ -218,7 +227,7 @@ export function AppLayout() {
                       to={it.to}
                       onClick={() => setMenuOpen(false)}
                       className={`flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium ${
-                        active ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-secondary"
+                        active ? "border-l-2 border-primary bg-primary/10 text-primary" : "text-foreground hover:bg-secondary"
                       }`}
                     >
                       <Icon className="w-5 h-5" />
