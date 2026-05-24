@@ -69,6 +69,8 @@ export type Plano = {
         series: number;
         repeticoes: string;
         descanso_s: number;
+        execucao?: string;
+        erros_comuns?: string;
       }>;
       cardio: { tipo: string; duracao_min: number; intensidade: string };
     }>;
