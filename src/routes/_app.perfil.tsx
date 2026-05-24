@@ -199,6 +199,10 @@ function Perfil() {
         <Card className="p-5 space-y-3 md:col-span-2">
           <h2 className="font-semibold">Ações</h2>
           <div className="flex flex-wrap gap-2">
+            <Button variant="outline" onClick={() => setTema(tema === "dark" ? "light" : "dark")}>
+              {tema === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
+              {tema === "dark" ? "Tema claro" : "Tema escuro"}
+            </Button>
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <Button variant="outline">
