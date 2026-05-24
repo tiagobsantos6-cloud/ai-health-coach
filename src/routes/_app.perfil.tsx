@@ -47,6 +47,8 @@ function Perfil() {
   const planoAss = useStore((s) => s.planoAssinatura);
   const setDados = useStore((s) => s.setDados);
   const reset = useStore((s) => s.reset);
+  const tema = useStore((s) => s.tema);
+  const setTema = useStore((s) => s.setTema);
   const fetchMyData = useServerFn(getMyDataFn);
 
   const [email, setEmail] = useState<string | null>(null);
