@@ -197,15 +197,21 @@ export function AppLayout() {
           })}
           <Sheet open={menuOpen} onOpenChange={setMenuOpen}>
             <SheetTrigger asChild>
-              <button
-                className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
-                  menuItems.some((m) => m.to === path) ? "text-primary" : "text-muted-foreground"
-                }`}
-                aria-label="Mais opções"
-              >
-                <Menu className="w-[22px] h-[22px]" />
-                Menu
-              </button>
+              {(() => {
+                const activeMenuItem = menuItems.find((m) => m.to === path);
+                const isMenuActive = !!activeMenuItem;
+                return (
+                  <button
+                    className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
+                      isMenuActive ? "text-primary" : "text-muted-foreground"
+                    }`}
+                    aria-label="Mais opções"
+                  >
+                    <Menu className={`w-[22px] h-[22px] ${isMenuActive ? "scale-110" : ""} transition-transform`} />
+                    {activeMenuItem ? activeMenuItem.label : "Menu"}
+                  </button>
+                );
+              })()}
             </SheetTrigger>
             <SheetContent side="bottom" className="rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
               <SheetHeader>
