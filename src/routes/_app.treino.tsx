@@ -5,8 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Timer, Pause, Play, RotateCcw, PlayCircle, ExternalLink, ChevronDown, AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/_app/treino")({
   head: () => ({
