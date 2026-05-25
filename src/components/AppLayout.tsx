@@ -75,6 +75,7 @@ export function AppLayout() {
 
   const saveData = useServerFn(saveMyDataFn);
   const lastSavedRef = useRef<string>("");
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (tierQuery.data?.tier) setPlanoAssinatura(tierQuery.data.tier);
@@ -95,8 +96,14 @@ export function AppLayout() {
     if (dados === null && plano === null) return;
     const payload = JSON.stringify({ dados, plano });
     if (payload === lastSavedRef.current) return;
-    lastSavedRef.current = payload;
-    saveData({ data: { dados, plano } }).catch((e) => console.error("save user data", e));
+
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      lastSavedRef.current = payload;
+      saveData({ data: { dados, plano } }).catch((e) => console.error("save user data", e));
+    }, 2000);
+
+    return () => { if (saveTimerRef.current) clearTimeout(saveTimerRef.current); };
   }, [dados, plano, hidratado, userId, saveData]);
 
   // Respect the user's saved theme preference.

@@ -77,6 +77,11 @@ function Gerando() {
   }, []);
 
   if (erro) {
+    const mensagemAmigavel = /429|Muitas requisi/i.test(erro)
+      ? "Muitas tentativas. Aguarde 1 minuto e tente novamente."
+      : /tentativas/i.test(erro)
+      ? "Não conseguimos gerar seu plano agora. Tente novamente em alguns minutos."
+      : erro;
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
         <div className="max-w-md text-center space-y-4">
@@ -84,9 +89,12 @@ function Gerando() {
             <AlertCircle className="w-8 h-8 text-destructive" />
           </div>
           <h2 className="text-xl font-bold">Não foi possível gerar seu plano</h2>
-          <p className="text-sm text-muted-foreground break-words">{erro}</p>
+          <p className="text-sm text-muted-foreground break-words">{mensagemAmigavel}</p>
           <div className="flex gap-2 justify-center">
             <Button onClick={tentar}>Tentar novamente</Button>
+            <Button variant="outline" onClick={() => navigate({ to: "/onboarding" })}>
+              Voltar ao início
+            </Button>
           </div>
         </div>
       </div>
