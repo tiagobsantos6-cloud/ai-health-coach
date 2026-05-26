@@ -1,5 +1,5 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
-import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut, Menu } from "lucide-react";
+import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut, Menu, ShoppingCart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +15,7 @@ const sideItems = [
   { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
   { to: "/treino", label: "Treino", icon: Dumbbell },
   { to: "/agua", label: "Água", icon: Droplets },
+  { to: "/compras", label: "Compras", icon: ShoppingCart },
   { to: "/evolucao", label: "Evolução", icon: TrendingUp },
   { to: "/planos", label: "Planos", icon: Crown },
   { to: "/perfil", label: "Perfil", icon: User },
@@ -28,6 +29,7 @@ const bottomItems = [
 ] as const;
 
 const menuItems = [
+  { to: "/compras", label: "Compras", icon: ShoppingCart },
   { to: "/evolucao", label: "Evolução", icon: TrendingUp },
   { to: "/planos", label: "Planos", icon: Crown },
   { to: "/perfil", label: "Perfil", icon: User },
