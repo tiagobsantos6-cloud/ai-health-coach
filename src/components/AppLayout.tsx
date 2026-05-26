@@ -132,6 +132,12 @@ export function AppLayout() {
   useEffect(() => { setMenuOpen(false); }, [path]);
 
   // Schedule local reminders for the current day based on saved config.
+  const [cfgTick, setCfgTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setCfgTick((n) => n + 1);
+    window.addEventListener("lembretes:config", bump);
+    return () => window.removeEventListener("lembretes:config", bump);
+  }, []);
   useEffect(() => {
     if (!hidratado) return;
     const cfg = loadLembretes();
@@ -143,7 +149,7 @@ export function AppLayout() {
       horarioTreino: dados?.horario,
     });
     return cleanup;
-  }, [hidratado, plano, dados]);
+  }, [hidratado, plano, dados, cfgTick]);
 
   // Track pending reminder badges (water/diet/training).
   const [pendentes, setPendentes] = useState<Pendentes>(() => loadPendentes());

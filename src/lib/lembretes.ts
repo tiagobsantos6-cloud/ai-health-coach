@@ -29,6 +29,7 @@ export function loadLembretes(): LembretesConfig {
 
 export function saveLembretes(c: LembretesConfig) {
   try { localStorage.setItem(LEMBRETES_KEY, JSON.stringify(c)); } catch { /* ignore */ }
+  try { window.dispatchEvent(new CustomEvent("lembretes:config")); } catch { /* ignore */ }
 }
 
 export type Pendentes = { agua?: boolean; dieta?: boolean; treino?: boolean };
