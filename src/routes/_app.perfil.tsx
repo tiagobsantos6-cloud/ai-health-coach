@@ -19,7 +19,6 @@ import { Switch } from "@/components/ui/switch";
 import {
   loadLembretes,
   saveLembretes,
-  setupLembretes,
   pedirPermissaoNotificacao,
   type LembretesConfig,
 } from "@/lib/lembretes";
