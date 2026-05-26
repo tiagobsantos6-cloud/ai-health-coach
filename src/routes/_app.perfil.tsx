@@ -295,21 +295,12 @@ type PlanoMini = { plano_alimentar?: Array<{ horario?: string }> } | null;
 type DadosMini = { horario?: string } | null;
 
 function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini }) {
+  void plano; void dados; // agendamento global é feito no AppLayout via evento "lembretes:config".
   const [cfg, setCfg] = useState<LembretesConfig>(() => loadLembretes());
-
-  const opts = {
-    horariosRefeicoes: (plano?.plano_alimentar ?? [])
-      .map((r) => r.horario ?? "")
-      .filter(Boolean),
-    horarioTreino: dados?.horario,
-  };
 
   useEffect(() => {
     saveLembretes(cfg);
-    const cleanup = setupLembretes(cfg, opts);
-    return cleanup;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cfg.agua, cfg.refeicao, cfg.treino]);
+  }, [cfg]);
 
   const toggle = async (key: keyof LembretesConfig, value: boolean) => {
     if (value) {
