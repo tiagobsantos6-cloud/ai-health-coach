@@ -1,5 +1,5 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
 import { gerarPlano } from "@/lib/gemini";
@@ -26,6 +26,7 @@ export const Route = createFileRoute("/gerando")({
   component: Gerando,
 });
 
+const MAX_TENTATIVAS = 3;
 
 const mensagens = [
   "Calculando suas necessidades calóricas...",
@@ -43,32 +44,51 @@ function Gerando() {
   const saveData = useServerFn(saveMyDataFn);
   const [msgIdx, setMsgIdx] = useState(0);
   const [erro, setErro] = useState<string | null>(null);
+  const [tentativa, setTentativa] = useState(1);
+  const [elapsed, setElapsed] = useState(0);
+  const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
     const interval = setInterval(() => setMsgIdx((i) => (i + 1) % mensagens.length), 2200);
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    if (erro) return;
+    const t = setInterval(() => setElapsed(Math.floor((Date.now() - startedAtRef.current) / 1000)), 1000);
+    return () => clearInterval(t);
+  }, [erro]);
+
   const tentar = async () => {
     setErro(null);
+    setTentativa(1);
+    setElapsed(0);
+    startedAtRef.current = Date.now();
     if (!dados) {
       navigate({ to: "/onboarding" });
       return;
     }
-    try {
-      const plano = await gerarPlano(dados);
-      setPlano(plano);
-      // Persist to server BEFORE navigating so dashboard never appears empty.
+    let ultimoErro: unknown = null;
+    for (let i = 1; i <= MAX_TENTATIVAS; i++) {
+      setTentativa(i);
       try {
-        await saveData({ data: { dados, plano } });
+        const plano = await gerarPlano(dados);
+        setPlano(plano);
+        try {
+          await saveData({ data: { dados, plano } });
+        } catch (e) {
+          console.error("[gerando] failed to persist plano", e);
+        }
+        navigate({ to: "/dashboard" });
+        return;
       } catch (e) {
-        console.error("[gerando] failed to persist plano", e);
+        ultimoErro = e;
+        // pequena espera antes de retentar
+        if (i < MAX_TENTATIVAS) await new Promise((r) => setTimeout(r, 1500));
       }
-      navigate({ to: "/dashboard" });
-    } catch (e: unknown) {
-      const msg = e instanceof Error ? e.message : "Erro desconhecido";
-      setErro(msg);
     }
+    const msg = ultimoErro instanceof Error ? ultimoErro.message : "Erro desconhecido";
+    setErro(msg);
   };
 
   useEffect(() => {
@@ -79,9 +99,7 @@ function Gerando() {
   if (erro) {
     const mensagemAmigavel = /429|Muitas requisi/i.test(erro)
       ? "Muitas tentativas. Aguarde 1 minuto e tente novamente."
-      : /tentativas/i.test(erro)
-      ? "Não conseguimos gerar seu plano agora. Tente novamente em alguns minutos."
-      : erro;
+      : `Não conseguimos após ${MAX_TENTATIVAS} tentativas. Tente novamente.`;
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
         <div className="max-w-md text-center space-y-4">
@@ -103,7 +121,7 @@ function Gerando() {
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
-      <div className="text-center space-y-8 max-w-md">
+      <div className="text-center space-y-6 max-w-md w-full">
         <motion.div
           animate={{ rotate: 360, scale: [1, 1.1, 1] }}
           transition={{ rotate: { repeat: Infinity, duration: 3, ease: "linear" }, scale: { repeat: Infinity, duration: 2 } }}
@@ -113,6 +131,11 @@ function Gerando() {
         </motion.div>
         <div>
           <h1 className="text-2xl font-bold mb-3">Gerando seu Plano de Saúde</h1>
+          {tentativa > 1 && (
+            <p className="text-sm text-primary font-semibold mb-2">
+              Tentativa {tentativa} de {MAX_TENTATIVAS} — ajustando o plano...
+            </p>
+          )}
           <motion.p
             key={msgIdx}
             initial={{ opacity: 0, y: 10 }}
@@ -121,7 +144,22 @@ function Gerando() {
           >
             {mensagens[msgIdx]}
           </motion.p>
+          <p className="text-xs text-muted-foreground mt-2">
+            Isso costuma levar entre 15 e 40 segundos
+          </p>
         </div>
+
+        {/* Indeterminate progress bar */}
+        <div className="h-1.5 w-full bg-secondary rounded-full overflow-hidden mx-auto max-w-xs">
+          <div className="h-full w-1/3 bg-primary rounded-full animate-indeterminate" />
+        </div>
+
+        {elapsed > 30 && (
+          <p className="text-sm text-muted-foreground">
+            Está demorando mais que o esperado... mas já estamos quase lá!
+          </p>
+        )}
+
         <div className="flex justify-center gap-1.5">
           {[0, 1, 2].map((i) => (
             <motion.div

@@ -49,7 +49,11 @@ function Perfil() {
   const reset = useStore((s) => s.reset);
   const tema = useStore((s) => s.tema);
   const setTema = useStore((s) => s.setTema);
+  const evolucao = useStore((s) => s.evolucao);
   const fetchMyData = useServerFn(getMyDataFn);
+
+  const [confirmarTexto, setConfirmarTexto] = useState("");
+  const [openLimpar, setOpenLimpar] = useState(false);
 
   const [email, setEmail] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
@@ -98,9 +102,11 @@ function Perfil() {
     navigate({ to: "/onboarding" });
   };
 
-  const limparTudo = () => {
-    localStorage.clear();
-    location.href = "/onboarding";
+  const limparTudo = async () => {
+    try { localStorage.clear(); } catch { /* ignore */ }
+    reset();
+    await supabase.auth.signOut();
+    navigate({ to: "/login" });
   };
 
   const sair = async () => {
@@ -203,7 +209,7 @@ function Perfil() {
               {tema === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
               {tema === "dark" ? "Tema claro" : "Tema escuro"}
             </Button>
-            <AlertDialog>
+            <AlertDialog open={openLimpar} onOpenChange={(o) => { setOpenLimpar(o); if (!o) setConfirmarTexto(""); }}>
               <AlertDialogTrigger asChild>
                 <Button variant="outline">
                   <Trash2 className="w-4 h-4 mr-2" /> Limpar todos os dados
@@ -211,14 +217,37 @@ function Perfil() {
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Tem certeza?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    Isso vai apagar seu plano e seus registros locais. Não dá pra desfazer.
+                  <AlertDialogTitle>Tem certeza? Esta ação não pode ser desfeita.</AlertDialogTitle>
+                  <AlertDialogDescription asChild>
+                    <div className="space-y-3">
+                      <div>Você vai perder:</div>
+                      <ul className="list-disc pl-5 space-y-1 text-sm">
+                        <li>Seu plano alimentar e de treino</li>
+                        <li>Histórico de evolução ({evolucao.length} {evolucao.length === 1 ? "semana registrada" : "semanas registradas"})</li>
+                        <li>Registros de água</li>
+                        <li>Configurações pessoais</li>
+                      </ul>
+                      <div className="pt-1">
+                        Para confirmar, digite <span className="font-mono font-bold text-foreground">CONFIRMAR</span> abaixo:
+                      </div>
+                      <Input
+                        value={confirmarTexto}
+                        onChange={(e) => setConfirmarTexto(e.target.value)}
+                        placeholder="CONFIRMAR"
+                        autoFocus
+                      />
+                    </div>
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={limparTudo}>Limpar tudo</AlertDialogAction>
+                  <AlertDialogCancel className="bg-secondary text-foreground hover:bg-secondary/80">Cancelar</AlertDialogCancel>
+                  <AlertDialogAction
+                    disabled={confirmarTexto !== "CONFIRMAR"}
+                    onClick={limparTudo}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:pointer-events-none"
+                  >
+                    Sim, apagar tudo
+                  </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>

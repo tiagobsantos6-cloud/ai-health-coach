@@ -1,8 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
-import { Droplet, Dumbbell, Moon, Scale } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import { Droplet, Dumbbell, Moon, Scale, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
@@ -153,7 +156,7 @@ function Dashboard() {
       <div className="grid grid-cols-2 gap-3">
         <QuickCard icon={<Droplet className="w-4 h-4" />} title="Água" value={`${aguaTotal}ml`} sub={`${aguaPct}% da meta`} />
         <QuickCard icon={<Dumbbell className="w-4 h-4" />} title="Treino do dia" value={treinoHoje} />
-        <QuickCard icon={<Moon className="w-4 h-4" />} title="Sono" value={`${dados?.sono ?? 8}h`} sub="meta diária" />
+        <SonoCard metaHoras={Number(plano.resumo.sono_ideal_h) || (dados?.sono ?? 8)} />
         <QuickCard icon={<Scale className="w-4 h-4" />} title="Peso atual" value={`${dados?.peso || "—"}kg`} />
       </div>
 
@@ -237,6 +240,98 @@ function QuickCard({ icon, title, value, sub }: { icon: React.ReactNode; title: 
       </div>
       <div className="text-xl font-bold mt-2 truncate">{value}</div>
       {sub && <div className="text-[11px] text-muted-foreground mt-0.5">{sub}</div>}
+    </Card>
+  );
+}
+
+function sonoStorageKey() {
+  const d = new Date();
+  const ymd = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  return `sono_hoje_${ymd}`;
+}
+
+function SonoCard({ metaHoras }: { metaHoras: number }) {
+  const key = sonoStorageKey();
+  const [registrado, setRegistrado] = useState<number | null>(null);
+  const [open, setOpen] = useState(false);
+  const [valor, setValor] = useState<number>(8);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(key);
+      if (raw != null) {
+        const n = Number(raw);
+        if (!Number.isNaN(n)) setRegistrado(n);
+      }
+    } catch { /* ignore */ }
+  }, [key]);
+
+  const salvar = () => {
+    try { localStorage.setItem(key, String(valor)); } catch { /* ignore */ }
+    setRegistrado(valor);
+    setOpen(false);
+  };
+
+  const meta = metaHoras || 8;
+  const atingiu = registrado != null && registrado >= meta;
+  const faltou = registrado != null && registrado < meta ? meta - registrado : 0;
+
+  return (
+    <Card className="p-4 bg-card border-border rounded-2xl">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2 text-muted-foreground text-[11px] uppercase tracking-wider font-semibold">
+          <span className="text-primary"><Moon className="w-4 h-4" /></span>
+          Sono
+        </div>
+        <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (o) setValor(registrado ?? meta); }}>
+          <DialogTrigger asChild>
+            <button
+              className="w-6 h-6 rounded-full bg-primary/15 text-primary flex items-center justify-center hover:bg-primary/25"
+              aria-label="Registrar sono"
+            >
+              <Plus className="w-3.5 h-3.5" />
+            </button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Quantas horas você dormiu?</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4 py-2">
+              <div className="text-center">
+                <div className="text-4xl font-bold text-primary">{valor.toFixed(1)}h</div>
+                <div className="text-xs text-muted-foreground mt-1">Meta: {meta}h</div>
+              </div>
+              <Slider
+                value={[valor]}
+                min={4}
+                max={12}
+                step={0.5}
+                onValueChange={(v) => setValor(v[0])}
+              />
+              <div className="flex justify-between text-[11px] text-muted-foreground">
+                <span>4h</span>
+                <span>12h</span>
+              </div>
+            </div>
+            <DialogFooter>
+              <Button onClick={salvar} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
+                Salvar
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div className="text-xl font-bold mt-2 truncate">
+        {registrado != null ? `${registrado}h` : `${meta}h`}
+      </div>
+      {registrado != null ? (
+        <div className={`text-[11px] mt-0.5 font-medium ${atingiu ? "text-success" : "text-primary"}`}>
+          {atingiu ? "✓ Meta atingida!" : `Faltou ${faltou.toFixed(1)}h para a meta`}
+          <span className="text-muted-foreground font-normal"> · hoje</span>
+        </div>
+      ) : (
+        <div className="text-[11px] text-muted-foreground mt-0.5">meta diária</div>
+      )}
     </Card>
   );
 }
