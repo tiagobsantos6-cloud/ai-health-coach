@@ -226,3 +226,261 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
   );
 }
 
+function beep(freq = 880) {
+  try {
+    const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const ctx = new Ctx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.frequency.value = freq;
+    osc.start();
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+    osc.stop(ctx.currentTime + 0.5);
+  } catch { /* ignore */ }
+}
+
+function fmtTempo(s: number) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+}
+
+type WakeLockSentinelLike = { release: () => Promise<void> };
+
+function ModoTreino({
+  exercicios,
+  diaNome,
+  onClose,
+}: {
+  exercicios: Exercicio[];
+  diaNome: string;
+  onClose: () => void;
+}) {
+  const [idx, setIdx] = useState(0);
+  const [seriesFeitas, setSeriesFeitas] = useState<number[]>(() => exercicios.map(() => 0));
+  const [pulado, setPulado] = useState<boolean[]>(() => exercicios.map(() => false));
+  const [descanso, setDescanso] = useState(0);
+  const [descRunning, setDescRunning] = useState(false);
+  const [tempoTotal, setTempoTotal] = useState(0);
+  const [concluido, setConcluido] = useState(false);
+  const startedRef = useRef<number>(Date.now());
+  const wakeRef = useRef<WakeLockSentinelLike | null>(null);
+
+  const ex = exercicios[idx];
+  const total = exercicios.length;
+  const feitos = seriesFeitas.reduce((a, b) => a + (b > 0 ? 1 : 0), 0) + pulado.filter(Boolean).length;
+
+  // wake lock
+  useEffect(() => {
+    let cancelled = false;
+    type WakeLockNav = { wakeLock?: { request: (t: "screen") => Promise<WakeLockSentinelLike> } };
+    const nav = navigator as unknown as WakeLockNav;
+    nav.wakeLock?.request("screen").then((sentinel) => {
+      if (cancelled) sentinel.release().catch(() => {});
+      else wakeRef.current = sentinel;
+    }).catch(() => {});
+    return () => {
+      cancelled = true;
+      wakeRef.current?.release().catch(() => {});
+      wakeRef.current = null;
+    };
+  }, []);
+
+  // tempo total
+  useEffect(() => {
+    const t = setInterval(() => setTempoTotal(Math.floor((Date.now() - startedRef.current) / 1000)), 1000);
+    return () => clearInterval(t);
+  }, []);
+
+  // countdown descanso
+  useEffect(() => {
+    if (!descRunning) return;
+    if (descanso <= 0) { setDescRunning(false); beep(660); return; }
+    const t = setTimeout(() => setDescanso((d) => d - 1), 1000);
+    return () => clearTimeout(t);
+  }, [descRunning, descanso]);
+
+  // bloquear scroll do body enquanto modo treino ativo
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
+
+  const avancarSeAcabou = (feitas: number) => {
+    if (feitas >= (ex?.series ?? 0)) {
+      // pequena espera para animação
+      setTimeout(() => {
+        if (idx + 1 >= total) {
+          setConcluido(true);
+        } else {
+          setIdx((i) => i + 1);
+          setDescanso(0);
+          setDescRunning(false);
+        }
+      }, 400);
+    }
+  };
+
+  const serieFeita = () => {
+    if (!ex) return;
+    const novas = [...seriesFeitas];
+    novas[idx] = Math.min(ex.series, (novas[idx] || 0) + 1);
+    setSeriesFeitas(novas);
+    beep(880);
+    // inicia descanso automaticamente se ainda faltam séries
+    if (novas[idx] < ex.series) {
+      setDescanso(ex.descanso_s || 60);
+      setDescRunning(true);
+    }
+    avancarSeAcabou(novas[idx]);
+  };
+
+  const pular = () => {
+    const np = [...pulado];
+    np[idx] = true;
+    setPulado(np);
+    setDescanso(0);
+    setDescRunning(false);
+    if (idx + 1 >= total) setConcluido(true);
+    else setIdx((i) => i + 1);
+  };
+
+  const progressoExercicio = total > 0 ? ((idx + 1) / total) * 100 : 0;
+  const progressoSeries = ex && ex.series > 0 ? ((seriesFeitas[idx] || 0) / ex.series) * 100 : 0;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-50 bg-background text-foreground flex flex-col"
+    >
+      {/* Header */}
+      <div className="px-4 pt-4 pb-3 border-b border-border">
+        <div className="flex items-center justify-between gap-3 mb-2">
+          <div className="min-w-0">
+            <div className="text-[11px] uppercase tracking-wider text-muted-foreground">{diaNome}</div>
+            <div className="text-sm font-semibold">
+              {concluido ? "Concluído" : `Exercício ${idx + 1} de ${total}`}
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="text-sm tabular-nums text-muted-foreground">{fmtTempo(tempoTotal)}</div>
+            <button onClick={onClose} aria-label="Sair do modo treino" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+        <div className="h-1.5 bg-secondary rounded-full overflow-hidden">
+          <div className="h-full bg-primary transition-all duration-500" style={{ width: `${concluido ? 100 : progressoExercicio}%` }} />
+        </div>
+      </div>
+
+      {/* Corpo */}
+      <div className="flex-1 overflow-y-auto px-4 py-6">
+        {concluido ? (
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="max-w-md mx-auto text-center space-y-5 pt-8"
+          >
+            <div className="text-6xl">💪</div>
+            <h2 className="text-3xl font-bold">Treino concluído!</h2>
+            <p className="text-muted-foreground">
+              Tempo total: <span className="font-semibold text-foreground tabular-nums">{fmtTempo(tempoTotal)}</span>
+            </p>
+            <Card className="p-4 text-left">
+              <div className="text-xs uppercase tracking-wider text-muted-foreground mb-2">Resumo</div>
+              <ul className="space-y-1.5 text-sm">
+                {exercicios.map((e, i) => {
+                  const sFeitas = seriesFeitas[i] || 0;
+                  const skip = pulado[i];
+                  return (
+                    <li key={i} className="flex items-center justify-between gap-2">
+                      <span className={skip ? "text-muted-foreground line-through" : ""}>{e.nome}</span>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {skip ? "pulado" : `${sFeitas}/${e.series} séries`}
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </Card>
+            <Button className="w-full" onClick={onClose}>Fechar</Button>
+          </motion.div>
+        ) : (
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -30 }}
+              transition={{ duration: 0.25 }}
+              className="max-w-md mx-auto space-y-6"
+            >
+              <div className="text-center space-y-1">
+                <div className="text-xs uppercase tracking-wider text-primary font-semibold">{ex.musculo}</div>
+                <h2 className="text-3xl font-bold leading-tight">{ex.nome}</h2>
+              </div>
+
+              <Card className="p-6 text-center bg-card">
+                <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-1">Séries × Repetições</div>
+                <div className="text-5xl font-extrabold tabular-nums">
+                  {ex.series} <span className="text-primary">×</span> {ex.repeticoes}
+                </div>
+                <div className="mt-4 text-sm text-muted-foreground">
+                  Série atual: <span className="font-semibold text-foreground tabular-nums">{(seriesFeitas[idx] || 0) + 1}</span> de {ex.series}
+                </div>
+                <div className="h-1.5 mt-3 bg-secondary rounded-full overflow-hidden">
+                  <div className="h-full bg-primary transition-all duration-500" style={{ width: `${progressoSeries}%` }} />
+                </div>
+              </Card>
+
+              {descRunning || descanso > 0 ? (
+                <Card className="p-5 bg-primary/10 border-primary/30 text-center space-y-2">
+                  <div className="text-xs uppercase tracking-wider text-primary font-semibold">Descanso</div>
+                  <div className="text-5xl font-bold text-primary tabular-nums">{descanso}s</div>
+                  <div className="h-2 bg-primary/20 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-primary transition-[width] duration-1000 ease-linear"
+                      style={{ width: `${ex.descanso_s ? (descanso / ex.descanso_s) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <div className="flex gap-2 justify-center pt-1">
+                    <Button size="sm" variant="outline" onClick={() => setDescRunning((r) => !r)}>
+                      {descRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => { setDescanso(0); setDescRunning(false); }}>
+                      Pular descanso
+                    </Button>
+                  </div>
+                </Card>
+              ) : null}
+
+              <div className="grid grid-cols-1 gap-2">
+                <Button size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90" onClick={serieFeita}>
+                  <Check className="w-5 h-5 mr-2" />
+                  Série feita
+                </Button>
+                <Button size="lg" variant="outline" onClick={pular}>
+                  <SkipForward className="w-5 h-5 mr-2" />
+                  Pular exercício
+                </Button>
+              </div>
+
+              <div className="text-center text-xs text-muted-foreground">
+                Progresso: {feitos} / {total}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+        )}
+      </div>
+    </motion.div>
+  );
+}
+
+
