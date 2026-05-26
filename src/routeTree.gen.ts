@@ -21,6 +21,7 @@ import { Route as AppPerfilRouteImport } from './routes/_app.perfil'
 import { Route as AppEvolucaoRouteImport } from './routes/_app.evolucao'
 import { Route as AppDietaRouteImport } from './routes/_app.dieta'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppComprasRouteImport } from './routes/_app.compras'
 import { Route as AppAguaRouteImport } from './routes/_app.agua'
 
 const SignupRoute = SignupRouteImport.update({
@@ -82,6 +83,11 @@ const AppDashboardRoute = AppDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AppRoute,
 } as any)
+const AppComprasRoute = AppComprasRouteImport.update({
+  id: '/compras',
+  path: '/compras',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppAguaRoute = AppAguaRouteImport.update({
   id: '/agua',
   path: '/agua',
@@ -95,6 +101,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agua': typeof AppAguaRoute
+  '/compras': typeof AppComprasRoute
   '/dashboard': typeof AppDashboardRoute
   '/dieta': typeof AppDietaRoute
   '/evolucao': typeof AppEvolucaoRoute
@@ -109,6 +116,7 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/agua': typeof AppAguaRoute
+  '/compras': typeof AppComprasRoute
   '/dashboard': typeof AppDashboardRoute
   '/dieta': typeof AppDietaRoute
   '/evolucao': typeof AppEvolucaoRoute
@@ -125,6 +133,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/signup': typeof SignupRoute
   '/_app/agua': typeof AppAguaRoute
+  '/_app/compras': typeof AppComprasRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/dieta': typeof AppDietaRoute
   '/_app/evolucao': typeof AppEvolucaoRoute
@@ -141,6 +150,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/signup'
     | '/agua'
+    | '/compras'
     | '/dashboard'
     | '/dieta'
     | '/evolucao'
@@ -155,6 +165,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/signup'
     | '/agua'
+    | '/compras'
     | '/dashboard'
     | '/dieta'
     | '/evolucao'
@@ -170,6 +181,7 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/signup'
     | '/_app/agua'
+    | '/_app/compras'
     | '/_app/dashboard'
     | '/_app/dieta'
     | '/_app/evolucao'
@@ -273,6 +285,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDashboardRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/compras': {
+      id: '/_app/compras'
+      path: '/compras'
+      fullPath: '/compras'
+      preLoaderRoute: typeof AppComprasRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/agua': {
       id: '/_app/agua'
       path: '/agua'
@@ -285,6 +304,7 @@ declare module '@tanstack/react-router' {
 
 interface AppRouteChildren {
   AppAguaRoute: typeof AppAguaRoute
+  AppComprasRoute: typeof AppComprasRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppDietaRoute: typeof AppDietaRoute
   AppEvolucaoRoute: typeof AppEvolucaoRoute
@@ -295,6 +315,7 @@ interface AppRouteChildren {
 
 const AppRouteChildren: AppRouteChildren = {
   AppAguaRoute: AppAguaRoute,
+  AppComprasRoute: AppComprasRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppDietaRoute: AppDietaRoute,
   AppEvolucaoRoute: AppEvolucaoRoute,
