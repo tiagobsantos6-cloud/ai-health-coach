@@ -9,12 +9,19 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LogOut, Save, RefreshCw, Trash2, Moon, Sun } from "lucide-react";
+import { LogOut, Save, RefreshCw, Trash2, Moon, Sun, Bell } from "lucide-react";
 import { NOMES_PLANOS } from "@/lib/planos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyDataFn } from "@/lib/userdata.functions";
+import { Switch } from "@/components/ui/switch";
+import {
+  loadLembretes,
+  saveLembretes,
+  pedirPermissaoNotificacao,
+  type LembretesConfig,
+} from "@/lib/lembretes";
 
 export const Route = createFileRoute("/_app/perfil")({
   head: () => ({
@@ -256,6 +263,18 @@ function Perfil() {
             </Button>
           </div>
         </Card>
+
+        {/* Lembretes */}
+        <Card className="p-5 space-y-4 md:col-span-2">
+          <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="font-semibold">Lembretes</h2>
+          </div>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Notificações locais no seu dispositivo. Mantenha o app aberto em segundo plano.
+          </p>
+          <LembretesSection plano={plano} dados={dados} />
+        </Card>
       </div>
     </div>
   );
@@ -266,6 +285,50 @@ function Info({ label, value }: { label: string; value: string }) {
     <div className="bg-secondary/40 rounded-lg p-3">
       <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
       <div className="font-semibold truncate text-sm mt-0.5">{value}</div>
+    </div>
+  );
+}
+
+
+type PlanoMini = { plano_alimentar?: Array<{ horario?: string }> } | null;
+type DadosMini = { horario?: string } | null;
+
+function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini }) {
+  void plano; void dados; // agendamento global é feito no AppLayout via evento "lembretes:config".
+  const [cfg, setCfg] = useState<LembretesConfig>(() => loadLembretes());
+
+  useEffect(() => {
+    saveLembretes(cfg);
+  }, [cfg]);
+
+  const toggle = async (key: keyof LembretesConfig, value: boolean) => {
+    if (value) {
+      const perm = await pedirPermissaoNotificacao();
+      if (perm !== "granted") {
+        toast.error("Permissão de notificação negada. Ative nas configurações do navegador.");
+        return;
+      }
+    }
+    setCfg((c) => ({ ...c, [key]: value }));
+  };
+
+  const itens: Array<{ key: keyof LembretesConfig; titulo: string; desc: string }> = [
+    { key: "agua", titulo: "Lembrete de água", desc: "A cada 2h entre 7h e 22h" },
+    { key: "refeicao", titulo: "Lembrete de refeição", desc: "15 min antes de cada horário do plano" },
+    { key: "treino", titulo: "Lembrete de treino", desc: "30 min antes do horário preferido" },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {itens.map((it) => (
+        <div key={it.key} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-secondary/40">
+          <div className="min-w-0">
+            <div className="font-medium text-sm">{it.titulo}</div>
+            <div className="text-xs text-muted-foreground">{it.desc}</div>
+          </div>
+          <Switch checked={cfg[it.key]} onCheckedChange={(v) => toggle(it.key, v)} />
+        </div>
+      ))}
     </div>
   );
 }

@@ -9,6 +9,7 @@ import { getMyTierFn } from "@/lib/subscription.functions";
 import { getMyDataFn, saveMyDataFn } from "@/lib/userdata.functions";
 import { LoadingPlano } from "@/components/LoadingPlano";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { loadLembretes, setupLembretes, loadPendentes, limparPendente, type Pendentes } from "@/lib/lembretes";
 
 const sideItems = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -130,6 +131,50 @@ export function AppLayout() {
   // Close the bottom-sheet menu whenever the route changes.
   useEffect(() => { setMenuOpen(false); }, [path]);
 
+  // Schedule local reminders for the current day based on saved config.
+  const [cfgTick, setCfgTick] = useState(0);
+  useEffect(() => {
+    const bump = () => setCfgTick((n) => n + 1);
+    window.addEventListener("lembretes:config", bump);
+    return () => window.removeEventListener("lembretes:config", bump);
+  }, []);
+  useEffect(() => {
+    if (!hidratado) return;
+    const cfg = loadLembretes();
+    const horariosRefeicoes = (plano?.plano_alimentar ?? [])
+      .map((r) => r.horario ?? "")
+      .filter(Boolean);
+    const cleanup = setupLembretes(cfg, {
+      horariosRefeicoes,
+      horarioTreino: dados?.horario,
+    });
+    return cleanup;
+  }, [hidratado, plano, dados, cfgTick]);
+
+  // Track pending reminder badges (water/diet/training).
+  const [pendentes, setPendentes] = useState<Pendentes>(() => loadPendentes());
+  useEffect(() => {
+    const sync = () => setPendentes(loadPendentes());
+    window.addEventListener("lembretes:pendentes", sync);
+    window.addEventListener("storage", sync);
+    return () => {
+      window.removeEventListener("lembretes:pendentes", sync);
+      window.removeEventListener("storage", sync);
+    };
+  }, []);
+  useEffect(() => {
+    if (path === "/agua") limparPendente("agua");
+    if (path === "/dieta") limparPendente("dieta");
+    if (path === "/treino") limparPendente("treino");
+  }, [path]);
+
+  const badgeFor = (to: string): boolean => {
+    if (to === "/agua") return !!pendentes.agua;
+    if (to === "/dieta") return !!pendentes.dieta;
+    if (to === "/treino") return !!pendentes.treino;
+    return false;
+  };
+
   const logout = async () => {
     await supabase.auth.signOut();
     navigate({ to: "/login" });
@@ -201,6 +246,7 @@ export function AppLayout() {
           {bottomItems.map((it) => {
             const active = path === it.to;
             const Icon = it.icon;
+            const hasBadge = badgeFor(it.to);
             return (
               <Link
                 key={it.to}
@@ -209,7 +255,12 @@ export function AppLayout() {
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                <Icon className={`w-[22px] h-[22px] ${active ? "scale-110" : ""} transition-transform`} />
+                <span className="relative">
+                  <Icon className={`w-[22px] h-[22px] ${active ? "scale-110" : ""} transition-transform`} />
+                  {hasBadge && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" />
+                  )}
+                </span>
                 {it.label}
               </Link>
             );
