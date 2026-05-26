@@ -1,11 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink, ChevronDown, AlertTriangle } from "lucide-react";
+import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink, ChevronDown, AlertTriangle, X, SkipForward, Check } from "lucide-react";
 
 export const Route = createFileRoute("/_app/treino")({
   head: () => ({
