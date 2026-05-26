@@ -9,12 +9,20 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LogOut, Save, RefreshCw, Trash2, Moon, Sun } from "lucide-react";
+import { LogOut, Save, RefreshCw, Trash2, Moon, Sun, Bell } from "lucide-react";
 import { NOMES_PLANOS } from "@/lib/planos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyDataFn } from "@/lib/userdata.functions";
+import { Switch } from "@/components/ui/switch";
+import {
+  loadLembretes,
+  saveLembretes,
+  setupLembretes,
+  pedirPermissaoNotificacao,
+  type LembretesConfig,
+} from "@/lib/lembretes";
 
 export const Route = createFileRoute("/_app/perfil")({
   head: () => ({
