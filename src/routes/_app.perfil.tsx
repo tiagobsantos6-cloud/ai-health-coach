@@ -290,3 +290,56 @@ function Info({ label, value }: { label: string; value: string }) {
   );
 }
 
+
+type PlanoMini = { plano_alimentar?: Array<{ horario?: string }> } | null;
+type DadosMini = { horario?: string } | null;
+
+function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini }) {
+  const [cfg, setCfg] = useState<LembretesConfig>(() => loadLembretes());
+
+  const opts = {
+    horariosRefeicoes: (plano?.plano_alimentar ?? [])
+      .map((r) => r.horario ?? "")
+      .filter(Boolean),
+    horarioTreino: dados?.horario,
+  };
+
+  useEffect(() => {
+    saveLembretes(cfg);
+    const cleanup = setupLembretes(cfg, opts);
+    return cleanup;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cfg.agua, cfg.refeicao, cfg.treino]);
+
+  const toggle = async (key: keyof LembretesConfig, value: boolean) => {
+    if (value) {
+      const perm = await pedirPermissaoNotificacao();
+      if (perm !== "granted") {
+        toast.error("Permissão de notificação negada. Ative nas configurações do navegador.");
+        return;
+      }
+    }
+    setCfg((c) => ({ ...c, [key]: value }));
+  };
+
+  const itens: Array<{ key: keyof LembretesConfig; titulo: string; desc: string }> = [
+    { key: "agua", titulo: "Lembrete de água", desc: "A cada 2h entre 7h e 22h" },
+    { key: "refeicao", titulo: "Lembrete de refeição", desc: "15 min antes de cada horário do plano" },
+    { key: "treino", titulo: "Lembrete de treino", desc: "30 min antes do horário preferido" },
+  ];
+
+  return (
+    <div className="space-y-3">
+      {itens.map((it) => (
+        <div key={it.key} className="flex items-center justify-between gap-3 p-3 rounded-xl bg-secondary/40">
+          <div className="min-w-0">
+            <div className="font-medium text-sm">{it.titulo}</div>
+            <div className="text-xs text-muted-foreground">{it.desc}</div>
+          </div>
+          <Switch checked={cfg[it.key]} onCheckedChange={(v) => toggle(it.key, v)} />
+        </div>
+      ))}
+    </div>
+  );
+}
+
