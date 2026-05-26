@@ -264,6 +264,18 @@ function Perfil() {
             </Button>
           </div>
         </Card>
+
+        {/* Lembretes */}
+        <Card className="p-5 space-y-4 md:col-span-2">
+          <div className="flex items-center gap-2">
+            <Bell className="w-4 h-4 text-primary" />
+            <h2 className="font-semibold">Lembretes</h2>
+          </div>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Notificações locais no seu dispositivo. Mantenha o app aberto em segundo plano.
+          </p>
+          <LembretesSection plano={plano} dados={dados} />
+        </Card>
       </div>
     </div>
   );
