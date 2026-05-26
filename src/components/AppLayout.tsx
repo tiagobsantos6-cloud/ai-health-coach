@@ -240,6 +240,7 @@ export function AppLayout() {
           {bottomItems.map((it) => {
             const active = path === it.to;
             const Icon = it.icon;
+            const hasBadge = badgeFor(it.to);
             return (
               <Link
                 key={it.to}
@@ -248,7 +249,12 @@ export function AppLayout() {
                   active ? "text-primary" : "text-muted-foreground"
                 }`}
               >
-                <Icon className={`w-[22px] h-[22px] ${active ? "scale-110" : ""} transition-transform`} />
+                <span className="relative">
+                  <Icon className={`w-[22px] h-[22px] ${active ? "scale-110" : ""} transition-transform`} />
+                  {hasBadge && (
+                    <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" />
+                  )}
+                </span>
                 {it.label}
               </Link>
             );
