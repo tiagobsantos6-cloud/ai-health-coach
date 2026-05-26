@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Sparkles, ArrowRight, ArrowLeft, Check } from "lucide-react";
+import { Sparkles, ArrowRight, ArrowLeft, Check, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
@@ -168,10 +168,11 @@ function Onboarding() {
                           <TooltipTrigger asChild>
                             <button
                               onClick={() => update({ biotipo: b })}
-                              className={`px-3 py-3 rounded-lg border text-sm transition-colors ${
+                              className={`relative px-3 py-3 rounded-lg border text-sm transition-colors ${
                                 d.biotipo === b ? "border-primary bg-primary/10 text-primary" : "border-border"
                               }`}
                             >
+                              <Info className="absolute top-1.5 right-1.5 w-3.5 h-3.5 text-muted-foreground" aria-hidden />
                               {b}
                             </button>
                           </TooltipTrigger>
