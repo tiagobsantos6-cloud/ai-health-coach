@@ -43,6 +43,7 @@ function Gerando() {
   const dados = useStore((s) => s.dados);
   const setPlano = useStore((s) => s.setPlano);
   const saveData = useServerFn(saveMyDataFn);
+  const registrarIndicacao = useServerFn(registrarIndicacaoFn);
   const [msgIdx, setMsgIdx] = useState(0);
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(1);
