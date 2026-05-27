@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { saveMyDataFn } from "@/lib/userdata.functions";
+import { registrarIndicacaoFn } from "@/lib/indicacoes.functions";
 
 export const Route = createFileRoute("/gerando")({
   head: () => ({
