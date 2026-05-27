@@ -66,11 +66,13 @@ function Perfil() {
   const [email, setEmail] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [planoCriadoEm, setPlanoCriadoEm] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setEmail(data.user?.email ?? null);
       setCreatedAt(data.user?.created_at ?? null);
+      setUserId(data.user?.id ?? null);
     });
   }, []);
 
