@@ -81,6 +81,17 @@ function Gerando() {
         } catch (e) {
           console.error("[gerando] failed to persist plano", e);
         }
+        try {
+          const ref = localStorage.getItem("indicacao_ref");
+          if (ref) {
+            const res = await registrarIndicacao({ data: { ref } });
+            if (res?.ok || res?.reason === "already_registered") {
+              localStorage.removeItem("indicacao_ref");
+            }
+          }
+        } catch (e) {
+          console.error("[gerando] indicacao falhou", e);
+        }
         navigate({ to: "/dashboard" });
         return;
       } catch (e) {
