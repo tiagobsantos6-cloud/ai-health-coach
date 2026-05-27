@@ -278,6 +278,18 @@ function Perfil() {
           </p>
           <LembretesSection plano={plano} dados={dados} />
         </Card>
+
+        {/* Indique um amigo */}
+        <Card className="p-5 space-y-4 md:col-span-2">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
+            <h2 className="font-semibold">Indique um amigo</h2>
+          </div>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Ganhe 7 dias de bônus a cada amigo que gerar o primeiro plano.
+          </p>
+          <IndicacaoSection userId={userId} />
+        </Card>
       </div>
     </div>
   );
