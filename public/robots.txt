@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /dieta
+Disallow: /treino
+Disallow: /agua
+Disallow: /evolucao
+Disallow: /perfil
+Disallow: /compras
+Disallow: /onboarding
+Disallow: /gerando
+
+Sitemap: https://ai-coach-buddy-88.lovable.app/sitemap.xml
