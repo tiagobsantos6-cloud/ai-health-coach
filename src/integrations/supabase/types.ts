@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      indicacoes: {
+        Row: {
+          created_at: string
+          id: string
+          indicado_id: string
+          indicador_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          indicado_id: string
+          indicador_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          indicado_id?: string
+          indicador_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -55,16 +76,19 @@ export type Database = {
       }
       subscriptions: {
         Row: {
+          bonus_ate: string | null
           tier: Database["public"]["Enums"]["subscription_tier"]
           updated_at: string
           user_id: string
         }
         Insert: {
+          bonus_ate?: string | null
           tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           user_id: string
         }
         Update: {
+          bonus_ate?: string | null
           tier?: Database["public"]["Enums"]["subscription_tier"]
           updated_at?: string
           user_id?: string

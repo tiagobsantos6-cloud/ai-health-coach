@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { saveMyDataFn } from "@/lib/userdata.functions";
+import { registrarIndicacaoFn } from "@/lib/indicacoes.functions";
 
 export const Route = createFileRoute("/gerando")({
   head: () => ({
@@ -42,6 +43,7 @@ function Gerando() {
   const dados = useStore((s) => s.dados);
   const setPlano = useStore((s) => s.setPlano);
   const saveData = useServerFn(saveMyDataFn);
+  const registrarIndicacao = useServerFn(registrarIndicacaoFn);
   const [msgIdx, setMsgIdx] = useState(0);
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(1);
@@ -78,6 +80,17 @@ function Gerando() {
           await saveData({ data: { dados, plano } });
         } catch (e) {
           console.error("[gerando] failed to persist plano", e);
+        }
+        try {
+          const ref = localStorage.getItem("indicacao_ref");
+          if (ref) {
+            const res = await registrarIndicacao({ data: { ref } });
+            if (res?.ok || res?.reason === "already_registered") {
+              localStorage.removeItem("indicacao_ref");
+            }
+          }
+        } catch (e) {
+          console.error("[gerando] indicacao falhou", e);
         }
         navigate({ to: "/dashboard" });
         return;

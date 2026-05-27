@@ -9,12 +9,13 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { LogOut, Save, RefreshCw, Trash2, Moon, Sun, Bell } from "lucide-react";
+import { LogOut, Save, RefreshCw, Trash2, Moon, Sun, Bell, Users, Copy, Share2 } from "lucide-react";
 import { NOMES_PLANOS } from "@/lib/planos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyDataFn } from "@/lib/userdata.functions";
+import { contarIndicacoesFn } from "@/lib/indicacoes.functions";
 import { Switch } from "@/components/ui/switch";
 import {
   loadLembretes,
@@ -65,11 +66,13 @@ function Perfil() {
   const [email, setEmail] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
   const [planoCriadoEm, setPlanoCriadoEm] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
 
   useEffect(() => {
     supabase.auth.getUser().then(({ data }) => {
       setEmail(data.user?.email ?? null);
       setCreatedAt(data.user?.created_at ?? null);
+      setUserId(data.user?.id ?? null);
     });
   }, []);
 
@@ -275,6 +278,18 @@ function Perfil() {
           </p>
           <LembretesSection plano={plano} dados={dados} />
         </Card>
+
+        {/* Indique um amigo */}
+        <Card className="p-5 space-y-4 md:col-span-2">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-primary" />
+            <h2 className="font-semibold">Indique um amigo</h2>
+          </div>
+          <p className="text-xs text-muted-foreground -mt-2">
+            Ganhe 7 dias de bônus a cada amigo que gerar o primeiro plano.
+          </p>
+          <IndicacaoSection userId={userId} />
+        </Card>
       </div>
     </div>
   );
@@ -332,4 +347,57 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
     </div>
   );
 }
+
+function IndicacaoSection({ userId }: { userId: string | null }) {
+  const contarFn = useServerFn(contarIndicacoesFn);
+  const [count, setCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!userId) return;
+    contarFn().then((r) => setCount(r?.count ?? 0)).catch(() => setCount(0));
+  }, [userId, contarFn]);
+
+  if (!userId) {
+    return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  }
+
+  const code = userId.replace(/-/g, "").slice(0, 8);
+  const link = `https://vitalia.app/cadastro?ref=${code}`;
+  const wppText = `Vem comigo no VitaIA! Plano de nutrição e treino feito por IA. Cadastre-se: ${link}`;
+
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Link copiado!");
+    } catch {
+      toast.error("Não foi possível copiar.");
+    }
+  };
+
+  const compartilharWpp = () => {
+    const url = `whatsapp://send?text=${encodeURIComponent(wppText)}`;
+    window.open(url, "_blank");
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-secondary/40 p-3 space-y-2">
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Seu link</div>
+        <div className="font-mono text-sm break-all">{link}</div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={copiar}>
+          <Copy className="w-4 h-4 mr-2" /> Copiar link
+        </Button>
+        <Button onClick={compartilharWpp}>
+          <Share2 className="w-4 h-4 mr-2" /> Compartilhar no WhatsApp
+        </Button>
+      </div>
+      <div className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">{count}</span> {count === 1 ? "amigo indicado" : "amigos indicados"}
+      </div>
+    </div>
+  );
+}
+
 
