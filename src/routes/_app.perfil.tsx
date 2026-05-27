@@ -15,6 +15,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyDataFn } from "@/lib/userdata.functions";
+import { contarIndicacoesFn } from "@/lib/indicacoes.functions";
 import { Switch } from "@/components/ui/switch";
 import {
   loadLembretes,
