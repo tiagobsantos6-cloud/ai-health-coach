@@ -30,6 +30,14 @@ function SignupPage() {
   const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
 
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) localStorage.setItem("indicacao_ref", ref);
+    } catch { /* ignore */ }
+  }, []);
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
