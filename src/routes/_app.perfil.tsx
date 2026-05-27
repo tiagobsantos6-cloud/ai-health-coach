@@ -348,3 +348,56 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
   );
 }
 
+function IndicacaoSection({ userId }: { userId: string | null }) {
+  const contarFn = useServerFn(contarIndicacoesFn);
+  const [count, setCount] = useState<number>(0);
+
+  useEffect(() => {
+    if (!userId) return;
+    contarFn().then((r) => setCount(r?.count ?? 0)).catch(() => setCount(0));
+  }, [userId, contarFn]);
+
+  if (!userId) {
+    return <p className="text-sm text-muted-foreground">Carregando...</p>;
+  }
+
+  const code = userId.replace(/-/g, "").slice(0, 8);
+  const link = `https://vitalia.app/cadastro?ref=${code}`;
+  const wppText = `Vem comigo no VitaIA! Plano de nutrição e treino feito por IA. Cadastre-se: ${link}`;
+
+  const copiar = async () => {
+    try {
+      await navigator.clipboard.writeText(link);
+      toast.success("Link copiado!");
+    } catch {
+      toast.error("Não foi possível copiar.");
+    }
+  };
+
+  const compartilharWpp = () => {
+    const url = `whatsapp://send?text=${encodeURIComponent(wppText)}`;
+    window.open(url, "_blank");
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl bg-secondary/40 p-3 space-y-2">
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Seu link</div>
+        <div className="font-mono text-sm break-all">{link}</div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        <Button variant="outline" onClick={copiar}>
+          <Copy className="w-4 h-4 mr-2" /> Copiar link
+        </Button>
+        <Button onClick={compartilharWpp}>
+          <Share2 className="w-4 h-4 mr-2" /> Compartilhar no WhatsApp
+        </Button>
+      </div>
+      <div className="text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">{count}</span> {count === 1 ? "amigo indicado" : "amigos indicados"}
+      </div>
+    </div>
+  );
+}
+
+
