@@ -168,9 +168,94 @@ function ExercicioCard({ ex }: { ex: Exercicio }) {
   );
 }
 
+const EXERCISE_MAP: Record<string, string> = {
+  "supino reto": "barbell bench press",
+  "supino inclinado": "incline dumbbell press",
+  "supino inclinado com halteres": "incline dumbbell press",
+  "desenvolvimento militar": "barbell overhead press",
+  "desenvolvimento com halteres": "dumbbell shoulder press",
+  "remada curvada": "barbell bent over row",
+  "puxada frontal": "cable lat pulldown",
+  "agachamento": "barbell squat",
+  "leg press": "leg press",
+  "cadeira extensora": "leg extension",
+  "mesa flexora": "leg curl",
+  "rosca direta": "barbell curl",
+  "rosca alternada": "dumbbell alternate bicep curl",
+  "triceps pulley": "cable pushdown",
+  "triceps testa": "ez barbell skullcrusher",
+  "elevação lateral": "dumbbell lateral raise",
+  "elevação frontal": "dumbbell front raise",
+  "crossover": "cable crossover",
+  "stiff": "romanian deadlift",
+  "afundo": "dumbbell lunge",
+  "panturrilha": "standing calf raises",
+  "abdominal": "crunch",
+  "prancha": "plank",
+};
+
+async function buscarGifExercicio(nomePt: string): Promise<string | null> {
+  const nomeEn = EXERCISE_MAP[nomePt.toLowerCase().trim()] ?? nomePt.toLowerCase().trim();
+  const cacheKey = `gif_${nomeEn}`;
+  try {
+    const cached = sessionStorage.getItem(cacheKey);
+    if (cached !== null) return cached === "null" ? null : cached;
+  } catch { /* ignore */ }
+  try {
+    const url = `https://api.exercisedb.io/exercises/name/${encodeURIComponent(nomeEn)}?limit=1`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error("fail");
+    const data = await res.json();
+    const gifUrl: string | null = data?.[0]?.gifUrl ?? null;
+    try { sessionStorage.setItem(cacheKey, gifUrl ?? "null"); } catch { /* ignore */ }
+    return gifUrl;
+  } catch {
+    try { sessionStorage.setItem(cacheKey, "null"); } catch { /* ignore */ }
+    return null;
+  }
+}
+
 function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () => void }) {
   const [open, setOpen] = useState(false);
+  const [gifUrl, setGifUrl] = useState<string | null>(null);
+  const [loadingGif, setLoadingGif] = useState(false);
+  const [fetched, setFetched] = useState(false);
+  const [descanso, setDescanso] = useState(0);
+  const [descRunning, setDescRunning] = useState(false);
+  const [terminou, setTerminou] = useState(false);
   const searchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.nome + " execução correta")}`;
+
+  useEffect(() => {
+    if (!open || fetched) return;
+    setLoadingGif(true);
+    setFetched(true);
+    buscarGifExercicio(ex.nome).then((url) => {
+      setGifUrl(url);
+      setLoadingGif(false);
+    });
+  }, [open, fetched, ex.nome]);
+
+  useEffect(() => {
+    if (!descRunning) return;
+    if (descanso <= 0) {
+      setDescRunning(false);
+      setTerminou(true);
+      try { navigator.vibrate?.([200]); } catch { /* ignore */ }
+      beep(660);
+      return;
+    }
+    const t = setTimeout(() => setDescanso((d) => d - 1), 1000);
+    return () => clearTimeout(t);
+  }, [descRunning, descanso]);
+
+  const iniciarDescanso = () => {
+    setDescanso(ex.descanso_s || 60);
+    setDescRunning(true);
+    setTerminou(false);
+    onStartTimer();
+  };
+
+  const progDesc = ex.descanso_s > 0 ? (descanso / ex.descanso_s) * 100 : 0;
 
   return (
     <div className="space-y-2">
@@ -188,24 +273,49 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
 
       {open && (
         <div className="rounded-lg border border-border bg-secondary/30 p-3 space-y-3 text-sm">
-          <a
-            href={searchUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-primary hover:underline font-medium"
-          >
-            <ExternalLink className="w-4 h-4" /> Ver no YouTube
-          </a>
+          <div className="flex justify-center">
+            {loadingGif ? (
+              <div
+                className="w-full max-w-[320px] h-[240px] rounded-xl animate-pulse"
+                style={{ backgroundColor: "#1C1C1E" }}
+              />
+            ) : gifUrl ? (
+              <img
+                src={gifUrl}
+                alt={`Execução de ${ex.nome}`}
+                loading="lazy"
+                className="w-full max-h-[320px] object-contain rounded-xl"
+                style={{ backgroundColor: "#1C1C1E" }}
+              />
+            ) : (
+              <div
+                className="w-full max-w-[320px] h-[200px] rounded-xl flex flex-col items-center justify-center gap-3"
+                style={{ backgroundColor: "#1C1C1E" }}
+              >
+                <Activity className="w-10 h-10 text-muted-foreground" />
+                <a
+                  href={searchUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-4 h-4" /> Ver no YouTube
+                </a>
+              </div>
+            )}
+          </div>
 
-          {ex.execucao ? (
+          <div>
+            <Badge className="bg-orange-500 hover:bg-orange-500 text-white border-transparent">
+              {ex.musculo}
+            </Badge>
+          </div>
+
+          {ex.execucao && (
             <div>
               <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Como executar</div>
               <p className="whitespace-pre-line leading-relaxed">{ex.execucao}</p>
             </div>
-          ) : (
-            <p className="text-muted-foreground text-xs">
-              Clique em &quot;Ver no YouTube&quot; para ver a execução correta deste exercício.
-            </p>
           )}
 
           {ex.erros_comuns && (
@@ -217,9 +327,46 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
             </div>
           )}
 
-          <Button size="sm" variant="secondary" className="w-full" onClick={onStartTimer}>
-            <Timer className="w-4 h-4 mr-2" /> Iniciar descanso ({ex.descanso_s}s)
-          </Button>
+          <a
+            href={searchUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 text-primary hover:underline font-medium text-sm"
+          >
+            <ExternalLink className="w-4 h-4" /> ▶ Ver no YouTube
+          </a>
+
+          {descRunning || descanso > 0 || terminou ? (
+            <div className="rounded-lg p-3 space-y-2" style={{ backgroundColor: "rgba(249,115,22,0.1)" }}>
+              {terminou ? (
+                <div className="text-center font-semibold text-orange-500">Próxima série! 💪</div>
+              ) : (
+                <>
+                  <div className="flex items-center justify-between">
+                    <div className="text-2xl font-bold tabular-nums text-orange-500">{descanso}s</div>
+                    <div className="flex gap-2">
+                      <Button size="sm" variant="outline" onClick={() => setDescRunning((r) => !r)} aria-label={descRunning ? "Pausar" : "Retomar"}>
+                        {descRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => { setDescanso(0); setDescRunning(false); setTerminou(false); }} aria-label="Reiniciar">
+                        <RotateCcw className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="h-2 w-full rounded-full bg-orange-500/20 overflow-hidden">
+                    <div
+                      className="h-full bg-orange-500 transition-[width] duration-1000 ease-linear"
+                      style={{ width: `${progDesc}%` }}
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+          ) : (
+            <Button size="sm" variant="secondary" className="w-full" onClick={iniciarDescanso}>
+              <Timer className="w-4 h-4 mr-2" /> ⏱ Iniciar descanso ({ex.descanso_s}s)
+            </Button>
+          )}
         </div>
       )}
     </div>
