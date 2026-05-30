@@ -194,6 +194,32 @@ const EXERCISE_MAP: Record<string, string> = {
   "prancha": "plank",
 };
 
+async function buscarGifWger(nomeEn: string): Promise<string | null> {
+  try {
+    const searchUrl = `https://wger.de/api/v2/exercise/search/?term=${encodeURIComponent(nomeEn)}&language=english&format=json`;
+    console.log("[wger] search:", searchUrl);
+    const res = await fetch(searchUrl);
+    if (!res.ok) throw new Error(`wger search ${res.status}`);
+    const data = await res.json();
+    const id = data?.suggestions?.[0]?.data?.id;
+    if (!id) {
+      console.log("[wger] no suggestion for", nomeEn);
+      return null;
+    }
+    const infoUrl = `https://wger.de/api/v2/exerciseinfo/${id}/?format=json`;
+    console.log("[wger] info:", infoUrl);
+    const res2 = await fetch(infoUrl);
+    if (!res2.ok) throw new Error(`wger info ${res2.status}`);
+    const info = await res2.json();
+    const img: string | null = info?.images?.[0]?.image ?? null;
+    console.log("[wger] image:", img);
+    return img;
+  } catch (err) {
+    console.warn("[wger] error:", err);
+    return null;
+  }
+}
+
 async function buscarGifExercicio(nomePt: string): Promise<string | null> {
   const nomeEn = EXERCISE_MAP[nomePt.toLowerCase().trim()] ?? nomePt.toLowerCase().trim();
   const cacheKey = `gif_${nomeEn}`;
@@ -201,18 +227,9 @@ async function buscarGifExercicio(nomePt: string): Promise<string | null> {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached !== null) return cached === "null" ? null : cached;
   } catch { /* ignore */ }
-  try {
-    const url = `https://api.exercisedb.io/exercises/name/${encodeURIComponent(nomeEn)}?limit=1`;
-    const res = await fetch(url);
-    if (!res.ok) throw new Error("fail");
-    const data = await res.json();
-    const gifUrl: string | null = data?.[0]?.gifUrl ?? null;
-    try { sessionStorage.setItem(cacheKey, gifUrl ?? "null"); } catch { /* ignore */ }
-    return gifUrl;
-  } catch {
-    try { sessionStorage.setItem(cacheKey, "null"); } catch { /* ignore */ }
-    return null;
-  }
+  const url = await buscarGifWger(nomeEn);
+  try { sessionStorage.setItem(cacheKey, url ?? "null"); } catch { /* ignore */ }
+  return url;
 }
 
 function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () => void }) {
