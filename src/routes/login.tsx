@@ -49,7 +49,8 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError("E-mail ou senha inválidos.");
+      const msg = errosPtBr[error.message] ?? "E-mail ou senha inválidos.";
+      setError(msg);
       return;
     }
     navigate({ to: "/" });
