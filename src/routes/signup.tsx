@@ -28,6 +28,8 @@ export const Route = createFileRoute("/signup")({
   component: SignupPage,
 });
 
+type Etapa = "form" | "confirmar-email";
+
 
 function SignupPage() {
   const navigate = useNavigate();
