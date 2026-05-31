@@ -39,7 +39,9 @@ function SignupPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [info, setInfo] = useState<string | null>(null);
+  const [etapa, setEtapa] = useState<Etapa>("form");
+  const [countdown, setCountdown] = useState(0);
+  const countdownRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     try {
@@ -49,10 +51,33 @@ function SignupPage() {
     } catch { /* ignore */ }
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (countdownRef.current) clearInterval(countdownRef.current);
+    };
+  }, []);
+
+  const traduzirErro = (msg: string): string => {
+    return errosPtBr[msg] ?? msg;
+  };
+
+  const startCountdown = () => {
+    setCountdown(60);
+    if (countdownRef.current) clearInterval(countdownRef.current);
+    countdownRef.current = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          if (countdownRef.current) clearInterval(countdownRef.current);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    setInfo(null);
     if (password !== confirmPassword) {
       setError("As senhas não coincidem.");
       return;
@@ -72,15 +97,73 @@ function SignupPage() {
     });
     setLoading(false);
     if (error) {
-      setError(error.message);
+      setError(traduzirErro(error.message));
       return;
     }
     if (data.session) {
       navigate({ to: "/onboarding" });
     } else {
-      setInfo("Enviamos um e-mail de confirmação. Verifique sua caixa de entrada para ativar a conta.");
+      setEtapa("confirmar-email");
+      startCountdown();
     }
   };
+
+  const reenviar = async () => {
+    setLoading(true);
+    setError(null);
+    const { error } = await supabase.auth.resend({
+      type: "signup",
+      email,
+    });
+    setLoading(false);
+    if (error) {
+      setError(traduzirErro(error.message));
+      return;
+    }
+    startCountdown();
+  };
+
+  if (etapa === "confirmar-email") {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+        <Card className="w-full max-w-sm p-6 space-y-6 rounded-2xl text-center">
+          <div className="flex items-center gap-2 justify-center">
+            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+              <Sparkles className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <span className="font-bold text-lg">VitaIA</span>
+          </div>
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center">
+              <Mail className="w-8 h-8 text-primary" />
+            </div>
+            <div className="space-y-1">
+              <h1 className="text-xl font-semibold">Verifique seu email</h1>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Enviamos um link de confirmação para <strong className="text-foreground">{email}</strong>. Clique no link para ativar sua conta.
+              </p>
+            </div>
+          </div>
+
+          {error && <p className="text-sm text-destructive">{error}</p>}
+
+          <div className="space-y-3">
+            <Button
+              type="button"
+              className="w-full"
+              disabled={loading || countdown > 0}
+              onClick={reenviar}
+            >
+              {loading ? "Enviando..." : countdown > 0 ? `Reenviar (${countdown}s)` : "Reenviar email"}
+            </Button>
+            <p className="text-sm text-muted-foreground">
+              <Link to="/login" className="text-primary font-medium">Voltar ao login</Link>
+            </p>
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4 bg-background">
@@ -113,7 +196,6 @@ function SignupPage() {
             <Input id="confirm" type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          {info && <p className="text-sm text-primary">{info}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? "Criando..." : "Criar conta"}
           </Button>
