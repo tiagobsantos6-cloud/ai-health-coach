@@ -223,11 +223,19 @@ async function buscarGifWger(nomeEn: string): Promise<string | null> {
 async function buscarGifExercicio(nomePt: string): Promise<string | null> {
   const nomeEn = EXERCISE_MAP[nomePt.toLowerCase().trim()] ?? nomePt.toLowerCase().trim();
   const cacheKey = `gif_${nomeEn}`;
+  const erroKey = `gif_erro_${nomeEn}`;
+  try {
+    const cacheErro = sessionStorage.getItem(erroKey);
+    if (cacheErro) return null;
+  } catch { /* ignore */ }
   try {
     const cached = sessionStorage.getItem(cacheKey);
     if (cached !== null) return cached === "null" ? null : cached;
   } catch { /* ignore */ }
   const url = await buscarGifWger(nomeEn);
+  if (url === null) {
+    try { sessionStorage.setItem(erroKey, "1"); } catch { /* ignore */ }
+  }
   try { sessionStorage.setItem(cacheKey, url ?? "null"); } catch { /* ignore */ }
   return url;
 }
