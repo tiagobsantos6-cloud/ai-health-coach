@@ -1,11 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Mail, Timer } from "lucide-react";
+
+const errosPtBr: Record<string, string> = {
+  "User already registered": "Este email já está cadastrado. Tente fazer login.",
+  "Invalid email": "Email inválido. Verifique e tente novamente.",
+  "Password should be at least 6 characters": "A senha deve ter pelo menos 6 caracteres.",
+  "Email rate limit exceeded": "Muitos emails enviados. Aguarde alguns minutos.",
+  "Signup requires a valid password": "Informe uma senha válida.",
+  "Unable to validate email": "Não foi possível validar o email.",
+};
 
 export const Route = createFileRoute("/signup")({
   head: () => ({
