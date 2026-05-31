@@ -8,6 +8,13 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
 
+const errosPtBr: Record<string, string> = {
+  "Invalid login credentials": "Email ou senha incorretos. Tente novamente.",
+  "Email not confirmed": "Email ainda não confirmado. Verifique sua caixa de entrada.",
+  "User not found": "Usuário não encontrado.",
+  "Rate limit exceeded": "Muitas tentativas. Aguarde um pouco.",
+};
+
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
@@ -42,7 +49,8 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      setError("E-mail ou senha inválidos.");
+      const msg = errosPtBr[error.message] ?? "E-mail ou senha inválidos.";
+      setError(msg);
       return;
     }
     navigate({ to: "/" });
