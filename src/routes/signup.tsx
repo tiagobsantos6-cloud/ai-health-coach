@@ -5,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Sparkles, Mail, Timer } from "lucide-react";
+import { Sparkles, Mail } from "lucide-react";
 
 const errosPtBr: Record<string, string> = {
   "User already registered": "Este email já está cadastrado. Tente fazer login.",
