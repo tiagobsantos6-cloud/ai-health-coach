@@ -49,6 +49,7 @@ function Gerando() {
   const [tentativa, setTentativa] = useState(1);
   const [elapsed, setElapsed] = useState(0);
   const [countdown, setCountdown] = useState(0);
+  const [sucesso, setSucesso] = useState(false);
   const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
