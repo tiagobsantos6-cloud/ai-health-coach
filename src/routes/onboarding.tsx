@@ -82,18 +82,38 @@ function Onboarding() {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
         <h1 className="sr-only">Personalização do seu Plano</h1>
         <div className="mb-8">
-
-          <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-            <span>Etapa {step} de 5</span>
-            <span>{Math.round((step / 5) * 100)}%</span>
+          <div
+            className="flex items-center justify-center gap-3 mb-3"
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={5}
+            aria-valuenow={step}
+            aria-label={`Etapa ${step} de 5`}
+          >
+            {[1, 2, 3, 4, 5].map((n) => {
+              const concluida = n < step;
+              const ativa = n === step;
+              return (
+                <motion.div
+                  key={n}
+                  layout
+                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                  className={`flex items-center justify-center rounded-full transition-colors ${
+                    ativa
+                      ? "w-4 h-4 bg-primary"
+                      : concluida
+                      ? "w-3 h-3 bg-primary text-primary-foreground"
+                      : "w-3 h-3 bg-muted border border-border"
+                  }`}
+                  aria-hidden
+                >
+                  {concluida && <Check className="w-2 h-2" strokeWidth={4} />}
+                </motion.div>
+              );
+            })}
           </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-primary"
-              initial={false}
-              animate={{ width: `${(step / 5) * 100}%` }}
-              transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            />
+          <div className="text-center text-xs text-muted-foreground">
+            Etapa {step} de 5
           </div>
         </div>
 
