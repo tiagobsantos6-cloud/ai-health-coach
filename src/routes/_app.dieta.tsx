@@ -238,6 +238,7 @@ function Dieta() {
                                   <PopoverTrigger asChild>
                                     <button
                                       type="button"
+                                      aria-label="Trocar alimento"
                                       className="shrink-0 p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10"
                                       title="Trocar alimento"
                                     >
