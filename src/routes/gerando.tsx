@@ -225,19 +225,21 @@ function Gerando() {
         </motion.div>
         <div>
           <h1 className="text-2xl font-bold mb-3">Gerando seu Plano de Saúde</h1>
-          {tentativa > 1 && (
-            <p className="text-sm text-primary font-semibold mb-2">
-              Tentativa {tentativa} de {MAX_TENTATIVAS} — ajustando o plano...
-            </p>
-          )}
-          <motion.p
-            key={msgIdx}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-muted-foreground"
-          >
-            {mensagens[msgIdx]}
-          </motion.p>
+          <div role="status" aria-live="polite">
+            {tentativa > 1 && (
+              <p className="text-sm text-orange-700 dark:text-primary font-semibold mb-2">
+                Tentativa {tentativa} de {MAX_TENTATIVAS} — ajustando o plano...
+              </p>
+            )}
+            <motion.p
+              key={msgIdx}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-muted-foreground"
+            >
+              {mensagens[msgIdx]}
+            </motion.p>
+          </div>
           <p className="text-xs text-muted-foreground mt-2">
             Isso costuma levar entre 15 e 40 segundos
           </p>
