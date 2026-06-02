@@ -175,6 +175,44 @@ function Gerando() {
     );
   }
 
+  if (sucesso) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
+        <div
+          role="status"
+          aria-live="polite"
+          className="text-center space-y-6 max-w-md w-full"
+        >
+          <motion.div
+            initial={{ scale: 0, rotate: -180 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            className="w-24 h-24 mx-auto rounded-full bg-gradient-to-br from-primary to-primary/60 flex items-center justify-center"
+          >
+            <Check className="w-12 h-12 text-primary-foreground" strokeWidth={3} />
+          </motion.div>
+          <motion.h2
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-2xl font-bold"
+          >
+            Seu plano está pronto! 🎉
+          </motion.h2>
+          <div className="h-2 w-full bg-secondary rounded-full overflow-hidden mx-auto max-w-xs">
+            <motion.div
+              className="h-full bg-primary rounded-full"
+              initial={{ width: "0%" }}
+              animate={{ width: "100%" }}
+              transition={{ duration: 2, ease: "easeOut" }}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
       <div className="text-center space-y-6 max-w-md w-full">
