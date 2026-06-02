@@ -242,8 +242,9 @@ function Onboarding() {
                   return (
                     <div className="space-y-4 mt-2 p-4 rounded-xl border border-border bg-muted/30">
                       <div className="space-y-2">
-                        <Label>Peso desejado (kg)</Label>
+                        <Label htmlFor="ob-peso-desejado">Peso desejado (kg)</Label>
                         <Input
+                          id="ob-peso-desejado"
                           type="number"
                           placeholder="Ex: 65"
                           value={d.pesoDesejado ?? ""}
