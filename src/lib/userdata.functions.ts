@@ -41,3 +41,18 @@ export const saveMyDataFn = createServerFn({ method: "POST" })
     }
     return { ok: true };
   });
+
+export const getMyIndicacoesCountFn = createServerFn({ method: "GET" })
+  .middleware([attachSupabaseAuth, requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { count, error } = await context.supabase
+      .from("indicacoes")
+      .select("*", { count: "exact", head: true })
+      .eq("indicador_id", context.userId);
+    if (error) {
+      console.error("[indicacoes] count error", error);
+      return { count: 0 };
+    }
+    return { count: count ?? 0 };
+  });
+
