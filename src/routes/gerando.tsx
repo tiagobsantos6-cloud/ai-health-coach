@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
 import { gerarPlano } from "@/lib/gemini";
-import { Sparkles, AlertCircle } from "lucide-react";
+import { Sparkles, AlertCircle, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -48,6 +48,7 @@ function Gerando() {
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(1);
   const [elapsed, setElapsed] = useState(0);
+  const [countdown, setCountdown] = useState(0);
   const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
