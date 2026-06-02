@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
 import { gerarPlano } from "@/lib/gemini";
-import { Sparkles, AlertCircle, Timer } from "lucide-react";
+import { Sparkles, AlertCircle, Timer, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
