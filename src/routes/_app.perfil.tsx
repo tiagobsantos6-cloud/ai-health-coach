@@ -368,7 +368,10 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
   const copiar = async () => {
     try {
       await navigator.clipboard.writeText(link);
-      toast.success("Link copiado!");
+      toast("Link copiado!", {
+        description: "Compartilhe com seus amigos.",
+        duration: 3000,
+      });
     } catch {
       toast.error("Não foi possível copiar.");
     }
