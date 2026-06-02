@@ -349,7 +349,7 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
 }
 
 function IndicacaoSection({ userId }: { userId: string | null }) {
-  const contarFn = useServerFn(contarIndicacoesFn);
+  const contarFn = useServerFn(getMyIndicacoesCountFn);
   const [count, setCount] = useState<number>(0);
 
   useEffect(() => {
