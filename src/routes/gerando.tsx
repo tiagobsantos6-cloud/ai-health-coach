@@ -94,7 +94,8 @@ function Gerando() {
         } catch (e) {
           console.error("[gerando] indicacao falhou", e);
         }
-        navigate({ to: "/dashboard" });
+        setSucesso(true);
+        setTimeout(() => navigate({ to: "/dashboard" }), 2000);
         return;
       } catch (e) {
         ultimoErro = e;
