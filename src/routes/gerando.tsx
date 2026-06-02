@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
 import { gerarPlano } from "@/lib/gemini";
-import { Sparkles, AlertCircle } from "lucide-react";
+import { Sparkles, AlertCircle, Timer } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -48,6 +48,7 @@ function Gerando() {
   const [erro, setErro] = useState<string | null>(null);
   const [tentativa, setTentativa] = useState(1);
   const [elapsed, setElapsed] = useState(0);
+  const [countdown, setCountdown] = useState(0);
   const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
@@ -105,14 +106,36 @@ function Gerando() {
   };
 
   useEffect(() => {
+    if (erro && /429|Muitas requisi/i.test(erro) && countdown === 0) {
+      setCountdown(60);
+    }
+  }, [erro]);
+
+  useEffect(() => {
+    if (countdown <= 0) return;
+    const t = setInterval(() => {
+      setCountdown((c) => {
+        if (c <= 1) {
+          clearInterval(t);
+          return 0;
+        }
+        return c - 1;
+      });
+    }, 1000);
+    return () => clearInterval(t);
+  }, [countdown]);
+
+  useEffect(() => {
     tentar();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (erro) {
-    const mensagemAmigavel = /429|Muitas requisi/i.test(erro)
-      ? "Muitas tentativas. Aguarde 1 minuto e tente novamente."
+    const is429 = /429|Muitas requisi/i.test(erro);
+    const mensagemAmigavel = is429
+      ? "Muitas tentativas. Aguarde um minuto e tente novamente."
       : `Não conseguimos após ${MAX_TENTATIVAS} tentativas. Tente novamente.`;
+    const progresso = countdown > 0 ? Math.round(((60 - countdown) / 60) * 100) : 0;
     return (
       <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
         <div className="max-w-md text-center space-y-4">
@@ -121,8 +144,26 @@ function Gerando() {
           </div>
           <h2 className="text-xl font-bold">Não foi possível gerar seu plano</h2>
           <p className="text-sm text-muted-foreground break-words">{mensagemAmigavel}</p>
+
+          {countdown > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-center gap-2 text-sm text-primary font-semibold">
+                <Timer className="w-4 h-4" />
+                <span>Aguarde {countdown}s para tentar novamente...</span>
+              </div>
+              <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-primary rounded-full transition-all duration-1000 ease-linear"
+                  style={{ width: `${progresso}%` }}
+                />
+              </div>
+            </div>
+          )}
+
           <div className="flex gap-2 justify-center">
-            <Button onClick={tentar}>Tentar novamente</Button>
+            <Button onClick={tentar} disabled={countdown > 0}>
+              {countdown > 0 ? `Aguarde ${countdown}s` : "Tentar novamente"}
+            </Button>
             <Button variant="outline" onClick={() => navigate({ to: "/onboarding" })}>
               Voltar ao início
             </Button>

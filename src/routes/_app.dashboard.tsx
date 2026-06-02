@@ -26,6 +26,7 @@ const cleanNum = (val: string | number) => {
 };
 
 function Dashboard() {
+  const [hidratado, setHidratado] = useState(false);
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const checklist = useStore((s) => s.checklist);
@@ -37,6 +38,11 @@ function Dashboard() {
   const resetRefeicoes = useStore((s) => s.resetRefeicoesIfNewDay);
 
   useEffect(() => { resetCheck(); resetAgua(); resetRefeicoes(); }, [resetCheck, resetAgua, resetRefeicoes]);
+
+  useEffect(() => {
+    const t = setTimeout(() => setHidratado(true), 400);
+    return () => clearTimeout(t);
+  }, []);
 
   const macros = useMemo(() => {
     if (!plano) return null;
@@ -80,7 +86,63 @@ function Dashboard() {
     console.debug("[Dashboard] meta:", macros, "consumido:", consumido);
   }, [macros, consumido]);
 
-  if (!plano || !macros) return null;
+  if (!hidratado || !plano || !macros) {
+    return (
+      <div className="space-y-5">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0 flex-1 space-y-2">
+            <div className="h-4 w-24 bg-muted rounded animate-pulse" />
+            <div className="h-6 w-48 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="w-11 h-11 shrink-0 rounded-full bg-muted animate-pulse" />
+        </div>
+
+        {/* Calories ring skeleton */}
+        <Card className="p-6 flex flex-col items-center bg-card border-border rounded-2xl">
+          <div className="h-5 w-32 bg-muted rounded animate-pulse mb-3" />
+          <div className="w-[200px] h-[200px] rounded-full bg-muted animate-pulse" />
+          <div className="grid grid-cols-3 gap-3 w-full mt-6">
+            <div className="h-20 bg-muted rounded-xl animate-pulse" />
+            <div className="h-20 bg-muted rounded-xl animate-pulse" />
+            <div className="h-20 bg-muted rounded-xl animate-pulse" />
+          </div>
+        </Card>
+
+        {/* Quick stats skeleton */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="h-24 bg-muted rounded-2xl animate-pulse" />
+          <div className="h-24 bg-muted rounded-2xl animate-pulse" />
+          <div className="h-24 bg-muted rounded-2xl animate-pulse" />
+          <div className="h-24 bg-muted rounded-2xl animate-pulse" />
+        </div>
+
+        {/* Checklist skeleton */}
+        <Card className="p-5 bg-card border-border rounded-2xl space-y-3">
+          <div className="flex justify-between items-center">
+            <div className="h-5 w-32 bg-muted rounded animate-pulse" />
+            <div className="h-5 w-10 bg-muted rounded animate-pulse" />
+          </div>
+          <div className="h-1.5 bg-muted rounded-full animate-pulse" />
+          <div className="space-y-2">
+            <div className="h-10 bg-muted rounded-xl animate-pulse" />
+            <div className="h-10 bg-muted rounded-xl animate-pulse" />
+            <div className="h-10 bg-muted rounded-xl animate-pulse" />
+          </div>
+        </Card>
+
+        {/* Weekly routine skeleton */}
+        <Card className="p-5 bg-card border-border rounded-2xl space-y-3">
+          <div className="h-5 w-36 bg-muted rounded animate-pulse" />
+          <div className="grid grid-cols-7 gap-1.5">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <div key={i} className="h-14 bg-muted rounded-xl animate-pulse" />
+            ))}
+          </div>
+        </Card>
+      </div>
+    );
+  }
 
   const consumed = Math.round(consumido.kcal);
   const kcalPct = Math.min(100, Math.max(0, Math.round((consumed / Math.max(1, macros.kcal)) * 100)));
