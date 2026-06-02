@@ -143,7 +143,7 @@ function Dieta() {
                 <div key={i} className="p-3 rounded-lg border border-border">
                   <div className="font-medium text-sm">{s.original}</div>
                   <div className="text-xs text-muted-foreground">→ {s.substituto}</div>
-                  <div className="text-xs text-primary mt-1">{s.equivalencia}</div>
+                  <div className="text-xs text-orange-700 dark:text-primary mt-1">{s.equivalencia}</div>
                 </div>
               ))}
             </div>
