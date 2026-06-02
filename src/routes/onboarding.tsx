@@ -133,15 +133,18 @@ function Onboarding() {
                   <p className="text-muted-foreground">Conte um pouco sobre você</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
+                  <Label htmlFor="ob-nome">Nome</Label>
+                  <Input id="ob-nome" value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Sexo</Label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <Label id="ob-sexo-label">Sexo</Label>
+                  <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="ob-sexo-label">
                     {["masculino", "feminino", "outro"].map((s) => (
                       <button
                         key={s}
+                        type="button"
+                        role="radio"
+                        aria-checked={d.sexo === s}
                         onClick={() => update({ sexo: s })}
                         className={`px-3 py-3 rounded-lg border text-sm capitalize transition-colors ${
                           d.sexo === s ? "border-primary bg-primary/10 text-primary" : "border-border"
@@ -153,8 +156,8 @@ function Onboarding() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Idade</Label>
-                  <Input type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
+                  <Label htmlFor="ob-idade">Idade</Label>
+                  <Input id="ob-idade" type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
                 </div>
               </>
             )}
@@ -167,17 +170,17 @@ function Onboarding() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Peso (kg)</Label>
-                    <Input type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
+                    <Label htmlFor="ob-peso">Peso (kg)</Label>
+                    <Input id="ob-peso" type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Altura (cm)</Label>
-                    <Input type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
+                    <Label htmlFor="ob-altura">Altura (cm)</Label>
+                    <Input id="ob-altura" type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>% gordura corporal (opcional)</Label>
-                  <Input type="number" value={d.gordura ?? ""} onChange={(e) => update({ gordura: e.target.value ? Number(e.target.value) : undefined })} />
+                  <Label htmlFor="ob-gordura">% gordura corporal (opcional)</Label>
+                  <Input id="ob-gordura" type="number" value={d.gordura ?? ""} onChange={(e) => update({ gordura: e.target.value ? Number(e.target.value) : undefined })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Biotipo</Label>
