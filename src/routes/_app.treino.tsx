@@ -133,7 +133,11 @@ function ExercicioCard({ ex }: { ex: Exercicio }) {
         </div>
         <div className="text-right text-sm">
           <div className="font-bold">{ex.series} × {ex.repeticoes}</div>
-          <button onClick={startTimer} className="text-xs text-primary flex items-center gap-1 mt-1 hover:underline">
+          <button
+            onClick={startTimer}
+            aria-label="Iniciar timer de descanso"
+            className="text-xs text-orange-700 dark:text-primary flex items-center gap-1 mt-1 hover:underline"
+          >
             <Timer className="w-3 h-3" /> {ex.descanso_s}s
           </button>
         </div>

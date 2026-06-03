@@ -82,18 +82,38 @@ function Onboarding() {
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">
         <h1 className="sr-only">Personalização do seu Plano</h1>
         <div className="mb-8">
-
-          <div className="flex items-center justify-between mb-2 text-sm text-muted-foreground">
-            <span>Etapa {step} de 5</span>
-            <span>{Math.round((step / 5) * 100)}%</span>
+          <div
+            className="flex items-center justify-center gap-3 mb-3"
+            role="progressbar"
+            aria-valuemin={1}
+            aria-valuemax={5}
+            aria-valuenow={step}
+            aria-label={`Etapa ${step} de 5`}
+          >
+            {[1, 2, 3, 4, 5].map((n) => {
+              const concluida = n < step;
+              const ativa = n === step;
+              return (
+                <motion.div
+                  key={n}
+                  layout
+                  transition={{ type: "spring", stiffness: 300, damping: 22 }}
+                  className={`flex items-center justify-center rounded-full transition-colors ${
+                    ativa
+                      ? "w-4 h-4 bg-primary"
+                      : concluida
+                      ? "w-3 h-3 bg-primary text-primary-foreground"
+                      : "w-3 h-3 bg-muted border border-border"
+                  }`}
+                  aria-hidden
+                >
+                  {concluida && <Check className="w-2 h-2" strokeWidth={4} />}
+                </motion.div>
+              );
+            })}
           </div>
-          <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <motion.div
-              className="h-full bg-primary"
-              initial={false}
-              animate={{ width: `${(step / 5) * 100}%` }}
-              transition={{ type: "spring", stiffness: 100, damping: 20 }}
-            />
+          <div className="text-center text-xs text-muted-foreground">
+            Etapa {step} de 5
           </div>
         </div>
 
@@ -113,15 +133,18 @@ function Onboarding() {
                   <p className="text-muted-foreground">Conte um pouco sobre você</p>
                 </div>
                 <div className="space-y-2">
-                  <Label>Nome</Label>
-                  <Input value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
+                  <Label htmlFor="ob-nome">Nome</Label>
+                  <Input id="ob-nome" value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
                 </div>
                 <div className="space-y-2">
-                  <Label>Sexo</Label>
-                  <div className="grid grid-cols-3 gap-2">
+                  <Label id="ob-sexo-label">Sexo</Label>
+                  <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-labelledby="ob-sexo-label">
                     {["masculino", "feminino", "outro"].map((s) => (
                       <button
                         key={s}
+                        type="button"
+                        role="radio"
+                        aria-checked={d.sexo === s}
                         onClick={() => update({ sexo: s })}
                         className={`px-3 py-3 rounded-lg border text-sm capitalize transition-colors ${
                           d.sexo === s ? "border-primary bg-primary/10 text-primary" : "border-border"
@@ -133,8 +156,8 @@ function Onboarding() {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>Idade</Label>
-                  <Input type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
+                  <Label htmlFor="ob-idade">Idade</Label>
+                  <Input id="ob-idade" type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
                 </div>
               </>
             )}
@@ -147,17 +170,17 @@ function Onboarding() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
-                    <Label>Peso (kg)</Label>
-                    <Input type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
+                    <Label htmlFor="ob-peso">Peso (kg)</Label>
+                    <Input id="ob-peso" type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
                   </div>
                   <div className="space-y-2">
-                    <Label>Altura (cm)</Label>
-                    <Input type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
+                    <Label htmlFor="ob-altura">Altura (cm)</Label>
+                    <Input id="ob-altura" type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label>% gordura corporal (opcional)</Label>
-                  <Input type="number" value={d.gordura ?? ""} onChange={(e) => update({ gordura: e.target.value ? Number(e.target.value) : undefined })} />
+                  <Label htmlFor="ob-gordura">% gordura corporal (opcional)</Label>
+                  <Input id="ob-gordura" type="number" value={d.gordura ?? ""} onChange={(e) => update({ gordura: e.target.value ? Number(e.target.value) : undefined })} />
                 </div>
                 <div className="space-y-2">
                   <Label>Biotipo</Label>
@@ -219,8 +242,9 @@ function Onboarding() {
                   return (
                     <div className="space-y-4 mt-2 p-4 rounded-xl border border-border bg-muted/30">
                       <div className="space-y-2">
-                        <Label>Peso desejado (kg)</Label>
+                        <Label htmlFor="ob-peso-desejado">Peso desejado (kg)</Label>
                         <Input
+                          id="ob-peso-desejado"
                           type="number"
                           placeholder="Ex: 65"
                           value={d.pesoDesejado ?? ""}
@@ -315,6 +339,8 @@ function Onboarding() {
                   </div>
                   {d.restricoes.includes("Outro") && (
                     <Input
+                      id="ob-restricao-outro"
+                      aria-label="Especifique sua restrição"
                       value={d.restricaoOutro ?? ""}
                       onChange={(e) => update({ restricaoOutro: e.target.value })}
                       placeholder="Especifique sua restrição"
@@ -323,32 +349,34 @@ function Onboarding() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label>Alimentos favoritos</Label>
-                  <Textarea value={d.favoritos} onChange={(e) => update({ favoritos: e.target.value })} placeholder="Ex: frango, arroz, banana..." />
+                  <Label htmlFor="ob-favoritos">Alimentos favoritos</Label>
+                  <Textarea id="ob-favoritos" value={d.favoritos} onChange={(e) => update({ favoritos: e.target.value })} placeholder="Ex: frango, arroz, banana..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>Alimentos que não gosta</Label>
-                  <Textarea value={d.naoGosta} onChange={(e) => update({ naoGosta: e.target.value })} placeholder="Ex: brócolis, peixe..." />
+                  <Label htmlFor="ob-naogosta">Alimentos que não gosta</Label>
+                  <Textarea id="ob-naogosta" value={d.naoGosta} onChange={(e) => update({ naoGosta: e.target.value })} placeholder="Ex: brócolis, peixe..." />
                 </div>
                 <div className="space-y-2">
-                  <Label>Refeições por dia: {d.refeicoes}</Label>
-                  <Slider value={[d.refeicoes]} min={3} max={6} step={1} onValueChange={(v) => update({ refeicoes: v[0] })} />
+                  <Label htmlFor="ob-refeicoes">Refeições por dia: {d.refeicoes}</Label>
+                  <Slider id="ob-refeicoes" value={[d.refeicoes]} min={3} max={6} step={1} onValueChange={(v) => update({ refeicoes: v[0] })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Orçamento mensal: R$ {d.orcamento}</Label>
-                  <Slider value={[d.orcamento]} min={200} max={2000} step={50} onValueChange={(v) => update({ orcamento: v[0] })} />
+                  <Label htmlFor="ob-orcamento">Orçamento mensal: R$ {d.orcamento}</Label>
+                  <Slider id="ob-orcamento" value={[d.orcamento]} min={200} max={2000} step={50} onValueChange={(v) => update({ orcamento: v[0] })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Usa suplementos?</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <Label id="ob-supl-label">Usa suplementos?</Label>
+                  <div className="grid grid-cols-2 gap-2" role="radiogroup" aria-labelledby="ob-supl-label">
                     {[{l:"Sim",v:true},{l:"Não",v:false}].map((o) => (
-                      <button key={o.l} onClick={() => update({ suplementos: o.v })} className={`px-3 py-2 rounded-lg border text-sm ${d.suplementos === o.v ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
+                      <button key={o.l} type="button" role="radio" aria-checked={d.suplementos === o.v} onClick={() => update({ suplementos: o.v })} className={`px-3 py-2 rounded-lg border text-sm ${d.suplementos === o.v ? "border-primary bg-primary/10 text-primary" : "border-border"}`}>
                         {o.l}
                       </button>
                     ))}
                   </div>
                   {d.suplementos && (
                     <Input
+                      id="ob-supl-quais"
+                      aria-label="Quais suplementos você usa"
                       value={d.suplementosQuais ?? ""}
                       onChange={(e) => update({ suplementosQuais: e.target.value })}
                       placeholder="Quais? Ex: whey, creatina..."
@@ -357,16 +385,16 @@ function Onboarding() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <Label>Problemas de saúde / lesões (opcional)</Label>
-                  <Textarea value={d.saude} onChange={(e) => update({ saude: e.target.value })} />
+                  <Label htmlFor="ob-saude">Problemas de saúde / lesões (opcional)</Label>
+                  <Textarea id="ob-saude" value={d.saude} onChange={(e) => update({ saude: e.target.value })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Qualidade do sono: {d.sono}/10</Label>
-                  <Slider value={[d.sono]} min={1} max={10} step={1} onValueChange={(v) => update({ sono: v[0] })} />
+                  <Label htmlFor="ob-sono">Qualidade do sono: {d.sono}/10</Label>
+                  <Slider id="ob-sono" value={[d.sono]} min={1} max={10} step={1} onValueChange={(v) => update({ sono: v[0] })} />
                 </div>
                 <div className="space-y-2">
-                  <Label>Nível de estresse: {d.estresse}/10</Label>
-                  <Slider value={[d.estresse]} min={1} max={10} step={1} onValueChange={(v) => update({ estresse: v[0] })} />
+                  <Label htmlFor="ob-estresse">Nível de estresse: {d.estresse}/10</Label>
+                  <Slider id="ob-estresse" value={[d.estresse]} min={1} max={10} step={1} onValueChange={(v) => update({ estresse: v[0] })} />
                 </div>
               </>
             )}

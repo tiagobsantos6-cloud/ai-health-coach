@@ -143,7 +143,7 @@ function Dieta() {
                 <div key={i} className="p-3 rounded-lg border border-border">
                   <div className="font-medium text-sm">{s.original}</div>
                   <div className="text-xs text-muted-foreground">→ {s.substituto}</div>
-                  <div className="text-xs text-primary mt-1">{s.equivalencia}</div>
+                  <div className="text-xs text-orange-700 dark:text-primary mt-1">{s.equivalencia}</div>
                 </div>
               ))}
             </div>
@@ -238,6 +238,7 @@ function Dieta() {
                                   <PopoverTrigger asChild>
                                     <button
                                       type="button"
+                                      aria-label="Trocar alimento"
                                       className="shrink-0 p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10"
                                       title="Trocar alimento"
                                     >

@@ -368,7 +368,10 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
   const copiar = async () => {
     try {
       await navigator.clipboard.writeText(link);
-      toast.success("Link copiado!");
+      toast("Link copiado!", {
+        description: "Compartilhe com seus amigos.",
+        duration: 3000,
+      });
     } catch {
       toast.error("Não foi possível copiar.");
     }
@@ -386,10 +389,10 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
         <div className="font-mono text-sm break-all">{link}</div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" onClick={copiar}>
+        <Button variant="outline" onClick={copiar} aria-label="Copiar link de indicação">
           <Copy className="w-4 h-4 mr-2" /> Copiar link
         </Button>
-        <Button onClick={compartilharWpp}>
+        <Button onClick={compartilharWpp} aria-label="Compartilhar no WhatsApp">
           <Share2 className="w-4 h-4 mr-2" /> Compartilhar no WhatsApp
         </Button>
       </div>
