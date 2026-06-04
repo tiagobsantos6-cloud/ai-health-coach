@@ -64,6 +64,13 @@ function Perfil() {
 
   const [confirmarTexto, setConfirmarTexto] = useState("");
   const [openLimpar, setOpenLimpar] = useState(false);
+  const { t } = useTranslation();
+  const [idioma, setIdioma] = useState<string>(() => (typeof window !== "undefined" ? localStorage.getItem("idioma") ?? "pt" : "pt"));
+  const trocarIdioma = (lng: "pt" | "en") => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem("idioma", lng);
+    setIdioma(lng);
+  };
 
   const [email, setEmail] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
