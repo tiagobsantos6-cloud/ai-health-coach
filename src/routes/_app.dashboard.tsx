@@ -10,9 +10,9 @@ import { Droplet, Dumbbell, Moon, Scale, Plus } from "lucide-react";
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — VitaIA" },
+      { title: "Dashboard — AI Health Coach" },
       { name: "description", content: "Resumo diário do seu plano: calorias, macros, água, treino e checklist de disciplina." },
-      { property: "og:title", content: "Dashboard — VitaIA" },
+      { property: "og:title", content: "Dashboard — AI Health Coach" },
       { property: "og:description", content: "Acompanhe suas metas diárias de nutrição, treino e hidratação." },
     ],
   }),

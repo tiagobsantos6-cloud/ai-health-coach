@@ -8,9 +8,9 @@ import { Droplet } from "lucide-react";
 export const Route = createFileRoute("/_app/agua")({
   head: () => ({
     meta: [
-      { title: "Hidratação — VitaIA" },
+      { title: "Hidratação — AI Health Coach" },
       { name: "description", content: "Acompanhe sua meta diária de hidratação com registros rápidos e progresso visual." },
-      { property: "og:title", content: "Hidratação — VitaIA" },
+      { property: "og:title", content: "Hidratação — AI Health Coach" },
       { property: "og:description", content: "Registre sua ingestão de água e acompanhe a meta diária." },
     ],
   }),

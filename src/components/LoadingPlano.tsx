@@ -13,7 +13,7 @@ export function LoadingPlano({ mensagem = "Carregando seu plano..." }: { mensage
           <Sparkles className="w-10 h-10 text-primary-foreground" />
         </motion.div>
         <div>
-          <h1 className="text-xl font-bold mb-1">VitaIA</h1>
+          <h1 className="text-xl font-bold mb-1">AI Health Coach</h1>
           <p className="text-sm text-muted-foreground">{mensagem}</p>
         </div>
         <div className="flex justify-center gap-1.5">

@@ -18,10 +18,10 @@ const errosPtBr: Record<string, string> = {
 export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
-      { title: "Entrar — VitaIA" },
-      { name: "description", content: "Acesse sua conta VitaIA para continuar seu plano personalizado de nutrição e treino." },
-      { property: "og:title", content: "Entrar — VitaIA" },
-      { property: "og:description", content: "Faça login no VitaIA e continue seu acompanhamento de saúde." },
+      { title: "Entrar — AI Health Coach" },
+      { name: "description", content: "Acesse sua conta AI Health Coach para continuar seu plano personalizado de nutrição e treino." },
+      { property: "og:title", content: "Entrar — AI Health Coach" },
+      { property: "og:description", content: "Faça login no AI Health Coach e continue seu acompanhamento de saúde." },
     ],
   }),
   component: LoginPage,
@@ -78,7 +78,7 @@ function LoginPage() {
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/30">
             <Sparkles className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">VitaIA</span>
+          <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">AI Health Coach</span>
         </div>
         <div className="text-center">
           <h1 className="text-xl font-semibold">Entrar</h1>

@@ -16,9 +16,9 @@ import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from 
 export const Route = createFileRoute("/_app/evolucao")({
   head: () => ({
     meta: [
-      { title: "Evolução — VitaIA" },
+      { title: "Evolução — AI Health Coach" },
       { name: "description", content: "Acompanhe sua evolução de peso, medidas e progresso em relação à meta com gráficos e ajustes da IA." },
-      { property: "og:title", content: "Evolução — VitaIA" },
+      { property: "og:title", content: "Evolução — AI Health Coach" },
       { property: "og:description", content: "Gráficos de evolução, progresso da meta e ajustes inteligentes do plano." },
     ],
   }),

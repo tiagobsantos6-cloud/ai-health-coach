@@ -13,9 +13,9 @@ import { registrarIndicacaoFn } from "@/lib/indicacoes.functions";
 export const Route = createFileRoute("/gerando")({
   head: () => ({
     meta: [
-      { title: "Gerando seu Plano — VitaIA" },
+      { title: "Gerando seu Plano — AI Health Coach" },
       { name: "description", content: "Estamos criando seu plano personalizado de nutrição e treino com inteligência artificial." },
-      { property: "og:title", content: "Gerando seu Plano — VitaIA" },
+      { property: "og:title", content: "Gerando seu Plano — AI Health Coach" },
       { property: "og:description", content: "Sua IA está montando seu plano sob medida." },
     ],
   }),
