@@ -76,7 +76,8 @@ function Gerando() {
     for (let i = 1; i <= MAX_TENTATIVAS; i++) {
       setTentativa(i);
       try {
-        const plano = await gerarPlano(dados);
+        const idioma = typeof window !== "undefined" ? localStorage.getItem("idioma") ?? "pt" : "pt";
+        const plano = await gerarPlano({ ...dados, idioma });
         setPlano(plano);
         try {
           await saveData({ data: { dados, plano } });
