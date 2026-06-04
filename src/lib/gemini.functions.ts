@@ -82,6 +82,7 @@ const dadosSchema = z.object({
   saude: shortText(500),
   sono: z.number().min(0).max(24),
   estresse: z.number().min(0).max(10),
+  idioma: z.string().max(5).optional(),
 });
 
 const resumoPlanoSchema = z.record(z.string(), z.string().max(50)).optional().default({});
@@ -343,7 +344,11 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       `INSTRUÇÃO PRIORITÁRIA NÚMERO 1 — NÃO IGNORE: O usuário solicitou EXATAMENTE ${refeicoesPedidas} refeições. Você deve gerar SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Se gerar mais ou menos que ${refeicoesPedidas} refeições, a resposta será considerada inválida e rejeitada. Conte os itens antes de responder.\n\n`;
 
     const callGateway = async (extraReinforcement?: string) => {
-      const systemContent = priorityPrompt + SYSTEM_PROMPT + (extraReinforcement ? `\n\n${extraReinforcement}` : "");
+      const languageReinforcement =
+        data.dados.idioma === "en"
+          ? "\n\nLANGUAGE: Respond with meal names, exercise names and all plan content in English."
+          : "";
+      const systemContent = priorityPrompt + SYSTEM_PROMPT + languageReinforcement + (extraReinforcement ? `\n\n${extraReinforcement}` : "");
       const response = await fetch(GATEWAY_URL, {
         method: "POST",
         headers: {

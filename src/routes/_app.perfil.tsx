@@ -1,5 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import i18n from "@/lib/i18n";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -62,6 +64,13 @@ function Perfil() {
 
   const [confirmarTexto, setConfirmarTexto] = useState("");
   const [openLimpar, setOpenLimpar] = useState(false);
+  const { t } = useTranslation();
+  const [idioma, setIdioma] = useState<string>(() => (typeof window !== "undefined" ? localStorage.getItem("idioma") ?? "pt" : "pt"));
+  const trocarIdioma = (lng: "pt" | "en") => {
+    i18n.changeLanguage(lng);
+    localStorage.setItem("idioma", lng);
+    setIdioma(lng);
+  };
 
   const [email, setEmail] = useState<string | null>(null);
   const [createdAt, setCreatedAt] = useState<string | null>(null);
@@ -209,6 +218,27 @@ function Perfil() {
           ) : (
             <p className="text-sm text-muted-foreground">Nenhum plano gerado ainda.</p>
           )}
+        </Card>
+
+        {/* Idioma */}
+        <Card className="p-5 space-y-3 md:col-span-2">
+          <h2 className="font-semibold">{t("perfil.idioma")}</h2>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => trocarIdioma("pt")}
+              className={`px-4 py-2 rounded-xl border text-sm font-medium ${idioma === "pt" ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground"}`}
+            >
+              🇧🇷 Português
+            </button>
+            <button
+              type="button"
+              onClick={() => trocarIdioma("en")}
+              className={`px-4 py-2 rounded-xl border text-sm font-medium ${idioma === "en" ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground"}`}
+            >
+              🇺🇸 English
+            </button>
+          </div>
         </Card>
 
         {/* Ações */}
