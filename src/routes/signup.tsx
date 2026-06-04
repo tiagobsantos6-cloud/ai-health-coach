@@ -19,10 +19,10 @@ const errosPtBr: Record<string, string> = {
 export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
-      { title: "Criar conta — VitaIA" },
-      { name: "description", content: "Crie sua conta no VitaIA e receba um plano personalizado de nutrição e treino gerado por IA." },
-      { property: "og:title", content: "Criar conta — VitaIA" },
-      { property: "og:description", content: "Cadastre-se no VitaIA e comece seu plano personalizado." },
+      { title: "Criar conta — AI Health Coach" },
+      { name: "description", content: "Crie sua conta no AI Health Coach e receba um plano personalizado de nutrição e treino gerado por IA." },
+      { property: "og:title", content: "Criar conta — AI Health Coach" },
+      { property: "og:description", content: "Cadastre-se no AI Health Coach e comece seu plano personalizado." },
     ],
   }),
   component: SignupPage,
@@ -131,7 +131,7 @@ function SignupPage() {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg">VitaIA</span>
+            <span className="font-bold text-lg">AI Health Coach</span>
           </div>
           <div className="flex flex-col items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-primary/15 flex items-center justify-center">
@@ -172,7 +172,7 @@ function SignupPage() {
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
             <Sparkles className="w-5 h-5 text-primary-foreground" />
           </div>
-          <span className="font-bold text-lg">VitaIA</span>
+          <span className="font-bold text-lg">AI Health Coach</span>
         </div>
         <div className="text-center">
           <h1 className="text-xl font-semibold">Criar conta</h1>

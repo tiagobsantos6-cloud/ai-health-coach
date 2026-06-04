@@ -10,9 +10,9 @@ import { Droplet, Dumbbell, Moon, Scale, Plus } from "lucide-react";
 export const Route = createFileRoute("/_app/dashboard")({
   head: () => ({
     meta: [
-      { title: "Dashboard — VitaIA" },
+      { title: "Dashboard — AI Health Coach" },
       { name: "description", content: "Resumo diário do seu plano: calorias, macros, água, treino e checklist de disciplina." },
-      { property: "og:title", content: "Dashboard — VitaIA" },
+      { property: "og:title", content: "Dashboard — AI Health Coach" },
       { property: "og:description", content: "Acompanhe suas metas diárias de nutrição, treino e hidratação." },
     ],
   }),
@@ -176,11 +176,10 @@ function Dashboard() {
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-sm text-muted-foreground">{saudacao},</p>
           <h1 className="text-[20px] md:text-2xl font-bold truncate">
-            <span className="md:hidden">Olá, {nome || "você"} 👋</span>
-            <span className="hidden md:inline">Painel de {nome || "você"} — Resumo Diário</span>
+            Olá, {nome || "você"} 👋
           </h1>
+          <p className="text-sm text-muted-foreground">Resumo do seu dia</p>
         </div>
         <div className="w-11 h-11 shrink-0 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
           {iniciais}

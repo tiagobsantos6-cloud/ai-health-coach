@@ -8,9 +8,9 @@ import { motion } from "framer-motion";
 export const Route = createFileRoute("/_app/planos")({
   head: () => ({
     meta: [
-      { title: "Planos — VitaIA" },
-      { name: "description", content: "Conheça os planos do VitaIA e desbloqueie recursos avançados de IA para nutrição e treino." },
-      { property: "og:title", content: "Planos — VitaIA" },
+      { title: "Planos — AI Health Coach" },
+      { name: "description", content: "Conheça os planos do AI Health Coach e desbloqueie recursos avançados de IA para nutrição e treino." },
+      { property: "og:title", content: "Planos — AI Health Coach" },
       { property: "og:description", content: "Escolha o plano ideal para o seu acompanhamento de saúde com IA." },
     ],
   }),

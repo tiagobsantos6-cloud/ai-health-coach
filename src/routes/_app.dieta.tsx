@@ -23,13 +23,13 @@ import { medidaCaseira } from "@/lib/medidaCaseira";
 export const Route = createFileRoute("/_app/dieta")({
   head: () => ({
     meta: [
-      { title: "Dieta — VitaIA" },
+      { title: "Dieta — AI Health Coach" },
       {
         name: "description",
         content:
           "Seu plano alimentar do dia: refeições, macros, substituições e progresso de calorias.",
       },
-      { property: "og:title", content: "Dieta — VitaIA" },
+      { property: "og:title", content: "Dieta — AI Health Coach" },
       {
         property: "og:description",
         content: "Plano alimentar personalizado com macros e substituições inteligentes.",

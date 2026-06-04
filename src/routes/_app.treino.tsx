@@ -11,9 +11,9 @@ import { Timer, Activity, Pause, Play, RotateCcw, PlayCircle, ExternalLink, Chev
 export const Route = createFileRoute("/_app/treino")({
   head: () => ({
     meta: [
-      { title: "Treino — VitaIA" },
+      { title: "Treino — AI Health Coach" },
       { name: "description", content: "Acompanhe seu plano de treino personalizado, séries, repetições e tempo de descanso." },
-      { property: "og:title", content: "Treino — VitaIA" },
+      { property: "og:title", content: "Treino — AI Health Coach" },
       { property: "og:description", content: "Plano de treino personalizado com timer e demonstração de execução." },
     ],
   }),

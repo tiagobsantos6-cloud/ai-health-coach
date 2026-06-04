@@ -27,10 +27,10 @@ import {
 export const Route = createFileRoute("/_app/perfil")({
   head: () => ({
     meta: [
-      { title: "Perfil — VitaIA" },
-      { name: "description", content: "Gerencie seus dados, plano atual e configurações da conta no VitaIA." },
-      { property: "og:title", content: "Perfil — VitaIA" },
-      { property: "og:description", content: "Dados pessoais, plano e configurações da sua conta VitaIA." },
+      { title: "Perfil — AI Health Coach" },
+      { name: "description", content: "Gerencie seus dados, plano atual e configurações da conta no AI Health Coach." },
+      { property: "og:title", content: "Perfil — AI Health Coach" },
+      { property: "og:description", content: "Dados pessoais, plano e configurações da sua conta AI Health Coach." },
     ],
   }),
   component: Perfil,
@@ -363,7 +363,7 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
 
   const code = userId.replace(/-/g, "").slice(0, 8);
   const link = `https://vitalia.app/cadastro?ref=${code}`;
-  const wppText = `Vem comigo no VitaIA! Plano de nutrição e treino feito por IA. Cadastre-se: ${link}`;
+  const wppText = `Vem comigo no AI Health Coach! Plano de nutrição e treino feito por IA. Cadastre-se: ${link}`;
 
   const copiar = async () => {
     try {

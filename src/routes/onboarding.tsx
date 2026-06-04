@@ -21,9 +21,9 @@ const biotipoDesc: Record<string, string> = {
 export const Route = createFileRoute("/onboarding")({
   head: () => ({
     meta: [
-      { title: "Personalização do seu Plano — VitaIA" },
+      { title: "Personalização do seu Plano — AI Health Coach" },
       { name: "description", content: "Responda algumas perguntas para que a IA gere seu plano personalizado de nutrição e treino." },
-      { property: "og:title", content: "Personalização do seu Plano — VitaIA" },
+      { property: "og:title", content: "Personalização do seu Plano — AI Health Coach" },
       { property: "og:description", content: "Conte-nos sobre você para criarmos um plano sob medida." },
     ],
   }),
@@ -76,7 +76,7 @@ function Onboarding() {
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-primary-foreground" />
         </div>
-        <span className="font-bold text-lg">VitaIA</span>
+        <span className="font-bold text-lg">AI Health Coach</span>
       </header>
 
       <main className="flex-1 max-w-2xl mx-auto w-full px-4 pb-12">

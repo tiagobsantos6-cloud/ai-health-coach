@@ -10,7 +10,7 @@ import {
   Sparkles, Brain, Utensils, Dumbbell, Droplets, TrendingUp, ShieldCheck, ArrowRight,
 } from "lucide-react";
 
-const TITLE = "VitaIA — Seu coach de saúde com Inteligência Artificial";
+const TITLE = "AI Health Coach — Seu coach de saúde com Inteligência Artificial";
 const DESC = "Plano personalizado de nutrição, treino e hidratação gerado por IA em 1 minuto. Acompanhamento diário, lista de compras e evolução semanal.";
 const URL = "https://ai-coach-buddy-88.lovable.app/";
 
@@ -72,7 +72,7 @@ function Landing() {
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
               <Sparkles className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg">VitaIA</span>
+            <span className="font-bold text-lg">AI Health Coach</span>
           </div>
           <div className="flex items-center gap-2">
             <Link to="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
@@ -133,7 +133,7 @@ function Landing() {
         <div className="max-w-2xl mx-auto text-center space-y-5">
           <h2 className="text-3xl md:text-4xl font-bold">Comece sua transformação hoje</h2>
           <p className="text-muted-foreground">
-            Mais de mil pessoas já criaram seu plano com a VitaIA. Leva 1 minuto e é grátis.
+            Mais de mil pessoas já criaram seu plano com a AI Health Coach. Leva 1 minuto e é grátis.
           </p>
           <Link to="/signup">
             <Button size="lg" className="text-base">
@@ -144,7 +144,7 @@ function Landing() {
       </section>
 
       <footer className="border-t border-border/40 px-4 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} VitaIA · Coach de saúde com IA
+        © {new Date().getFullYear()} AI Health Coach · Coach de saúde com IA
       </footer>
     </div>
   );

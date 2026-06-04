@@ -8,9 +8,9 @@ import { Share2, RotateCcw, ShoppingCart } from "lucide-react";
 export const Route = createFileRoute("/_app/compras")({
   head: () => ({
     meta: [
-      { title: "Lista de Compras — VitaIA" },
+      { title: "Lista de Compras — AI Health Coach" },
       { name: "description", content: "Lista de compras semanal consolidada a partir do seu plano alimentar." },
-      { property: "og:title", content: "Lista de Compras — VitaIA" },
+      { property: "og:title", content: "Lista de Compras — AI Health Coach" },
       { property: "og:description", content: "Tudo que você precisa comprar para seguir seu plano da semana." },
     ],
   }),
@@ -217,7 +217,7 @@ function Compras() {
   }, [itens, marcados]);
 
   const compartilharWhatsApp = () => {
-    const linhas: string[] = ["🛒 *LISTA DE COMPRAS — VitaIA*", ""];
+    const linhas: string[] = ["🛒 *LISTA DE COMPRAS — AI Health Coach*", ""];
     for (const cat of ORDEM_CATEGORIAS) {
       const arr = porCategoria.get(cat);
       if (!arr || arr.length === 0) continue;
