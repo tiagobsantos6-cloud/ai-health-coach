@@ -13,28 +13,28 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { loadLembretes, setupLembretes, loadPendentes, limparPendente, type Pendentes } from "@/lib/lembretes";
 
 const sideItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
-  { to: "/treino", label: "Treino", icon: Dumbbell },
-  { to: "/agua", label: "Água", icon: Droplets },
-  { to: "/compras", label: "Compras", icon: ShoppingCart },
-  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
-  { to: "/planos", label: "Planos", icon: Crown },
-  { to: "/perfil", label: "Perfil", icon: User },
+  { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/dieta", labelKey: "nav.dieta", icon: UtensilsCrossed },
+  { to: "/treino", labelKey: "nav.treino", icon: Dumbbell },
+  { to: "/agua", labelKey: "nav.agua", icon: Droplets },
+  { to: "/compras", labelKey: "nav.compras", icon: ShoppingCart },
+  { to: "/evolucao", labelKey: "nav.evolucao", icon: TrendingUp },
+  { to: "/planos", labelKey: "nav.planos", icon: Crown },
+  { to: "/perfil", labelKey: "nav.perfil", icon: User },
 ] as const;
 
 const bottomItems = [
-  { to: "/dashboard", label: "Início", icon: LayoutDashboard },
-  { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
-  { to: "/treino", label: "Treino", icon: Dumbbell },
-  { to: "/agua", label: "Água", icon: Droplets },
+  { to: "/dashboard", labelKey: "nav.inicio", icon: LayoutDashboard },
+  { to: "/dieta", labelKey: "nav.dieta", icon: UtensilsCrossed },
+  { to: "/treino", labelKey: "nav.treino", icon: Dumbbell },
+  { to: "/agua", labelKey: "nav.agua", icon: Droplets },
 ] as const;
 
 const menuItems = [
-  { to: "/compras", label: "Compras", icon: ShoppingCart },
-  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
-  { to: "/planos", label: "Planos", icon: Crown },
-  { to: "/perfil", label: "Perfil", icon: User },
+  { to: "/compras", labelKey: "nav.compras", icon: ShoppingCart },
+  { to: "/evolucao", labelKey: "nav.evolucao", icon: TrendingUp },
+  { to: "/planos", labelKey: "nav.planos", icon: Crown },
+  { to: "/perfil", labelKey: "nav.perfil", icon: User },
 ] as const;
 
 export function AppLayout() {
