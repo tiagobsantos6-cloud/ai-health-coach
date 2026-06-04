@@ -125,7 +125,7 @@ function SignupPage() {
 
   if (etapa === "confirmar-email") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+      <div className="relative min-h-screen flex items-center justify-center px-4 bg-background"><LanguageSwitcher />
         <Card className="w-full max-w-sm p-6 space-y-6 rounded-2xl text-center">
           <div className="flex items-center gap-2 justify-center">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
@@ -166,7 +166,7 @@ function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <div className="relative min-h-screen flex items-center justify-center px-4 bg-background"><LanguageSwitcher />
       <Card className="w-full max-w-sm p-6 space-y-5 rounded-2xl">
         <div className="flex items-center gap-2 justify-center">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
