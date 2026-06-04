@@ -210,7 +210,7 @@ export function AppLayout() {
                 }`}
               >
                 <Icon className="w-[18px] h-[18px]" />
-                {it.label}
+                {t(it.labelKey)}
               </Link>
             );
           })}
@@ -262,7 +262,7 @@ export function AppLayout() {
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" />
                   )}
                 </span>
-                {it.label}
+                {t(it.labelKey)}
               </Link>
             );
           })}
@@ -279,7 +279,7 @@ export function AppLayout() {
                     aria-label="Mais opções"
                   >
                     <Menu className={`w-[22px] h-[22px] ${isMenuActive ? "scale-110" : ""} transition-transform`} />
-                    {activeMenuItem ? activeMenuItem.label : "Menu"}
+                    {activeMenuItem ? t(activeMenuItem.labelKey) : "Menu"}
                   </button>
                 );
               })()}
@@ -302,7 +302,7 @@ export function AppLayout() {
                       }`}
                     >
                       <Icon className="w-5 h-5" />
-                      {it.label}
+                      {t(it.labelKey)}
                     </Link>
                   );
                 })}
