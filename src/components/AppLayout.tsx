@@ -221,7 +221,7 @@ export function AppLayout() {
           className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <LogOut className="w-4 h-4" />
-          Sair
+          {t("nav.sair")}
         </button>
       </aside>
 
