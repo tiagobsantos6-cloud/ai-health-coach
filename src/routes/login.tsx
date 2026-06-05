@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const errosPtBr: Record<string, string> = {
   "Invalid login credentials": "Email ou senha incorretos. Tente novamente.",
@@ -73,7 +72,7 @@ function LoginPage() {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center px-4 bg-background"><LanguageSwitcher />
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
       <Card className="w-full max-w-sm p-6 space-y-5 rounded-2xl">
         <div className="flex items-center gap-2 justify-center">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/30">

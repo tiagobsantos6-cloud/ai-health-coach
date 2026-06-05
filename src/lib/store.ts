@@ -27,7 +27,6 @@ export type DadosUsuario = {
   saude: string;
   sono: number;
   estresse: number;
-  idioma?: string;
 };
 
 export type Alimento = {

@@ -1,7 +1,6 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut, Menu, ShoppingCart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -13,28 +12,28 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { loadLembretes, setupLembretes, loadPendentes, limparPendente, type Pendentes } from "@/lib/lembretes";
 
 const sideItems = [
-  { to: "/dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
-  { to: "/dieta", labelKey: "nav.dieta", icon: UtensilsCrossed },
-  { to: "/treino", labelKey: "nav.treino", icon: Dumbbell },
-  { to: "/agua", labelKey: "nav.agua", icon: Droplets },
-  { to: "/compras", labelKey: "nav.compras", icon: ShoppingCart },
-  { to: "/evolucao", labelKey: "nav.evolucao", icon: TrendingUp },
-  { to: "/planos", labelKey: "nav.planos", icon: Crown },
-  { to: "/perfil", labelKey: "nav.perfil", icon: User },
+  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
+  { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
+  { to: "/treino", label: "Treino", icon: Dumbbell },
+  { to: "/agua", label: "Água", icon: Droplets },
+  { to: "/compras", label: "Compras", icon: ShoppingCart },
+  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
+  { to: "/planos", label: "Planos", icon: Crown },
+  { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
 const bottomItems = [
-  { to: "/dashboard", labelKey: "nav.inicio", icon: LayoutDashboard },
-  { to: "/dieta", labelKey: "nav.dieta", icon: UtensilsCrossed },
-  { to: "/treino", labelKey: "nav.treino", icon: Dumbbell },
-  { to: "/agua", labelKey: "nav.agua", icon: Droplets },
+  { to: "/dashboard", label: "Início", icon: LayoutDashboard },
+  { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
+  { to: "/treino", label: "Treino", icon: Dumbbell },
+  { to: "/agua", label: "Água", icon: Droplets },
 ] as const;
 
 const menuItems = [
-  { to: "/compras", labelKey: "nav.compras", icon: ShoppingCart },
-  { to: "/evolucao", labelKey: "nav.evolucao", icon: TrendingUp },
-  { to: "/planos", labelKey: "nav.planos", icon: Crown },
-  { to: "/perfil", labelKey: "nav.perfil", icon: User },
+  { to: "/compras", label: "Compras", icon: ShoppingCart },
+  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
+  { to: "/planos", label: "Planos", icon: Crown },
+  { to: "/perfil", label: "Perfil", icon: User },
 ] as const;
 
 export function AppLayout() {
@@ -46,7 +45,6 @@ export function AppLayout() {
   const navigate = useNavigate();
   const path = useRouterState({ select: (r) => r.location.pathname });
   const [menuOpen, setMenuOpen] = useState(false);
-  const { t } = useTranslation();
 
   // Track auth session — gate all server fns on this
   const [userId, setUserId] = useState<string | null>(null);
@@ -211,7 +209,7 @@ export function AppLayout() {
                 }`}
               >
                 <Icon className="w-[18px] h-[18px]" />
-                {t(it.labelKey)}
+                {it.label}
               </Link>
             );
           })}
@@ -221,7 +219,7 @@ export function AppLayout() {
           className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <LogOut className="w-4 h-4" />
-          {t("nav.sair")}
+          Sair
         </button>
       </aside>
 
@@ -263,7 +261,7 @@ export function AppLayout() {
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" />
                   )}
                 </span>
-                {t(it.labelKey)}
+                {it.label}
               </Link>
             );
           })}
@@ -280,7 +278,7 @@ export function AppLayout() {
                     aria-label="Mais opções"
                   >
                     <Menu className={`w-[22px] h-[22px] ${isMenuActive ? "scale-110" : ""} transition-transform`} />
-                    {activeMenuItem ? t(activeMenuItem.labelKey) : "Menu"}
+                    {activeMenuItem ? activeMenuItem.label : "Menu"}
                   </button>
                 );
               })()}
@@ -303,7 +301,7 @@ export function AppLayout() {
                       }`}
                     >
                       <Icon className="w-5 h-5" />
-                      {t(it.labelKey)}
+                      {it.label}
                     </Link>
                   );
                 })}
