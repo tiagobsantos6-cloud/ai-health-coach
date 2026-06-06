@@ -203,7 +203,16 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ob-nome">Nome</Label>
-                  <Input id="ob-nome" value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
+                  <Input
+                    id="ob-nome"
+                    value={d.nome}
+                    onChange={(e) => update({ nome: e.target.value })}
+                    onBlur={(e) => handleBlur("nome", e.target.value)}
+                    aria-invalid={!!erros.nome}
+                    className={borderClass("nome", d.nome, !!erros.nome || d.nome.trim().length > 0)}
+                    placeholder="Seu nome"
+                  />
+                  <ErroMsg campo="nome" />
                 </div>
                 <div className="space-y-2">
                   <Label id="ob-sexo-label">Sexo</Label>
@@ -226,7 +235,17 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ob-idade">Idade</Label>
-                  <Input id="ob-idade" type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
+                  <Input
+                    id="ob-idade"
+                    type="number"
+                    placeholder="Ex: 25"
+                    value={d.idade || ""}
+                    onChange={(e) => update({ idade: Number(e.target.value) })}
+                    onBlur={(e) => handleBlur("idade", Number(e.target.value))}
+                    aria-invalid={!!erros.idade}
+                    className={borderClass("idade", d.idade, d.idade > 0 || !!erros.idade)}
+                  />
+                  <ErroMsg campo="idade" />
                 </div>
               </>
             )}
