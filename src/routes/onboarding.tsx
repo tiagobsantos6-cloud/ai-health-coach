@@ -516,7 +516,7 @@ function Onboarding() {
             </Button>
           )}
           {step < 5 ? (
-            <Button onClick={() => setStep(step + 1)} disabled={!canNext()} className="flex-1">
+            <Button onClick={handleContinuar} disabled={!canNext()} className="flex-1">
               Continuar <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
