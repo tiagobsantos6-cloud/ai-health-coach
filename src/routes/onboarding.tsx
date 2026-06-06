@@ -259,11 +259,31 @@ function Onboarding() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="ob-peso">Peso (kg)</Label>
-                    <Input id="ob-peso" type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
+                    <Input
+                      id="ob-peso"
+                      type="number"
+                      placeholder="Ex: 70"
+                      value={d.peso || ""}
+                      onChange={(e) => update({ peso: Number(e.target.value) })}
+                      onBlur={(e) => handleBlur("peso", Number(e.target.value))}
+                      aria-invalid={!!erros.peso}
+                      className={borderClass("peso", d.peso, d.peso > 0 || !!erros.peso)}
+                    />
+                    <ErroMsg campo="peso" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="ob-altura">Altura (cm)</Label>
-                    <Input id="ob-altura" type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
+                    <Input
+                      id="ob-altura"
+                      type="number"
+                      placeholder="Ex: 170"
+                      value={d.altura || ""}
+                      onChange={(e) => update({ altura: Number(e.target.value) })}
+                      onBlur={(e) => handleBlur("altura", Number(e.target.value))}
+                      aria-invalid={!!erros.altura}
+                      className={borderClass("altura", d.altura, d.altura > 0 || !!erros.altura)}
+                    />
+                    <ErroMsg campo="altura" />
                   </div>
                 </div>
                 <div className="space-y-2">
