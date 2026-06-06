@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianGrid } from "recharts";
-import { Sparkles, Loader2, Lock } from "lucide-react";
+import { Sparkles, Loader2, Lock, TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { gerarAjustes } from "@/lib/gemini";
 import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
@@ -71,7 +71,7 @@ function Evolucao() {
         <p className="text-muted-foreground">Acompanhe seu progresso semanal</p>
       </div>
 
-      <Card className="p-5 space-y-4">
+      <Card id="registro-form" className="p-5 space-y-4">
         <h2 className="font-semibold">Novo registro semanal</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
@@ -185,7 +185,40 @@ function Evolucao() {
         );
       })()}
 
-      {evolucao.length > 0 && (
+      {evolucao.length === 0 && (
+        <Card className="p-8 flex flex-col items-center text-center space-y-4">
+          <TrendingUp className="w-12 h-12 text-primary" />
+          <h3 className="text-lg font-semibold">Nenhum registro ainda</h3>
+          <p className="text-sm text-muted-foreground max-w-xs">
+            Registre seu peso e métricas semanais para acompanhar sua evolução.
+          </p>
+          <Button onClick={() => document.getElementById("registro-form")?.scrollIntoView({ behavior: "smooth" })}>
+            Fazer primeiro registro
+          </Button>
+        </Card>
+      )}
+
+      {evolucao.length === 1 && (
+        <Card className="p-5">
+          <h2 className="font-semibold mb-3">Evolução do peso</h2>
+          <div className="h-64">
+            <ResponsiveContainer>
+              <LineChart data={evolucao}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                <XAxis dataKey="data" stroke="var(--muted-foreground)" fontSize={12} />
+                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
+                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
+                <Line type="monotone" dataKey="peso" stroke="var(--primary)" strokeWidth={2} dot={{ r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+          <p className="text-sm text-muted-foreground text-center mt-3">
+            Registre mais semanas para ver sua evolução completa 📈
+          </p>
+        </Card>
+      )}
+
+      {evolucao.length >= 2 && (
         <Card className="p-5">
           <h2 className="font-semibold mb-3">Evolução do peso</h2>
           <div className="h-64">
