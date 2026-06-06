@@ -103,7 +103,7 @@ function Onboarding() {
   };
 
   const stepCampos: Record<number, string[]> = { 1: ["nome", "idade"], 2: ["peso", "altura"] };
-  const stepValores = (s: number): Record<string, unknown> => ({
+  const stepValores = (_s: number): Record<string, unknown> => ({
     nome: d.nome, idade: d.idade, peso: d.peso, altura: d.altura,
   });
   const stepTemErro = (s: number) => {
