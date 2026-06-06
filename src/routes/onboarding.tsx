@@ -52,17 +52,86 @@ function Onboarding() {
     saude: "", sono: 7, estresse: 5,
   });
 
+  type ErrLevel = { msg: string; level: "error" | "warn" };
+  const [erros, setErros] = useState<Record<string, ErrLevel | undefined>>({});
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", tema === "dark");
   }, [tema]);
 
   const update = (p: Partial<DadosUsuario>) => setD({ ...d, ...p });
 
+  const validarCampo = (campo: string, valor: unknown): ErrLevel | undefined => {
+    if (campo === "nome") {
+      if (!String(valor ?? "").trim()) return { msg: "Campo obrigatório", level: "error" };
+    }
+    if (campo === "idade") {
+      const n = Number(valor);
+      if (!n) return { msg: "Campo obrigatório", level: "error" };
+      if (n < 10 || n > 100) return { msg: "Idade deve estar entre 10 e 100 anos", level: "warn" };
+    }
+    if (campo === "peso") {
+      const n = Number(valor);
+      if (!n) return { msg: "Campo obrigatório", level: "error" };
+      if (n < 30 || n > 300) return { msg: "Peso deve estar entre 30 e 300 kg", level: "warn" };
+    }
+    if (campo === "altura") {
+      const n = Number(valor);
+      if (!n) return { msg: "Campo obrigatório", level: "error" };
+      if (n < 100 || n > 250) return { msg: "Altura deve estar entre 100 e 250 cm", level: "warn" };
+    }
+    return undefined;
+  };
+
+  const handleBlur = (campo: string, valor: unknown) => {
+    setErros((e) => ({ ...e, [campo]: validarCampo(campo, valor) }));
+  };
+
+  const borderClass = (campo: string, valor: unknown, tocado: boolean) => {
+    const err = erros[campo];
+    if (err?.level === "error") return "border-destructive focus-visible:ring-destructive";
+    if (err?.level === "warn") return "border-orange-500 focus-visible:ring-orange-500";
+    if (tocado && !validarCampo(campo, valor)) return "border-green-500/60";
+    return "";
+  };
+
+  const ErroMsg = ({ campo }: { campo: string }) => {
+    const err = erros[campo];
+    if (!err) return null;
+    const color = err.level === "error" ? "text-destructive" : "text-orange-500";
+    return <p className={`text-xs ${color} mt-1`}>{err.msg}</p>;
+  };
+
+  const stepCampos: Record<number, string[]> = { 1: ["nome", "idade"], 2: ["peso", "altura"] };
+  const stepValores = (_s: number): Record<string, unknown> => ({
+    nome: d.nome, idade: d.idade, peso: d.peso, altura: d.altura,
+  });
+  const stepTemErro = (s: number) => {
+    const campos = stepCampos[s] ?? [];
+    const vals = stepValores(s);
+    return campos.some((c) => !!validarCampo(c, vals[c]));
+  };
+
   const canNext = () => {
-    if (step === 1) return d.nome.trim() && d.idade > 0;
-    if (step === 2) return d.peso > 0 && d.altura > 0;
+    if (step === 1) return !stepTemErro(1);
+    if (step === 2) return !stepTemErro(2);
     if (step === 3) return !!d.objetivo;
     return true;
+  };
+
+  const handleContinuar = () => {
+    const campos = stepCampos[step] ?? [];
+    const vals = stepValores(step);
+    const novos: Record<string, ErrLevel | undefined> = {};
+    let bloqueia = false;
+    for (const c of campos) {
+      const e = validarCampo(c, vals[c]);
+      novos[c] = e;
+      if (e) bloqueia = true;
+    }
+    setErros((prev) => ({ ...prev, ...novos }));
+    if (bloqueia) return;
+    setStep(step + 1);
   };
 
   const finish = () => {
@@ -134,7 +203,16 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ob-nome">Nome</Label>
-                  <Input id="ob-nome" value={d.nome} onChange={(e) => update({ nome: e.target.value })} placeholder="Seu nome" />
+                  <Input
+                    id="ob-nome"
+                    value={d.nome}
+                    onChange={(e) => update({ nome: e.target.value })}
+                    onBlur={(e) => handleBlur("nome", e.target.value)}
+                    aria-invalid={!!erros.nome}
+                    className={borderClass("nome", d.nome, !!erros.nome || d.nome.trim().length > 0)}
+                    placeholder="Seu nome"
+                  />
+                  <ErroMsg campo="nome" />
                 </div>
                 <div className="space-y-2">
                   <Label id="ob-sexo-label">Sexo</Label>
@@ -157,7 +235,17 @@ function Onboarding() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="ob-idade">Idade</Label>
-                  <Input id="ob-idade" type="number" placeholder="Ex: 25" value={d.idade || ""} onChange={(e) => update({ idade: Number(e.target.value) })} />
+                  <Input
+                    id="ob-idade"
+                    type="number"
+                    placeholder="Ex: 25"
+                    value={d.idade || ""}
+                    onChange={(e) => update({ idade: Number(e.target.value) })}
+                    onBlur={(e) => handleBlur("idade", Number(e.target.value))}
+                    aria-invalid={!!erros.idade}
+                    className={borderClass("idade", d.idade, d.idade > 0 || !!erros.idade)}
+                  />
+                  <ErroMsg campo="idade" />
                 </div>
               </>
             )}
@@ -171,11 +259,31 @@ function Onboarding() {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label htmlFor="ob-peso">Peso (kg)</Label>
-                    <Input id="ob-peso" type="number" placeholder="Ex: 70" value={d.peso || ""} onChange={(e) => update({ peso: Number(e.target.value) })} />
+                    <Input
+                      id="ob-peso"
+                      type="number"
+                      placeholder="Ex: 70"
+                      value={d.peso || ""}
+                      onChange={(e) => update({ peso: Number(e.target.value) })}
+                      onBlur={(e) => handleBlur("peso", Number(e.target.value))}
+                      aria-invalid={!!erros.peso}
+                      className={borderClass("peso", d.peso, d.peso > 0 || !!erros.peso)}
+                    />
+                    <ErroMsg campo="peso" />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="ob-altura">Altura (cm)</Label>
-                    <Input id="ob-altura" type="number" placeholder="Ex: 170" value={d.altura || ""} onChange={(e) => update({ altura: Number(e.target.value) })} />
+                    <Input
+                      id="ob-altura"
+                      type="number"
+                      placeholder="Ex: 170"
+                      value={d.altura || ""}
+                      onChange={(e) => update({ altura: Number(e.target.value) })}
+                      onBlur={(e) => handleBlur("altura", Number(e.target.value))}
+                      aria-invalid={!!erros.altura}
+                      className={borderClass("altura", d.altura, d.altura > 0 || !!erros.altura)}
+                    />
+                    <ErroMsg campo="altura" />
                   </div>
                 </div>
                 <div className="space-y-2">
@@ -408,7 +516,7 @@ function Onboarding() {
             </Button>
           )}
           {step < 5 ? (
-            <Button onClick={() => setStep(step + 1)} disabled={!canNext()} className="flex-1">
+            <Button onClick={handleContinuar} disabled={!canNext()} className="flex-1">
               Continuar <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
