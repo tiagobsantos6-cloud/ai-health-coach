@@ -52,17 +52,86 @@ function Onboarding() {
     saude: "", sono: 7, estresse: 5,
   });
 
+  type ErrLevel = { msg: string; level: "error" | "warn" };
+  const [erros, setErros] = useState<Record<string, ErrLevel | undefined>>({});
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", tema === "dark");
   }, [tema]);
 
   const update = (p: Partial<DadosUsuario>) => setD({ ...d, ...p });
 
+  const validarCampo = (campo: string, valor: unknown): ErrLevel | undefined => {
+    if (campo === "nome") {
+      if (!String(valor ?? "").trim()) return { msg: "Campo obrigatório", level: "error" };
+    }
+    if (campo === "idade") {
+      const n = Number(valor);
+      if (!n) return { msg: "Campo obrigatório", level: "error" };
+      if (n < 10 || n > 100) return { msg: "Idade deve estar entre 10 e 100 anos", level: "warn" };
+    }
+    if (campo === "peso") {
+      const n = Number(valor);
+      if (!n) return { msg: "Campo obrigatório", level: "error" };
+      if (n < 30 || n > 300) return { msg: "Peso deve estar entre 30 e 300 kg", level: "warn" };
+    }
+    if (campo === "altura") {
+      const n = Number(valor);
+      if (!n) return { msg: "Campo obrigatório", level: "error" };
+      if (n < 100 || n > 250) return { msg: "Altura deve estar entre 100 e 250 cm", level: "warn" };
+    }
+    return undefined;
+  };
+
+  const handleBlur = (campo: string, valor: unknown) => {
+    setErros((e) => ({ ...e, [campo]: validarCampo(campo, valor) }));
+  };
+
+  const borderClass = (campo: string, valor: unknown, tocado: boolean) => {
+    const err = erros[campo];
+    if (err?.level === "error") return "border-destructive focus-visible:ring-destructive";
+    if (err?.level === "warn") return "border-orange-500 focus-visible:ring-orange-500";
+    if (tocado && !validarCampo(campo, valor)) return "border-green-500/60";
+    return "";
+  };
+
+  const ErroMsg = ({ campo }: { campo: string }) => {
+    const err = erros[campo];
+    if (!err) return null;
+    const color = err.level === "error" ? "text-destructive" : "text-orange-500";
+    return <p className={`text-xs ${color} mt-1`}>{err.msg}</p>;
+  };
+
+  const stepCampos: Record<number, string[]> = { 1: ["nome", "idade"], 2: ["peso", "altura"] };
+  const stepValores = (s: number): Record<string, unknown> => ({
+    nome: d.nome, idade: d.idade, peso: d.peso, altura: d.altura,
+  });
+  const stepTemErro = (s: number) => {
+    const campos = stepCampos[s] ?? [];
+    const vals = stepValores(s);
+    return campos.some((c) => !!validarCampo(c, vals[c]));
+  };
+
   const canNext = () => {
-    if (step === 1) return d.nome.trim() && d.idade > 0;
-    if (step === 2) return d.peso > 0 && d.altura > 0;
+    if (step === 1) return !stepTemErro(1);
+    if (step === 2) return !stepTemErro(2);
     if (step === 3) return !!d.objetivo;
     return true;
+  };
+
+  const handleContinuar = () => {
+    const campos = stepCampos[step] ?? [];
+    const vals = stepValores(step);
+    const novos: Record<string, ErrLevel | undefined> = {};
+    let bloqueia = false;
+    for (const c of campos) {
+      const e = validarCampo(c, vals[c]);
+      novos[c] = e;
+      if (e) bloqueia = true;
+    }
+    setErros((prev) => ({ ...prev, ...novos }));
+    if (bloqueia) return;
+    setStep(step + 1);
   };
 
   const finish = () => {
