@@ -323,15 +323,15 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
               >
                 <Dumbbell className="w-14 h-14 text-orange-500" />
                 <p className="text-sm text-center text-muted-foreground">
-                  Veja a execução correta no YouTube
+                  Ilustração não disponível para este exercício
                 </p>
                 <a
                   href={searchUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-medium text-sm transition"
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition shadow-lg shadow-orange-500/30"
                 >
-                  <ExternalLink className="w-4 h-4" /> Ver no YouTube
+                  ▶ Ver execução no YouTube
                 </a>
               </div>
             )}
