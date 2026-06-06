@@ -186,24 +186,47 @@ function Dashboard() {
         </div>
       </div>
 
+      {(!plano.plano_alimentar || plano.plano_alimentar.length === 0) && (
+        <Card className="p-4 bg-destructive/10 border-destructive/20 text-destructive">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+            <p className="text-sm font-medium">Seu plano está incompleto. Regenere para corrigir.</p>
+            <Button asChild size="sm" variant="outline" className="border-destructive text-destructive hover:bg-destructive/10">
+              <Link to="/perfil">Regenerar plano</Link>
+            </Button>
+          </div>
+        </Card>
+      )}
+
       {/* Calories ring */}
       <Card className="p-6 flex flex-col items-center bg-card border-border rounded-2xl">
         <h2 className="card-title mb-3">Calorias do dia</h2>
-        <div className="relative">
-          <svg width="220" height="220" viewBox="0 0 220 220" className="-rotate-90">
-            <circle cx="110" cy="110" r={r} fill="none" stroke="var(--muted)" strokeWidth="14" />
-            <circle
-              cx="110" cy="110" r={r} fill="none"
-              stroke="var(--primary)" strokeWidth="14" strokeLinecap="round"
-              strokeDasharray={c} style={{ strokeDashoffset: offset, transition: "stroke-dashoffset 0.7s ease" }}
-            />
-          </svg>
-          <div className="absolute inset-0 flex flex-col items-center justify-center">
-            <div className="text-4xl font-bold">{restante}</div>
-            <div className="text-xs text-muted-foreground mt-1">kcal restantes</div>
-            <div className="text-[11px] text-muted-foreground mt-2">{consumed} / {macros.kcal}</div>
+        {consumed === 0 ? (
+          <div className="flex flex-col items-center text-center space-y-3 py-6">
+            <p className="text-lg font-medium">Bom dia! Pronto para começar? 💪</p>
+            <p className="text-sm text-muted-foreground max-w-xs">
+              Marque suas refeições na Dieta para acompanhar o progresso.
+            </p>
+            <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Link to="/dieta">Ver plano alimentar</Link>
+            </Button>
           </div>
-        </div>
+        ) : (
+          <div className="relative">
+            <svg width="220" height="220" viewBox="0 0 220 220" className="-rotate-90">
+              <circle cx="110" cy="110" r={r} fill="none" stroke="var(--muted)" strokeWidth="14" />
+              <circle
+                cx="110" cy="110" r={r} fill="none"
+                stroke="var(--primary)" strokeWidth="14" strokeLinecap="round"
+                strokeDasharray={c} style={{ strokeDashoffset: offset, transition: "stroke-dashoffset 0.7s ease" }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <div className="text-4xl font-bold">{restante}</div>
+              <div className="text-xs text-muted-foreground mt-1">kcal restantes</div>
+              <div className="text-[11px] text-muted-foreground mt-2">{consumed} / {macros.kcal}</div>
+            </div>
+          </div>
+        )}
 
         {/* Macro pills */}
         <div className="grid grid-cols-3 gap-3 w-full mt-6">
