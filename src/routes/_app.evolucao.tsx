@@ -218,22 +218,30 @@ function Evolucao() {
         </Card>
       )}
 
-      {evolucao.length >= 2 && (
-        <Card className="p-5">
-          <h2 className="font-semibold mb-3">Evolução do peso</h2>
-          <div className="h-64">
-            <ResponsiveContainer>
-              <LineChart data={evolucao}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
-                <XAxis dataKey="data" stroke="var(--muted-foreground)" fontSize={12} />
-                <YAxis stroke="var(--muted-foreground)" fontSize={12} />
-                <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
-                <Line type="monotone" dataKey="peso" stroke="var(--primary)" strokeWidth={2} dot={{ r: 4 }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </Card>
-      )}
+      {evolucao.length >= 2 && (() => {
+        const primeiro = evolucao[0];
+        const ultimo = evolucao[evolucao.length - 1];
+        const delta = (ultimo.peso - primeiro.peso).toFixed(1);
+        const sentido = Number(delta) < 0 ? "perda" : Number(delta) > 0 ? "ganho" : "manutenção";
+        const ariaLabel = `Gráfico de linha da evolução do peso com ${evolucao.length} registros: variação de ${primeiro.peso}kg em ${primeiro.data} para ${ultimo.peso}kg em ${ultimo.data} (${sentido} de ${Math.abs(Number(delta))}kg).`;
+        return (
+          <Card className="p-5" aria-label={ariaLabel}>
+            <h2 className="font-semibold mb-3">Evolução do peso</h2>
+            <div className="h-64" role="img" aria-label={ariaLabel}>
+              <ResponsiveContainer>
+                <LineChart data={evolucao}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="data" stroke="var(--muted-foreground)" fontSize={12} />
+                  <YAxis stroke="var(--muted-foreground)" fontSize={12} />
+                  <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 8 }} />
+                  <Line type="monotone" dataKey="peso" stroke="var(--primary)" strokeWidth={2} dot={{ r: 4 }} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </Card>
+        );
+      })()}
+
 
       <Card className="p-5">
         <div className="flex justify-between items-center mb-3">
