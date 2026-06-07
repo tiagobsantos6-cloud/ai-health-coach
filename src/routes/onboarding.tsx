@@ -178,6 +178,42 @@ function Onboarding() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <AlertDialog open={rascunhoModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cadastro em andamento</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem um cadastro em andamento. Deseja continuar de onde parou?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                try { localStorage.removeItem("onboarding_rascunho"); } catch { /* ignore */ }
+                setRascunhoPendente(null);
+                setRascunhoModal(false);
+                setHidratado(true);
+              }}
+            >
+              Começar do zero
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (rascunhoPendente) {
+                  setD(rascunhoPendente.dados);
+                  setStep(rascunhoPendente.etapa);
+                }
+                setRascunhoPendente(null);
+                setRascunhoModal(false);
+                setHidratado(true);
+              }}
+            >
+              Continuar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <header className="flex items-center gap-2 p-6">
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-primary-foreground" />
