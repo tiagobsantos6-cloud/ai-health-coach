@@ -211,7 +211,7 @@ export function AppLayout() {
                 }`}
               >
                 <Icon className="w-[18px] h-[18px]" />
-                {it.label}
+                {t(it.k)}
               </Link>
             );
           })}
