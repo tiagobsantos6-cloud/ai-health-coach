@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ const cleanNum = (val: string | number) => {
 };
 
 function Dashboard() {
+  const { t } = useTranslation();
   const [hidratado, setHidratado] = useState(false);
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
@@ -177,9 +179,9 @@ function Dashboard() {
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h1 className="text-[20px] md:text-2xl font-bold truncate">
-            Olá, {nome || "você"} 👋
+            {t("dashboard.ola", { nome: nome || "você" })}
           </h1>
-          <p className="text-sm text-muted-foreground">Resumo do seu dia</p>
+          <p className="text-sm text-muted-foreground">{t("dashboard.resumo")}</p>
         </div>
         <div className="w-11 h-11 shrink-0 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center text-primary-foreground font-bold">
           {iniciais}
@@ -189,9 +191,9 @@ function Dashboard() {
       {(!plano.plano_alimentar || plano.plano_alimentar.length === 0) && (
         <Card className="p-4 bg-destructive/10 border-destructive/20 text-destructive">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="text-sm font-medium">Seu plano está incompleto. Regenere para corrigir.</p>
+            <p className="text-sm font-medium">{t("dashboard.plano_incompleto")}</p>
             <Button asChild size="sm" variant="outline" className="border-destructive text-destructive hover:bg-destructive/10">
-              <Link to="/perfil">Regenerar plano</Link>
+              <Link to="/perfil">{t("dashboard.regenerar_plano")}</Link>
             </Button>
           </div>
         </Card>
@@ -199,15 +201,15 @@ function Dashboard() {
 
       {/* Calories ring */}
       <Card className="p-6 flex flex-col items-center bg-card border-border rounded-2xl">
-        <h2 className="card-title mb-3">Calorias do dia</h2>
+        <h2 className="card-title mb-3">{t("dashboard.calorias")}</h2>
         {consumed === 0 ? (
           <div className="flex flex-col items-center text-center space-y-3 py-6">
-            <p className="text-lg font-medium">Bom dia! Pronto para começar? 💪</p>
+            <p className="text-lg font-medium">{t("dashboard.pronto")}</p>
             <p className="text-sm text-muted-foreground max-w-xs">
-              Marque suas refeições na Dieta para acompanhar o progresso.
+              {t("dashboard.marcar_refeicoes")}
             </p>
             <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
-              <Link to="/dieta">Ver plano alimentar</Link>
+              <Link to="/dieta">{t("dashboard.ver_plano")}</Link>
             </Button>
           </div>
         ) : (
@@ -222,7 +224,7 @@ function Dashboard() {
             </svg>
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <div className="text-4xl font-bold">{restante}</div>
-              <div className="text-xs text-muted-foreground mt-1">kcal restantes</div>
+              <div className="text-xs text-muted-foreground mt-1">{t("dashboard.restantes")}</div>
               <div className="text-[11px] text-muted-foreground mt-2">{consumed} / {macros.kcal}</div>
             </div>
           </div>
@@ -230,31 +232,31 @@ function Dashboard() {
 
         {/* Macro pills */}
         <div className="grid grid-cols-3 gap-3 w-full mt-6">
-          <MacroPill label="Proteínas" value={consumido.p} goal={macros.p} unit="g" color="var(--success)" />
-          <MacroPill label="Carbos" value={consumido.c} goal={macros.c} unit="g" color="var(--chart-3)" />
-          <MacroPill label="Gorduras" value={consumido.g} goal={macros.g} unit="g" color="var(--destructive)" />
+          <MacroPill label={t("dashboard.proteinas")} value={consumido.p} goal={macros.p} unit="g" color="var(--success)" />
+          <MacroPill label={t("dashboard.carbos")} value={consumido.c} goal={macros.c} unit="g" color="var(--chart-3)" />
+          <MacroPill label={t("dashboard.gorduras")} value={consumido.g} goal={macros.g} unit="g" color="var(--destructive)" />
         </div>
       </Card>
 
       {/* Quick stats grid 2x2 */}
       <div className="grid grid-cols-2 gap-3">
-        <QuickCard icon={<Droplet className="w-4 h-4" />} title="Água" value={`${aguaTotal}ml`} sub={`${aguaPct}% da meta`} />
-        <QuickCard icon={<Dumbbell className="w-4 h-4" />} title="Treino do dia" value={treinoHoje} />
+        <QuickCard icon={<Droplet className="w-4 h-4" />} title={t("dashboard.agua")} value={`${aguaTotal}ml`} sub={`${aguaPct}% ${t("dashboard.meta_agua")}`} />
+        <QuickCard icon={<Dumbbell className="w-4 h-4" />} title={t("dashboard.treino_dia")} value={treinoHoje} />
         <SonoCard metaHoras={Number(plano.resumo.sono_ideal_h) || (dados?.sono ?? 8)} />
-        <QuickCard icon={<Scale className="w-4 h-4" />} title="Peso atual" value={`${dados?.peso || "—"}kg`} />
+        <QuickCard icon={<Scale className="w-4 h-4" />} title={t("dashboard.peso")} value={`${dados?.peso || "—"}kg`} />
       </div>
 
       {/* Checklist */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="card-title">Checklist do dia</h2>
+          <h2 className="card-title">{t("dashboard.checklist")}</h2>
           <span className="text-sm text-primary font-bold">{checkPct}%</span>
         </div>
         <div className="h-1.5 bg-secondary rounded-full overflow-hidden mb-4">
           <div className="h-full bg-primary transition-all duration-500" style={{ width: `${checkPct}%` }} />
         </div>
         <div className="space-y-1">
-          {items.length === 0 && <p className="text-sm text-muted-foreground">Nenhum item</p>}
+          {items.length === 0 && <p className="text-sm text-muted-foreground">{t("dashboard.nenhum_item")}</p>}
           {items.map((it) => {
             const checked = !!checklist[it];
             return (
@@ -285,12 +287,12 @@ function Dashboard() {
 
       {/* Weekly routine */}
       <Card className="p-5 bg-card border-border rounded-2xl">
-        <h2 className="card-title mb-3">Rotina da semana</h2>
+        <h2 className="card-title mb-3">{t("dashboard.semana")}</h2>
         <div className="grid grid-cols-7 gap-1.5">
           {plano.rotina_semanal.map((d, i) => (
             <div key={i} className="p-2 rounded-xl bg-secondary text-center">
               <div className="text-[10px] font-bold uppercase text-muted-foreground">{d.dia_semana.slice(0, 3)}</div>
-              <div className="text-[11px] mt-1 truncate text-foreground">{d.treino || "Off"}</div>
+              <div className="text-[11px] mt-1 truncate text-foreground">{d.treino || t("dashboard.off")}</div>
             </div>
           ))}
         </div>
@@ -335,6 +337,7 @@ function sonoStorageKey() {
 }
 
 function SonoCard({ metaHoras }: { metaHoras: number }) {
+  const { t } = useTranslation();
   const key = sonoStorageKey();
   const [registrado, setRegistrado] = useState<number | null>(null);
   const [open, setOpen] = useState(false);
@@ -365,25 +368,25 @@ function SonoCard({ metaHoras }: { metaHoras: number }) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-muted-foreground text-[11px] uppercase tracking-wider font-semibold">
           <span className="text-primary"><Moon className="w-4 h-4" /></span>
-          Sono
+          {t("dashboard.sono")}
         </div>
         <Dialog open={open} onOpenChange={(o) => { setOpen(o); if (o) setValor(registrado ?? meta); }}>
           <DialogTrigger asChild>
             <button
               className="w-6 h-6 rounded-full bg-primary/15 text-primary flex items-center justify-center hover:bg-primary/25"
-              aria-label="Registrar sono"
+              aria-label={t("dashboard.registrar_sono")}
             >
               <Plus className="w-3.5 h-3.5" />
             </button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Quantas horas você dormiu?</DialogTitle>
+              <DialogTitle>{t("dashboard.dormiu")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div className="text-center">
                 <div className="text-4xl font-bold text-primary">{valor.toFixed(1)}h</div>
-                <div className="text-xs text-muted-foreground mt-1">Meta: {meta}h</div>
+                <div className="text-xs text-muted-foreground mt-1">{t("dashboard.meta_label")}: {meta}h</div>
               </div>
               <Slider
                 value={[valor]}
@@ -399,7 +402,7 @@ function SonoCard({ metaHoras }: { metaHoras: number }) {
             </div>
             <DialogFooter>
               <Button onClick={salvar} className="w-full bg-primary text-primary-foreground hover:bg-primary/90">
-                Salvar
+                {t("dashboard.salvar")}
               </Button>
             </DialogFooter>
           </DialogContent>
