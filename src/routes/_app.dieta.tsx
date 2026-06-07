@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore, type Alimento } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import {
@@ -45,6 +46,7 @@ const cleanNum = (val: string | number) => {
 };
 
 function Dieta() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
   
   const trocarAlimento = useStore((s) => s.trocarAlimento);
@@ -125,18 +127,18 @@ function Dieta() {
     <div className="space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold">Plano alimentar</h1>
-          <p className="text-muted-foreground">Suas refeições do dia</p>
+          <h1 className="text-2xl md:text-3xl font-bold">{t("dieta.titulo")}</h1>
+          <p className="text-muted-foreground">{t("dieta.subtitulo")}</p>
         </div>
         <Dialog open={openSub} onOpenChange={setOpenSub}>
           <DialogTrigger asChild>
             <Button variant="outline" size="sm">
-              <Replace className="w-4 h-4 mr-1" /> Substituições
+              <Replace className="w-4 h-4 mr-1" /> {t("dieta.substituicoes")}
             </Button>
           </DialogTrigger>
           <DialogContent className="max-h-[80vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Substituições equivalentes</DialogTitle>
+              <DialogTitle>{t("dieta.subs_equivalentes")}</DialogTitle>
             </DialogHeader>
             <div className="space-y-2">
               {plano.substituicoes.map((s, i) => (
@@ -154,15 +156,15 @@ function Dieta() {
       {/* Resumo diário — começa em zero, acumula apenas ao marcar refeição como feita */}
       <Card className="p-5 bg-card border-border rounded-2xl">
         <div className="flex items-end justify-between mb-1">
-          <h2 className="card-title">Resumo do dia</h2>
+          <h2 className="card-title">{t("dieta.resumo")}</h2>
           <div className="text-right">
             <div className="text-2xl font-bold text-primary leading-none">
               {Math.round(consumido.kcal)}
               <span className="text-sm text-muted-foreground font-medium"> / {meta.kcal} kcal</span>
             </div>
             <div className="text-[11px] text-muted-foreground mt-1">
-              Planejado: <span className="text-foreground font-semibold">{totals.kcal}</span> kcal
-              {" · "}Restante:{" "}
+              {t("dieta.planejado")}: <span className="text-foreground font-semibold">{totals.kcal}</span> kcal
+              {" · "}{t("dieta.restante")}:{" "}
               <span className="text-foreground font-semibold">
                 {Math.max(0, meta.kcal - Math.round(consumido.kcal))}
               </span>{" "}
@@ -171,9 +173,9 @@ function Dieta() {
           </div>
         </div>
         <div className="space-y-3 mt-4">
-          <MacroBar label="Proteínas" value={consumido.p} goal={meta.p} color="var(--success)" />
-          <MacroBar label="Carboidratos" value={consumido.c} goal={meta.c} color="var(--chart-3)" />
-          <MacroBar label="Gorduras" value={consumido.g} goal={meta.g} color="var(--destructive)" />
+          <MacroBar label={t("dieta.proteinas")} value={consumido.p} goal={meta.p} color="var(--success)" />
+          <MacroBar label={t("dieta.carboidratos")} value={consumido.c} goal={meta.c} color="var(--chart-3)" />
+          <MacroBar label={t("dieta.gorduras")} value={consumido.g} goal={meta.g} color="var(--destructive)" />
         </div>
       </Card>
 
@@ -238,16 +240,16 @@ function Dieta() {
                                   <PopoverTrigger asChild>
                                     <button
                                       type="button"
-                                      aria-label="Trocar alimento"
+                                      aria-label={t("dieta.trocar_alimento")}
                                       className="shrink-0 p-1 rounded-md text-muted-foreground hover:text-primary hover:bg-primary/10"
-                                      title="Trocar alimento"
+                                      title={t("dieta.trocar_alimento")}
                                     >
                                       <ArrowLeftRight className="w-3.5 h-3.5" />
                                     </button>
                                   </PopoverTrigger>
                                   <PopoverContent align="start" className="w-72 p-2">
                                     <div className="text-xs font-semibold px-2 py-1 text-muted-foreground">
-                                      Trocar por equivalente
+                                      {t("dieta.trocar")}
                                     </div>
                                     <div className="space-y-1 max-h-64 overflow-y-auto">
                                       {opcoes.map((o, k) => (
@@ -305,7 +307,7 @@ function Dieta() {
                           className="flex items-center gap-2 text-sm font-medium"
                           style={{ color: "var(--success)" }}
                         >
-                          <Check className="w-4 h-4" /> Feita
+                          <Check className="w-4 h-4" /> {t("dieta.feita")}
                         </div>
                         <Button
                           variant="ghost"
@@ -313,7 +315,7 @@ function Dieta() {
                           onClick={() => toggleRefeicao(i)}
                           className="text-muted-foreground"
                         >
-                          <RotateCcw className="w-3.5 h-3.5 mr-1" /> Desfazer
+                          <RotateCcw className="w-3.5 h-3.5 mr-1" /> {t("dieta.desfazer")}
                         </Button>
                       </div>
                     ) : (
@@ -322,7 +324,7 @@ function Dieta() {
                         className="w-full pulse-success"
                         style={{ background: "var(--success)", color: "white" }}
                       >
-                        <Check className="w-4 h-4 mr-1" /> Marcar como feita
+                        <Check className="w-4 h-4 mr-1" /> {t("dieta.marcar")}
                       </Button>
                     )}
                   </div>
@@ -336,15 +338,15 @@ function Dieta() {
       <div className="fixed bottom-16 md:bottom-4 left-4 right-4 md:left-auto md:right-8 md:w-auto bg-card border border-border rounded-xl shadow-lg p-3 z-30">
         <div className="flex justify-around md:gap-6 text-xs items-center">
           <div className="text-center">
-            <div className="text-muted-foreground">Total do plano</div>
+            <div className="text-muted-foreground">{t("dieta.total")}</div>
             <div className="font-bold text-primary">{totals.kcal} kcal</div>
           </div>
           <div className="text-center">
-            <div className="text-muted-foreground">Meta</div>
+            <div className="text-muted-foreground">{t("dieta.meta")}</div>
             <div className="font-bold">{metaResumo} kcal</div>
           </div>
           <div className="text-center">
-            <div className="text-muted-foreground">Diferença</div>
+            <div className="text-muted-foreground">{t("dieta.diferenca")}</div>
             <div
               className="font-bold"
               style={{

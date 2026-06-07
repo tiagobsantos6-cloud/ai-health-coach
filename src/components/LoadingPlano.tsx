@@ -1,7 +1,10 @@
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
-export function LoadingPlano({ mensagem = "Carregando seu plano..." }: { mensagem?: string }) {
+export function LoadingPlano({ mensagem }: { mensagem?: string }) {
+  const { t } = useTranslation();
+  const msg = mensagem ?? t("geral.carregando");
   return (
     <div className="min-h-screen flex items-center justify-center p-6 bg-background text-foreground">
       <div className="text-center space-y-6">
@@ -14,7 +17,7 @@ export function LoadingPlano({ mensagem = "Carregando seu plano..." }: { mensage
         </motion.div>
         <div>
           <h1 className="text-xl font-bold mb-1">AI Health Coach</h1>
-          <p className="text-sm text-muted-foreground">{mensagem}</p>
+          <p className="text-sm text-muted-foreground">{msg}</p>
         </div>
         <div className="flex justify-center gap-1.5">
           {[0, 1, 2].map((i) => (

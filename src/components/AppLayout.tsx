@@ -1,6 +1,7 @@
 import { Link, Outlet, useRouterState, useNavigate } from "@tanstack/react-router";
 import { LayoutDashboard, UtensilsCrossed, Dumbbell, TrendingUp, Droplets, User, Sparkles, Crown, LogOut, Menu, ShoppingCart } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
@@ -12,31 +13,32 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { loadLembretes, setupLembretes, loadPendentes, limparPendente, type Pendentes } from "@/lib/lembretes";
 
 const sideItems = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-  { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
-  { to: "/treino", label: "Treino", icon: Dumbbell },
-  { to: "/agua", label: "Água", icon: Droplets },
-  { to: "/compras", label: "Compras", icon: ShoppingCart },
-  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
-  { to: "/planos", label: "Planos", icon: Crown },
-  { to: "/perfil", label: "Perfil", icon: User },
+  { to: "/dashboard", k: "nav.dashboard", icon: LayoutDashboard },
+  { to: "/dieta", k: "nav.dieta", icon: UtensilsCrossed },
+  { to: "/treino", k: "nav.treino", icon: Dumbbell },
+  { to: "/agua", k: "nav.agua", icon: Droplets },
+  { to: "/compras", k: "nav.compras", icon: ShoppingCart },
+  { to: "/evolucao", k: "nav.evolucao", icon: TrendingUp },
+  { to: "/planos", k: "nav.planos", icon: Crown },
+  { to: "/perfil", k: "nav.perfil", icon: User },
 ] as const;
 
 const bottomItems = [
-  { to: "/dashboard", label: "Início", icon: LayoutDashboard },
-  { to: "/dieta", label: "Dieta", icon: UtensilsCrossed },
-  { to: "/treino", label: "Treino", icon: Dumbbell },
-  { to: "/agua", label: "Água", icon: Droplets },
+  { to: "/dashboard", k: "nav.inicio", icon: LayoutDashboard },
+  { to: "/dieta", k: "nav.dieta", icon: UtensilsCrossed },
+  { to: "/treino", k: "nav.treino", icon: Dumbbell },
+  { to: "/agua", k: "nav.agua", icon: Droplets },
 ] as const;
 
 const menuItems = [
-  { to: "/compras", label: "Compras", icon: ShoppingCart },
-  { to: "/evolucao", label: "Evolução", icon: TrendingUp },
-  { to: "/planos", label: "Planos", icon: Crown },
-  { to: "/perfil", label: "Perfil", icon: User },
+  { to: "/compras", k: "nav.compras", icon: ShoppingCart },
+  { to: "/evolucao", k: "nav.evolucao", icon: TrendingUp },
+  { to: "/planos", k: "nav.planos", icon: Crown },
+  { to: "/perfil", k: "nav.perfil", icon: User },
 ] as const;
 
 export function AppLayout() {
+  const { t } = useTranslation();
   const setPlanoAssinatura = useStore((s) => s.setPlanoAssinatura);
   const hidratado = useStore((s) => s.hidratado);
   const hydrateFromServer = useStore((s) => s.hydrateFromServer);
@@ -182,7 +184,7 @@ export function AppLayout() {
 
   // Show loading screen while fetching server data — never expose an empty dashboard.
   if (authReady && userId && (!hidratado || dataQuery.isLoading || dataQuery.isFetching) && path !== "/onboarding" && path !== "/gerando") {
-    return <LoadingPlano mensagem="Carregando seu plano..." />;
+    return <LoadingPlano mensagem={t("geral.carregando")} />;
   }
 
   return (
@@ -209,7 +211,7 @@ export function AppLayout() {
                 }`}
               >
                 <Icon className="w-[18px] h-[18px]" />
-                {it.label}
+                {t(it.k)}
               </Link>
             );
           })}
@@ -219,7 +221,7 @@ export function AppLayout() {
           className="flex items-center gap-2 px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
         >
           <LogOut className="w-4 h-4" />
-          Sair
+          {t("nav.sair")}
         </button>
       </aside>
 
@@ -231,7 +233,7 @@ export function AppLayout() {
             </div>
             <span className="font-bold">AI Health Coach</span>
           </div>
-          <Link to="/perfil" aria-label="Perfil" className="text-muted-foreground hover:text-foreground">
+          <Link to="/perfil" aria-label={t("nav.perfil")} className="text-muted-foreground hover:text-foreground">
             <User className="w-5 h-5" />
           </Link>
 
@@ -261,7 +263,7 @@ export function AppLayout() {
                     <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-destructive ring-2 ring-card" />
                   )}
                 </span>
-                {it.label}
+                {t(it.k)}
               </Link>
             );
           })}
@@ -275,17 +277,17 @@ export function AppLayout() {
                     className={`flex flex-col items-center justify-center gap-1 py-2.5 text-[11px] font-medium ${
                       isMenuActive ? "text-primary" : "text-muted-foreground"
                     }`}
-                    aria-label="Mais opções"
+                    aria-label={t("nav.mais_opcoes")}
                   >
                     <Menu className={`w-[22px] h-[22px] ${isMenuActive ? "scale-110" : ""} transition-transform`} />
-                    {activeMenuItem ? activeMenuItem.label : "Menu"}
+                    {activeMenuItem ? t(activeMenuItem.k) : t("nav.menu")}
                   </button>
                 );
               })()}
             </SheetTrigger>
             <SheetContent side="bottom" className="rounded-t-2xl pb-[env(safe-area-inset-bottom)]">
               <SheetHeader>
-                <SheetTitle>Mais opções</SheetTitle>
+                <SheetTitle>{t("nav.mais_opcoes")}</SheetTitle>
               </SheetHeader>
               <div className="flex flex-col gap-1 mt-4">
                 {menuItems.map((it) => {
@@ -301,7 +303,7 @@ export function AppLayout() {
                       }`}
                     >
                       <Icon className="w-5 h-5" />
-                      {it.label}
+                      {t(it.k)}
                     </Link>
                   );
                 })}
@@ -310,7 +312,7 @@ export function AppLayout() {
                   className="flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-secondary hover:text-foreground"
                 >
                   <LogOut className="w-5 h-5" />
-                  Sair
+                  {t("nav.sair")}
                 </button>
               </div>
             </SheetContent>
