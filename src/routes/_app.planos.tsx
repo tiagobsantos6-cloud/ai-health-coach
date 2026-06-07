@@ -93,7 +93,7 @@ const tiers: Tier[] = [
 ];
 
 function Planos() {
-  const { t } = useTranslation();
+  const { t: tr } = useTranslation();
   const planoAtual = useStore((s) => s.planoAssinatura);
   // Tier upgrades happen server-side (via a future payments webhook).
   // Client cannot mutate plan tier — UI is informational only.
