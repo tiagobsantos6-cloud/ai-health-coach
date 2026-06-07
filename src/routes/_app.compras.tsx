@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -147,6 +148,7 @@ function formatarQuantidade(q: number, u: Unidade) {
 }
 
 function Compras() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
 
   const itens = useMemo<ItemCompra[]>(() => {
@@ -235,9 +237,9 @@ function Compras() {
   if (!plano) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl md:text-3xl font-bold">Lista de Compras</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("compras.titulo")}</h1>
         <Card className="p-6 text-sm text-muted-foreground">
-          Gere seu plano alimentar primeiro para ver sua lista de compras semanal.
+          {t("compras.sem_plano")}
         </Card>
       </div>
     );
@@ -246,9 +248,9 @@ function Compras() {
   if (itens.length === 0) {
     return (
       <div className="space-y-4">
-        <h1 className="text-2xl md:text-3xl font-bold">Lista de Compras</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("compras.titulo")}</h1>
         <Card className="p-6 text-sm text-muted-foreground">
-          Seu plano não tem alimentos suficientes para montar uma lista.
+          {t("compras.sem_itens")}
         </Card>
       </div>
     );
@@ -260,18 +262,18 @@ function Compras() {
         <div>
           <h1 className="text-2xl md:text-3xl font-bold flex items-center gap-2">
             <ShoppingCart className="w-6 h-6 text-primary" />
-            Lista de Compras
+            {t("compras.titulo")}
           </h1>
-          <p className="text-sm text-muted-foreground">Consolidado para 7 dias do seu plano</p>
+          <p className="text-sm text-muted-foreground">{t("compras.subtitulo")}</p>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" onClick={resetar}>
             <RotateCcw className="w-4 h-4 mr-2" />
-            Resetar lista
+            {t("compras.resetar")}
           </Button>
           <Button onClick={compartilharWhatsApp}>
             <Share2 className="w-4 h-4 mr-2" />
-            Compartilhar no WhatsApp
+            {t("compras.compartilhar")}
           </Button>
         </div>
       </div>

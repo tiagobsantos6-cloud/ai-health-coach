@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 import { useStore, type PlanoAssinatura } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,7 @@ const tiers: Tier[] = [
 ];
 
 function Planos() {
+  const { t } = useTranslation();
   const planoAtual = useStore((s) => s.planoAssinatura);
   // Tier upgrades happen server-side (via a future payments webhook).
   // Client cannot mutate plan tier — UI is informational only.
@@ -99,12 +101,12 @@ function Planos() {
   return (
     <div className="space-y-8">
       <div className="rounded-md border border-dashed p-3 text-sm text-muted-foreground text-center">
-        Pagamentos em breve. Por enquanto, todas as contas começam no plano gratuito.
+        {t("planos.pagamentos_em_breve")}
       </div>
       <div className="text-center max-w-2xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">Escolha seu plano</h1>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight">{t("planos.titulo")}</h1>
         <p className="text-muted-foreground mt-2">
-          Acelere seus resultados com recursos pensados para o seu objetivo.
+          {t("planos.subtitulo")}
         </p>
       </div>
 
@@ -126,7 +128,7 @@ function Planos() {
               >
                 {t.destaque && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[11px] font-semibold px-3 py-1 rounded-full">
-                    Mais popular
+                    {t("planos.mais_popular")}
                   </span>
                 )}
                 <div className="flex items-center gap-2">
@@ -160,7 +162,7 @@ function Planos() {
                   disabled
                   className="w-full"
                 >
-                  {ativo ? "Plano atual" : "Em breve"}
+                  {ativo ? t("planos.plano_atual") : t("planos.em_breve")}
                 </Button>
               </Card>
             </motion.div>
@@ -169,7 +171,7 @@ function Planos() {
       </div>
 
       <p className="text-center text-xs text-muted-foreground">
-        Pagamentos serão processados em breve. Cancele quando quiser.
+        {t("planos.cancele")}
       </p>
     </div>
   );

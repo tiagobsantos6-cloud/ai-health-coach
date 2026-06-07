@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,7 @@ export const Route = createFileRoute("/_app/agua")({
 
 
 function Agua() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
   const agua = useStore((s) => s.agua);
   const addAgua = useStore((s) => s.addAgua);
@@ -36,17 +38,17 @@ function Agua() {
   const offset = c - (pct / 100) * c;
 
   const msg =
-    pct >= 100 ? "🎉 Meta atingida! Continue se hidratando." :
-    pct >= 75 ? "💪 Quase lá! Falta pouco." :
-    pct >= 50 ? "👏 Boa! Mantenha o ritmo." :
-    pct >= 25 ? "💧 Beba mais um copo agora." :
-    "💦 Vamos começar! Beba água.";
+    pct >= 100 ? t("agua.meta_atingida") :
+    pct >= 75 ? t("agua.quase_la") :
+    pct >= 50 ? t("agua.boa") :
+    pct >= 25 ? t("agua.mais_um_copo") :
+    t("agua.beba");
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Hidratação</h1>
-        <p className="text-muted-foreground">Meta diária: {meta} ml</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("agua.titulo")}</h1>
+        <p className="text-muted-foreground">{t("agua.meta", { ml: meta })}</p>
       </div>
 
       <Card className="p-6 flex flex-col items-center">
@@ -61,7 +63,7 @@ function Agua() {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <div className="text-3xl font-bold">{total}</div>
-            <div className="text-xs text-muted-foreground">de {meta} ml</div>
+            <div className="text-xs text-muted-foreground">{t("agua.de", { meta })}</div>
             <div className="text-sm text-primary font-bold mt-1">{pct}%</div>
           </div>
         </div>
@@ -78,8 +80,8 @@ function Agua() {
       </div>
 
       <Card className="p-5">
-        <h2 className="font-semibold mb-3">Histórico de hoje</h2>
-        {agua.length === 0 && <p className="text-sm text-muted-foreground">Nenhum registro ainda</p>}
+        <h2 className="font-semibold mb-3">{t("agua.historico")}</h2>
+        {agua.length === 0 && <p className="text-sm text-muted-foreground">{t("agua.nenhum")}</p>}
         <div className="space-y-2">
           {[...agua].reverse().map((r, i) => (
             <div key={i} className="flex justify-between items-center text-sm py-2 border-b border-border last:border-0">
