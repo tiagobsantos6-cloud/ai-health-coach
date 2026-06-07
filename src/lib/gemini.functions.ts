@@ -445,6 +445,21 @@ export const gerarAjustesFn = createServerFn({ method: "POST" })
     historico: historicoSchema.parse(data.historico),
   }))
   .handler(async ({ data, context }) => {
+    // Server-side paywall: ajustes_ia_evolucao requires intermediario or completo tier.
+    const { data: sub, error: subErr } = await context.supabase
+      .from("subscriptions")
+      .select("tier")
+      .eq("user_id", context.userId)
+      .maybeSingle();
+    if (subErr) {
+      console.error("[gerarAjustesFn] subscription lookup error", subErr);
+      throw new Error(SERVICE_UNAVAILABLE);
+    }
+    const tier = sub?.tier ?? "gratuito";
+    if (tier !== "intermediario" && tier !== "completo") {
+      throw new Error("Recurso disponível apenas no plano Intermediário ou superior.");
+    }
+
     await rateLimit(context.userId);
 
     const apiKey = process.env.LOVABLE_API_KEY;
