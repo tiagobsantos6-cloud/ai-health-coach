@@ -94,6 +94,7 @@ function Gerando() {
         } catch (e) {
           console.error("[gerando] indicacao falhou", e);
         }
+        try { localStorage.removeItem("onboarding_rascunho"); } catch { /* noop */ }
         setSucesso(true);
         setTimeout(() => navigate({ to: "/dashboard" }), 2000);
         return;

@@ -11,6 +11,16 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Sparkles, ArrowRight, ArrowLeft, Check, Info } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const biotipoDesc: Record<string, string> = {
   Ectomorfo: "Corpo naturalmente magro, metabolismo acelerado, dificuldade em ganhar peso e massa muscular. Ombros e quadris estreitos, pouca gordura corporal.",
@@ -54,6 +64,33 @@ function Onboarding() {
 
   type ErrLevel = { msg: string; level: "error" | "warn" };
   const [erros, setErros] = useState<Record<string, ErrLevel | undefined>>({});
+
+  const [rascunhoModal, setRascunhoModal] = useState(false);
+  const [rascunhoPendente, setRascunhoPendente] = useState<{ etapa: number; dados: DadosUsuario } | null>(null);
+  const [hidratado, setHidratado] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("onboarding_rascunho");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed.etapa === "number" && parsed.dados) {
+          setRascunhoPendente({ etapa: parsed.etapa, dados: parsed.dados });
+          setRascunhoModal(true);
+          return;
+        }
+      }
+    } catch { /* ignore */ }
+    setHidratado(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hidratado || typeof window === "undefined") return;
+    try {
+      localStorage.setItem("onboarding_rascunho", JSON.stringify({ etapa: step, dados: d }));
+    } catch { /* ignore */ }
+  }, [step, d, hidratado]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", tema === "dark");
@@ -141,6 +178,42 @@ function Onboarding() {
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <AlertDialog open={rascunhoModal}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Cadastro em andamento</AlertDialogTitle>
+            <AlertDialogDescription>
+              Você tem um cadastro em andamento. Deseja continuar de onde parou?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                try { localStorage.removeItem("onboarding_rascunho"); } catch { /* ignore */ }
+                setRascunhoPendente(null);
+                setRascunhoModal(false);
+                setHidratado(true);
+              }}
+            >
+              Começar do zero
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (rascunhoPendente) {
+                  setD(rascunhoPendente.dados);
+                  setStep(rascunhoPendente.etapa);
+                }
+                setRascunhoPendente(null);
+                setRascunhoModal(false);
+                setHidratado(true);
+              }}
+            >
+              Continuar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <header className="flex items-center gap-2 p-6">
         <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
           <Sparkles className="w-5 h-5 text-primary-foreground" />
