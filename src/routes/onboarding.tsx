@@ -65,6 +65,33 @@ function Onboarding() {
   type ErrLevel = { msg: string; level: "error" | "warn" };
   const [erros, setErros] = useState<Record<string, ErrLevel | undefined>>({});
 
+  const [rascunhoModal, setRascunhoModal] = useState(false);
+  const [rascunhoPendente, setRascunhoPendente] = useState<{ etapa: number; dados: DadosUsuario } | null>(null);
+  const [hidratado, setHidratado] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const raw = localStorage.getItem("onboarding_rascunho");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed.etapa === "number" && parsed.dados) {
+          setRascunhoPendente({ etapa: parsed.etapa, dados: parsed.dados });
+          setRascunhoModal(true);
+          return;
+        }
+      }
+    } catch { /* ignore */ }
+    setHidratado(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hidratado || typeof window === "undefined") return;
+    try {
+      localStorage.setItem("onboarding_rascunho", JSON.stringify({ etapa: step, dados: d }));
+    } catch { /* ignore */ }
+  }, [step, d, hidratado]);
+
   useEffect(() => {
     document.documentElement.classList.toggle("dark", tema === "dark");
   }, [tema]);
