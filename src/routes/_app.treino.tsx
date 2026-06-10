@@ -23,6 +23,7 @@ export const Route = createFileRoute("/_app/treino")({
 
 
 function Treino() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
   if (!plano) return null;
   const dias = plano.treino.dias;
@@ -30,7 +31,7 @@ function Treino() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Plano de treino</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("treino.titulo")}</h1>
         <p className="text-muted-foreground">{plano.treino.divisao}</p>
       </div>
 
@@ -49,12 +50,12 @@ function Treino() {
               {semExercicios ? (
                 <Card className="p-8 text-center">
                   <div className="text-3xl mb-2">💪</div>
-                  <div className="font-semibold">Dia de descanso</div>
-                  <div className="text-sm text-muted-foreground mt-1">Aproveite para recuperar!</div>
+                  <div className="font-semibold">{t("treino.dia_descanso")}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t("treino.aproveite")}</div>
                 </Card>
               ) : (
                 <>
-                  <div className="text-sm text-muted-foreground">Foco: <span className="text-foreground font-medium">{d.foco}</span></div>
+                  <div className="text-sm text-muted-foreground">{t("treino.foco")}: <span className="text-foreground font-medium">{d.foco}</span></div>
                   {d.exercicios.map((ex, j) => (
                     <ExercicioCard key={j} ex={ex} />
                   ))}
@@ -62,7 +63,7 @@ function Treino() {
                     <Card className="p-4 border-primary/30 bg-primary/5">
                       <div className="flex items-center gap-2 mb-1">
                         <Activity className="w-4 h-4 text-primary" />
-                        <span className="font-semibold">Cardio</span>
+                        <span className="font-semibold">{t("treino.cardio")}</span>
                       </div>
                       <div className="flex gap-2 flex-wrap">
                         <Badge variant="secondary">{d.cardio.tipo}</Badge>
