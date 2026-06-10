@@ -326,7 +326,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
               >
                 <Dumbbell className="w-14 h-14 text-orange-500" />
                 <p className="text-sm text-center text-muted-foreground">
-                  Ilustração não disponível para este exercício
+                  {t("treino.sem_gif")}
                 </p>
                 <a
                   href={searchUrl}
@@ -334,7 +334,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition shadow-lg shadow-orange-500/30"
                 >
-                  ▶ Ver execução no YouTube
+                  {t("treino.ver_no_youtube")}
                 </a>
               </div>
             )}
