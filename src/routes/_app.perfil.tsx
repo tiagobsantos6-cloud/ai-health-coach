@@ -10,6 +10,7 @@ import {
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { LogOut, Save, RefreshCw, Trash2, Moon, Sun, Bell, Users, Copy, Share2 } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { NOMES_PLANOS } from "@/lib/planos";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -209,6 +210,12 @@ function Perfil() {
           ) : (
             <p className="text-sm text-muted-foreground">Nenhum plano gerado ainda.</p>
           )}
+        </Card>
+
+        {/* Idioma */}
+        <Card className="p-5 space-y-3 md:col-span-2">
+          <h2 className="font-semibold">Idioma / Language</h2>
+          <LanguageSwitcher />
         </Card>
 
         {/* Ações */}

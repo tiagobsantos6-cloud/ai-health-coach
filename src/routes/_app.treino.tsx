@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
@@ -22,6 +23,7 @@ export const Route = createFileRoute("/_app/treino")({
 
 
 function Treino() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
   if (!plano) return null;
   const dias = plano.treino.dias;
@@ -29,7 +31,7 @@ function Treino() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Plano de treino</h1>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("treino.titulo")}</h1>
         <p className="text-muted-foreground">{plano.treino.divisao}</p>
       </div>
 
@@ -48,12 +50,12 @@ function Treino() {
               {semExercicios ? (
                 <Card className="p-8 text-center">
                   <div className="text-3xl mb-2">💪</div>
-                  <div className="font-semibold">Dia de descanso</div>
-                  <div className="text-sm text-muted-foreground mt-1">Aproveite para recuperar!</div>
+                  <div className="font-semibold">{t("treino.dia_descanso")}</div>
+                  <div className="text-sm text-muted-foreground mt-1">{t("treino.aproveite")}</div>
                 </Card>
               ) : (
                 <>
-                  <div className="text-sm text-muted-foreground">Foco: <span className="text-foreground font-medium">{d.foco}</span></div>
+                  <div className="text-sm text-muted-foreground">{t("treino.foco")}: <span className="text-foreground font-medium">{d.foco}</span></div>
                   {d.exercicios.map((ex, j) => (
                     <ExercicioCard key={j} ex={ex} />
                   ))}
@@ -61,7 +63,7 @@ function Treino() {
                     <Card className="p-4 border-primary/30 bg-primary/5">
                       <div className="flex items-center gap-2 mb-1">
                         <Activity className="w-4 h-4 text-primary" />
-                        <span className="font-semibold">Cardio</span>
+                        <span className="font-semibold">{t("treino.cardio")}</span>
                       </div>
                       <div className="flex gap-2 flex-wrap">
                         <Badge variant="secondary">{d.cardio.tipo}</Badge>
@@ -245,6 +247,7 @@ async function buscarGifExercicio(nomePt: string): Promise<string | null> {
 }
 
 function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () => void }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
   const [loadingGif, setLoadingGif] = useState(false);
@@ -296,7 +299,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
         aria-expanded={open}
       >
         <PlayCircle className="w-4 h-4 mr-2" />
-        Ver execução
+        {t("treino.ver_execucao")}
         <ChevronDown className={`w-4 h-4 ml-auto transition-transform ${open ? "rotate-180" : ""}`} />
       </Button>
 
@@ -323,7 +326,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
               >
                 <Dumbbell className="w-14 h-14 text-orange-500" />
                 <p className="text-sm text-center text-muted-foreground">
-                  Ilustração não disponível para este exercício
+                  {t("treino.sem_gif")}
                 </p>
                 <a
                   href={searchUrl}
@@ -331,7 +334,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-orange-500 hover:bg-orange-600 text-white font-semibold text-sm transition shadow-lg shadow-orange-500/30"
                 >
-                  ▶ Ver execução no YouTube
+                  {t("treino.ver_no_youtube")}
                 </a>
               </div>
             )}
@@ -345,7 +348,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
 
           {ex.execucao && (
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Como executar</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{t("treino.como_executar")}</div>
               <p className="whitespace-pre-line leading-relaxed">{ex.execucao}</p>
             </div>
           )}
@@ -353,7 +356,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
           {ex.erros_comuns && (
             <div>
               <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-destructive mb-1">
-                <AlertTriangle className="w-3.5 h-3.5" /> Erros comuns
+                <AlertTriangle className="w-3.5 h-3.5" /> {t("treino.erros_comuns")}
               </div>
               <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{ex.erros_comuns}</p>
             </div>
@@ -365,13 +368,13 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-primary hover:underline font-medium text-sm"
           >
-            <ExternalLink className="w-4 h-4" /> ▶ Ver no YouTube
+            <ExternalLink className="w-4 h-4" /> {t("treino.ver_youtube")}
           </a>
 
           {descRunning || descanso > 0 || terminou ? (
             <div className="rounded-lg p-3 space-y-2" style={{ backgroundColor: "rgba(249,115,22,0.1)" }}>
               {terminou ? (
-                <div className="text-center font-semibold text-orange-500">Próxima série! 💪</div>
+                <div className="text-center font-semibold text-orange-500">{t("treino.proxima_serie")}</div>
               ) : (
                 <>
                   <div className="flex items-center justify-between">
@@ -396,7 +399,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
             </div>
           ) : (
             <Button size="sm" variant="secondary" className="w-full" onClick={iniciarDescanso}>
-              <Timer className="w-4 h-4 mr-2" /> ⏱ Iniciar descanso ({ex.descanso_s}s)
+              <Timer className="w-4 h-4 mr-2" /> {t("treino.iniciar_descanso", { s: ex.descanso_s })}
             </Button>
           )}
         </div>

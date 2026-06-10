@@ -1,5 +1,6 @@
 import { createFileRoute, redirect, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { motion, AnimatePresence } from "framer-motion";
 import { useStore, type DadosUsuario } from "@/lib/store";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ const objetivos = ["Hipertrofia", "Emagrecimento", "Definição", "Performance",
 const restricoesList = ["Lactose", "Glúten", "Vegano", "Vegetariano", "Outro"];
 
 function Onboarding() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setDados = useStore((s) => s.setDados);
   const tema = useStore((s) => s.tema);
@@ -181,9 +183,9 @@ function Onboarding() {
       <AlertDialog open={rascunhoModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cadastro em andamento</AlertDialogTitle>
+            <AlertDialogTitle>{t("onboarding.cadastro_andamento")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Você tem um cadastro em andamento. Deseja continuar de onde parou?
+              {t("onboarding.cadastro_pergunta")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -195,7 +197,7 @@ function Onboarding() {
                 setHidratado(true);
               }}
             >
-              Começar do zero
+              {t("onboarding.comecar_zero")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
@@ -208,7 +210,7 @@ function Onboarding() {
                 setHidratado(true);
               }}
             >
-              Continuar
+              {t("onboarding.continuar")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -255,7 +257,7 @@ function Onboarding() {
             })}
           </div>
           <div className="text-center text-xs text-muted-foreground">
-            Etapa {step} de 5
+            {t("onboarding.etapa", { atual: step, total: 5 })}
           </div>
         </div>
 
@@ -585,16 +587,16 @@ function Onboarding() {
         <div className="flex gap-3 mt-8">
           {step > 1 && (
             <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+              <ArrowLeft className="w-4 h-4 mr-2" /> {t("onboarding.voltar")}
             </Button>
           )}
           {step < 5 ? (
             <Button onClick={handleContinuar} disabled={!canNext()} className="flex-1">
-              Continuar <ArrowRight className="w-4 h-4 ml-2" />
+              {t("onboarding.continuar")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
             <Button onClick={finish} className="flex-1">
-              Gerar meu plano <Check className="w-4 h-4 ml-2" />
+              {t("onboarding.gerar")} <Check className="w-4 h-4 ml-2" />
             </Button>
           )}
         </div>

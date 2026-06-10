@@ -82,6 +82,7 @@ const dadosSchema = z.object({
   saude: shortText(500),
   sono: z.number().min(0).max(24),
   estresse: z.number().min(0).max(10),
+  idioma: z.string().max(5).optional().default("pt"),
 });
 
 const resumoPlanoSchema = z.record(z.string(), z.string().max(50)).optional().default({});
@@ -342,8 +343,12 @@ export const gerarPlanoFn = createServerFn({ method: "POST" })
       `REGRA OBRIGATÓRIA DE TREINO: O usuário selecionou ${diasTreinoPedidos} dias de treino por semana. Gere EXATAMENTE ${diasTreinoPedidos} objetos no array treino.dias. Cada objeto deve ter um dia da semana diferente (Segunda, Terça, Quarta, Quinta, Sexta, Sábado ou Domingo) com exercícios reais. NÃO gere dias vazios, NÃO gere dias de descanso no array, NÃO repita dias. Se dias_treino=5, gere 5 objetos com 5 dias diferentes, todos com exercícios.\n\n` +
       `INSTRUÇÃO PRIORITÁRIA NÚMERO 1 — NÃO IGNORE: O usuário solicitou EXATAMENTE ${refeicoesPedidas} refeições. Você deve gerar SOMENTE ${refeicoesPedidas} itens no array plano_alimentar. Se gerar mais ou menos que ${refeicoesPedidas} refeições, a resposta será considerada inválida e rejeitada. Conte os itens antes de responder.\n\n`;
 
+    const instrucaoIdioma = dd.idioma === "en"
+      ? "IMPORTANT: Generate ALL plan content in English — meal names, food names, exercise names, tips, habits, checklist items and descriptions must all be in English.\n\n"
+      : "IMPORTANTE: Gere TODO o conteúdo do plano em português brasileiro — nomes de refeições, alimentos, exercícios, dicas, hábitos, itens do checklist e descrições devem estar em português.\n\n";
+
     const callGateway = async (extraReinforcement?: string) => {
-      const systemContent = priorityPrompt + SYSTEM_PROMPT + (extraReinforcement ? `\n\n${extraReinforcement}` : "");
+      const systemContent = instrucaoIdioma + priorityPrompt + SYSTEM_PROMPT + (extraReinforcement ? `\n\n${extraReinforcement}` : "");
       const response = await fetch(GATEWAY_URL, {
         method: "POST",
         headers: {

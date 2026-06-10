@@ -93,10 +93,8 @@ const tiers: Tier[] = [
 ];
 
 function Planos() {
-  const { t: tr } = useTranslation();
+  const { t } = useTranslation();
   const planoAtual = useStore((s) => s.planoAssinatura);
-  // Tier upgrades happen server-side (via a future payments webhook).
-  // Client cannot mutate plan tier — UI is informational only.
 
   return (
     <div className="space-y-8">
@@ -111,54 +109,54 @@ function Planos() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {tiers.map((t, i) => {
-          const Icon = t.icon;
-          const ativo = planoAtual === t.id;
+        {tiers.map((tier, i) => {
+          const Icon = tier.icon;
+          const ativo = planoAtual === tier.id;
           return (
             <motion.div
-              key={t.id}
+              key={tier.id}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.06 }}
             >
               <Card
                 className={`relative p-6 h-full flex flex-col gap-4 transition-shadow ${
-                  t.destaque ? "border-primary shadow-lg ring-1 ring-primary/30" : ""
+                  tier.destaque ? "border-primary shadow-lg ring-1 ring-primary/30" : ""
                 }`}
               >
-                {t.destaque && (
+                {tier.destaque && (
                   <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-[11px] font-semibold px-3 py-1 rounded-full">
                     {t("planos.mais_popular")}
                   </span>
                 )}
                 <div className="flex items-center gap-2">
-                  <div className={`w-10 h-10 rounded-xl bg-muted flex items-center justify-center ${t.cor}`}>
+                  <div className={`w-10 h-10 rounded-xl bg-muted flex items-center justify-center ${tier.cor}`}>
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg leading-tight">{t.nome}</h2>
-                    <p className="text-xs text-muted-foreground">{t.periodo}</p>
+                    <h2 className="font-bold text-lg leading-tight">{tier.nome}</h2>
+                    <p className="text-xs text-muted-foreground">{tier.periodo}</p>
                   </div>
                 </div>
 
                 <div>
-                  <span className="text-3xl font-bold">{t.preco}</span>
-                  {t.id !== "gratuito" && (
+                  <span className="text-3xl font-bold">{tier.preco}</span>
+                  {tier.id !== "gratuito" && (
                     <span className="text-sm text-muted-foreground">/mês</span>
                   )}
                 </div>
 
                 <ul className="space-y-2 flex-1">
-                  {t.beneficios.map((b) => (
+                  {tier.beneficios.map((b) => (
                     <li key={b} className="flex items-start gap-2 text-sm">
-                      <Check className={`w-4 h-4 mt-0.5 shrink-0 ${t.cor}`} />
+                      <Check className={`w-4 h-4 mt-0.5 shrink-0 ${tier.cor}`} />
                       <span>{b}</span>
                     </li>
                   ))}
                 </ul>
 
                 <Button
-                  variant={ativo ? "outline" : t.destaque ? "default" : "secondary"}
+                  variant={ativo ? "outline" : tier.destaque ? "default" : "secondary"}
                   disabled
                   className="w-full"
                 >

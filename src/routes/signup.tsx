@@ -1,11 +1,13 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles, Mail } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const errosPtBr: Record<string, string> = {
   "User already registered": "Este email já está cadastrado. Tente fazer login.",
@@ -32,6 +34,7 @@ type Etapa = "form" | "confirmar-email";
 
 
 function SignupPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
@@ -125,7 +128,8 @@ function SignupPage() {
 
   if (etapa === "confirmar-email") {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+      <div className="min-h-screen flex items-center justify-center px-4 bg-background relative">
+        <LanguageSwitcher className="absolute top-4 right-4" />
         <Card className="w-full max-w-sm p-6 space-y-6 rounded-2xl text-center">
           <div className="flex items-center gap-2 justify-center">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
@@ -138,9 +142,9 @@ function SignupPage() {
               <Mail className="w-8 h-8 text-primary" />
             </div>
             <div className="space-y-1">
-              <h1 className="text-xl font-semibold">Verifique seu email</h1>
+              <h1 className="text-xl font-semibold">{t("signup.verificar_email")}</h1>
               <p className="text-sm text-muted-foreground leading-relaxed">
-                Enviamos um link de confirmação para <strong className="text-foreground">{email}</strong>. Clique no link para ativar sua conta.
+                {t("signup.verificar_desc", { email })}
               </p>
             </div>
           </div>
@@ -154,10 +158,10 @@ function SignupPage() {
               disabled={loading || countdown > 0}
               onClick={reenviar}
             >
-              {loading ? "Enviando..." : countdown > 0 ? `Reenviar (${countdown}s)` : "Reenviar email"}
+              {loading ? t("signup.enviando") : countdown > 0 ? t("signup.reenviar_em", { s: countdown }) : t("signup.reenviar")}
             </Button>
             <p className="text-sm text-muted-foreground">
-              <Link to="/login" className="text-primary font-medium">Voltar ao login</Link>
+              <Link to="/login" className="text-primary font-medium">{t("signup.voltar_login")}</Link>
             </p>
           </div>
         </Card>
@@ -166,7 +170,8 @@ function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background relative">
+      <LanguageSwitcher className="absolute top-4 right-4" />
       <Card className="w-full max-w-sm p-6 space-y-5 rounded-2xl">
         <div className="flex items-center gap-2 justify-center">
           <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
@@ -175,34 +180,34 @@ function SignupPage() {
           <span className="font-bold text-lg">AI Health Coach</span>
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-semibold">Criar conta</h1>
-          <p className="text-sm text-muted-foreground">Comece seu plano em 1 minuto</p>
+          <h1 className="text-xl font-semibold">{t("signup.titulo")}</h1>
+          <p className="text-sm text-muted-foreground">{t("signup.subtitulo")}</p>
         </div>
         <form onSubmit={submit} className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="nome">Nome completo</Label>
+            <Label htmlFor="nome">{t("signup.nome")}</Label>
             <Input id="nome" required value={nome} onChange={(e) => setNome(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email">{t("login.email")}</Label>
             <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">{t("login.senha")}</Label>
             <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="confirm">Confirmar senha</Label>
+            <Label htmlFor="confirm">{t("signup.confirmar_senha")}</Label>
             <Input id="confirm" type="password" required minLength={6} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Criando..." : "Criar conta"}
+            {loading ? t("signup.criando") : t("signup.criar")}
           </Button>
         </form>
         <p className="text-sm text-center text-muted-foreground">
-          Já tenho conta?{" "}
-          <Link to="/login" className="text-primary font-medium">Entrar</Link>
+          {t("signup.ja_tem")}{" "}
+          <Link to="/login" className="text-primary font-medium">{t("signup.entrar")}</Link>
         </p>
       </Card>
     </div>

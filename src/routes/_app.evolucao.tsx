@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,7 @@ export const Route = createFileRoute("/_app/evolucao")({
 
 
 function Evolucao() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const evolucao = useStore((s) => s.evolucao);
@@ -67,35 +69,35 @@ function Evolucao() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Evolução</h1>
-        <p className="text-muted-foreground">Acompanhe seu progresso semanal</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("evolucao.titulo")}</h1>
+        <p className="text-muted-foreground">{t("evolucao.subtitulo")}</p>
       </div>
 
       <Card id="registro-form" className="p-5 space-y-4">
-        <h2 className="font-semibold">Novo registro semanal</h2>
+        <h2 className="font-semibold">{t("evolucao.novo_registro")}</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Peso atual (kg)</Label>
+            <Label>{t("evolucao.peso")}</Label>
             <Input type="number" value={peso} onChange={(e) => setPeso(Number(e.target.value))} />
           </div>
           <div className="space-y-2">
-            <Label>Energia: {energia}/10</Label>
+            <Label>{t("evolucao.energia", { v: energia })}</Label>
             <Slider value={[energia]} min={1} max={10} step={1} onValueChange={(v) => setEnergia(v[0])} />
           </div>
           <div className="space-y-2">
-            <Label>Fome: {fome}/10</Label>
+            <Label>{t("evolucao.fome", { v: fome })}</Label>
             <Slider value={[fome]} min={1} max={10} step={1} onValueChange={(v) => setFome(v[0])} />
           </div>
           <div className="space-y-2">
-            <Label>Qualidade do treino: {treino}/10</Label>
+            <Label>{t("evolucao.qualidade_treino", { v: treino })}</Label>
             <Slider value={[treino]} min={1} max={10} step={1} onValueChange={(v) => setTreino(v[0])} />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Observações</Label>
-          <Textarea value={obs} onChange={(e) => setObs(e.target.value)} placeholder="Como foi sua semana?" />
+          <Label>{t("evolucao.obs")}</Label>
+          <Textarea value={obs} onChange={(e) => setObs(e.target.value)} placeholder={t("evolucao.como_foi")} />
         </div>
-        <Button onClick={salvar}>Salvar registro</Button>
+        <Button onClick={salvar}>{t("evolucao.salvar")}</Button>
       </Card>
 
       {plano.metas && plano.metas.peso_desejado > 0 && (() => {
@@ -145,7 +147,7 @@ function Evolucao() {
         return (
           <Card className="p-5 space-y-4">
             <div className="flex items-baseline justify-between flex-wrap gap-2">
-              <h2 className="font-semibold">Progresso da meta</h2>
+              <h2 className="font-semibold">{t("evolucao.meta_progresso")}</h2>
               <span className="text-sm text-muted-foreground">
                 {pesoAtual.toFixed(1)}kg → {meta.peso_desejado}kg
               </span>
@@ -188,19 +190,19 @@ function Evolucao() {
       {evolucao.length === 0 && (
         <Card className="p-8 flex flex-col items-center text-center space-y-4">
           <TrendingUp className="w-12 h-12 text-primary" />
-          <h3 className="text-lg font-semibold">Nenhum registro ainda</h3>
+          <h3 className="text-lg font-semibold">{t("evolucao.sem_dados")}</h3>
           <p className="text-sm text-muted-foreground max-w-xs">
-            Registre seu peso e métricas semanais para acompanhar sua evolução.
+            {t("evolucao.sem_dados_desc")}
           </p>
           <Button onClick={() => document.getElementById("registro-form")?.scrollIntoView({ behavior: "smooth" })}>
-            Fazer primeiro registro
+            {t("evolucao.primeiro_registro")}
           </Button>
         </Card>
       )}
 
       {evolucao.length === 1 && (
         <Card className="p-5" aria-label={`Gráfico de evolução do peso com 1 registro: ${evolucao[0].peso}kg em ${evolucao[0].data}`}>
-          <h2 className="font-semibold mb-3">Evolução do peso</h2>
+          <h2 className="font-semibold mb-3">{t("evolucao.evolucao_peso")}</h2>
           <div className="h-64" role="img" aria-label={`Gráfico de linha mostrando 1 registro de peso: ${evolucao[0].peso}kg`}>
             <ResponsiveContainer>
               <LineChart data={evolucao}>
@@ -226,7 +228,7 @@ function Evolucao() {
         const ariaLabel = `Gráfico de linha da evolução do peso com ${evolucao.length} registros: variação de ${primeiro.peso}kg em ${primeiro.data} para ${ultimo.peso}kg em ${ultimo.data} (${sentido} de ${Math.abs(Number(delta))}kg).`;
         return (
           <Card className="p-5" aria-label={ariaLabel}>
-            <h2 className="font-semibold mb-3">Evolução do peso</h2>
+            <h2 className="font-semibold mb-3">{t("evolucao.evolucao_peso")}</h2>
             <div className="h-64" role="img" aria-label={ariaLabel}>
               <ResponsiveContainer>
                 <LineChart data={evolucao}>
@@ -245,11 +247,11 @@ function Evolucao() {
 
       <Card className="p-5">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="font-semibold">Ajustes inteligentes</h2>
+          <h2 className="font-semibold">{t("evolucao.ajustes")}</h2>
           {podeAjustesIA ? (
             <Button onClick={gerar} disabled={loading || evolucao.length === 0} size="sm">
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-              Gerar ajustes com IA
+              {t("evolucao.gerar_ajustes")}
             </Button>
           ) : (
             <Button asChild size="sm" variant="outline">
@@ -274,7 +276,7 @@ function Evolucao() {
 
       {evolucao.length > 0 && (
         <Card className="p-5 overflow-x-auto">
-          <h2 className="font-semibold mb-3">Histórico</h2>
+          <h2 className="font-semibold mb-3">{t("evolucao.historico")}</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-muted-foreground border-b border-border">

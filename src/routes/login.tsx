@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { Card } from "@/components/ui/card";
@@ -7,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const errosPtBr: Record<string, string> = {
   "Invalid login credentials": "Email ou senha incorretos. Tente novamente.",
@@ -29,6 +31,7 @@ export const Route = createFileRoute("/login")({
 
 
 function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -72,7 +75,8 @@ function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-background relative">
+      <LanguageSwitcher className="absolute top-4 right-4" />
       <Card className="w-full max-w-sm p-6 space-y-5 rounded-2xl">
         <div className="flex items-center gap-2 justify-center">
           <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-primary to-accent flex items-center justify-center shadow-lg shadow-primary/30">
@@ -81,8 +85,8 @@ function LoginPage() {
           <span className="font-bold text-xl bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">AI Health Coach</span>
         </div>
         <div className="text-center">
-          <h1 className="text-xl font-semibold">Entrar</h1>
-          <p className="text-sm text-muted-foreground">Acesse seu plano personalizado</p>
+          <h1 className="text-xl font-semibold">{t("login.titulo")}</h1>
+          <p className="text-sm text-muted-foreground">{t("login.subtitulo")}</p>
         </div>
 
         <button
@@ -92,33 +96,33 @@ function LoginPage() {
           className="w-full flex items-center justify-center gap-2 h-10 rounded-md bg-white text-gray-900 font-medium text-sm border border-gray-200 hover:bg-gray-50 transition disabled:opacity-60"
         >
           <GoogleIcon />
-          {googleLoading ? "Conectando..." : "Entrar com Google"}
+          {googleLoading ? t("login.conectando") : t("login.google")}
         </button>
 
         <div className="relative">
           <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-border" /></div>
           <div className="relative flex justify-center text-xs uppercase">
-            <span className="bg-card px-2 text-muted-foreground">ou</span>
+            <span className="bg-card px-2 text-muted-foreground">{t("login.ou")}</span>
           </div>
         </div>
 
         <form onSubmit={submit} className="space-y-3">
           <div className="space-y-1.5">
-            <Label htmlFor="email">E-mail</Label>
+            <Label htmlFor="email">{t("login.email")}</Label>
             <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="password">Senha</Label>
+            <Label htmlFor="password">{t("login.senha")}</Label>
             <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Entrando..." : "Entrar"}
+            {loading ? t("login.entrando") : t("login.entrar")}
           </Button>
         </form>
         <p className="text-sm text-center text-muted-foreground">
-          Não tem conta?{" "}
-          <Link to="/signup" className="text-primary font-medium">Cadastre-se</Link>
+          {t("login.sem_conta")}{" "}
+          <Link to="/signup" className="text-primary font-medium">{t("login.cadastre")}</Link>
         </p>
       </Card>
     </div>
