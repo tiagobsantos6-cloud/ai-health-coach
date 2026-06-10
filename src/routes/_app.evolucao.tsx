@@ -276,7 +276,7 @@ function Evolucao() {
 
       {evolucao.length > 0 && (
         <Card className="p-5 overflow-x-auto">
-          <h2 className="font-semibold mb-3">Histórico</h2>
+          <h2 className="font-semibold mb-3">{t("evolucao.historico")}</h2>
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-muted-foreground border-b border-border">
