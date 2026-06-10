@@ -147,14 +147,14 @@ function Gerando() {
           <div className="w-16 h-16 mx-auto rounded-full bg-destructive/10 flex items-center justify-center">
             <AlertCircle className="w-8 h-8 text-destructive" />
           </div>
-          <h2 className="text-xl font-bold">Não foi possível gerar seu plano</h2>
+          <h2 className="text-xl font-bold">{t("gerando.erro")}</h2>
           <p className="text-sm text-muted-foreground break-words">{mensagemAmigavel}</p>
 
           {countdown > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-center gap-2 text-sm text-primary font-semibold">
                 <Timer className="w-4 h-4" />
-                <span>Aguarde {countdown}s para tentar novamente...</span>
+                <span>{t("gerando.aguarde_s", { s: countdown })}...</span>
               </div>
               <div className="h-2 w-full bg-secondary rounded-full overflow-hidden">
                 <div
@@ -167,10 +167,10 @@ function Gerando() {
 
           <div className="flex gap-2 justify-center">
             <Button onClick={tentar} disabled={countdown > 0}>
-              {countdown > 0 ? `Aguarde ${countdown}s` : "Tentar novamente"}
+              {countdown > 0 ? t("gerando.aguarde_s", { s: countdown }) : t("gerando.tentar")}
             </Button>
             <Button variant="outline" onClick={() => navigate({ to: "/onboarding" })}>
-              Voltar ao início
+              {t("gerando.voltar")}
             </Button>
           </div>
         </div>
