@@ -28,6 +28,7 @@ export const Route = createFileRoute("/_app/evolucao")({
 
 
 function Evolucao() {
+  const { t } = useTranslation();
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const evolucao = useStore((s) => s.evolucao);
