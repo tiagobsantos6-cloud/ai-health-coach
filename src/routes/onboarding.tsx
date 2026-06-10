@@ -51,6 +51,7 @@ const objetivos = ["Hipertrofia", "Emagrecimento", "Definição", "Performance",
 const restricoesList = ["Lactose", "Glúten", "Vegano", "Vegetariano", "Outro"];
 
 function Onboarding() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const setDados = useStore((s) => s.setDados);
   const tema = useStore((s) => s.tema);
