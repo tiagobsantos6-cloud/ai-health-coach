@@ -228,7 +228,7 @@ function Evolucao() {
         const ariaLabel = `Gráfico de linha da evolução do peso com ${evolucao.length} registros: variação de ${primeiro.peso}kg em ${primeiro.data} para ${ultimo.peso}kg em ${ultimo.data} (${sentido} de ${Math.abs(Number(delta))}kg).`;
         return (
           <Card className="p-5" aria-label={ariaLabel}>
-            <h2 className="font-semibold mb-3">Evolução do peso</h2>
+            <h2 className="font-semibold mb-3">{t("evolucao.evolucao_peso")}</h2>
             <div className="h-64" role="img" aria-label={ariaLabel}>
               <ResponsiveContainer>
                 <LineChart data={evolucao}>
