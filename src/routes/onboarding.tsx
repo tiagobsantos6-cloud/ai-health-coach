@@ -257,9 +257,8 @@ function Onboarding() {
             })}
           </div>
           <div className="text-center text-xs text-muted-foreground">
-            Etapa {step} de 5
+            {t("onboarding.etapa", { atual: step, total: 5 })}
           </div>
-        </div>
 
         <AnimatePresence mode="wait">
           <motion.div
