@@ -247,11 +247,11 @@ function Evolucao() {
 
       <Card className="p-5">
         <div className="flex justify-between items-center mb-3">
-          <h2 className="font-semibold">Ajustes inteligentes</h2>
+          <h2 className="font-semibold">{t("evolucao.ajustes")}</h2>
           {podeAjustesIA ? (
             <Button onClick={gerar} disabled={loading || evolucao.length === 0} size="sm">
               {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
-              Gerar ajustes com IA
+              {t("evolucao.gerar_ajustes")}
             </Button>
           ) : (
             <Button asChild size="sm" variant="outline">
