@@ -69,35 +69,35 @@ function Evolucao() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Evolução</h1>
-        <p className="text-muted-foreground">Acompanhe seu progresso semanal</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("evolucao.titulo")}</h1>
+        <p className="text-muted-foreground">{t("evolucao.subtitulo")}</p>
       </div>
 
       <Card id="registro-form" className="p-5 space-y-4">
-        <h2 className="font-semibold">Novo registro semanal</h2>
+        <h2 className="font-semibold">{t("evolucao.novo_registro")}</h2>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label>Peso atual (kg)</Label>
+            <Label>{t("evolucao.peso")}</Label>
             <Input type="number" value={peso} onChange={(e) => setPeso(Number(e.target.value))} />
           </div>
           <div className="space-y-2">
-            <Label>Energia: {energia}/10</Label>
+            <Label>{t("evolucao.energia", { v: energia })}</Label>
             <Slider value={[energia]} min={1} max={10} step={1} onValueChange={(v) => setEnergia(v[0])} />
           </div>
           <div className="space-y-2">
-            <Label>Fome: {fome}/10</Label>
+            <Label>{t("evolucao.fome", { v: fome })}</Label>
             <Slider value={[fome]} min={1} max={10} step={1} onValueChange={(v) => setFome(v[0])} />
           </div>
           <div className="space-y-2">
-            <Label>Qualidade do treino: {treino}/10</Label>
+            <Label>{t("evolucao.qualidade_treino", { v: treino })}</Label>
             <Slider value={[treino]} min={1} max={10} step={1} onValueChange={(v) => setTreino(v[0])} />
           </div>
         </div>
         <div className="space-y-2">
-          <Label>Observações</Label>
-          <Textarea value={obs} onChange={(e) => setObs(e.target.value)} placeholder="Como foi sua semana?" />
+          <Label>{t("evolucao.obs")}</Label>
+          <Textarea value={obs} onChange={(e) => setObs(e.target.value)} placeholder={t("evolucao.como_foi")} />
         </div>
-        <Button onClick={salvar}>Salvar registro</Button>
+        <Button onClick={salvar}>{t("evolucao.salvar")}</Button>
       </Card>
 
       {plano.metas && plano.metas.peso_desejado > 0 && (() => {
