@@ -34,6 +34,7 @@ type Etapa = "form" | "confirmar-email";
 
 
 function SignupPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
