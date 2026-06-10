@@ -200,7 +200,7 @@ function Gerando() {
             transition={{ delay: 0.2 }}
             className="text-2xl font-bold"
           >
-            Seu plano está pronto! 🎉
+            {t("gerando.pronto")}
           </motion.h2>
           <div className="h-2 w-full bg-secondary rounded-full overflow-hidden mx-auto max-w-xs">
             <motion.div
