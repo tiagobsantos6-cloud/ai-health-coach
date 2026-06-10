@@ -190,12 +190,12 @@ function Evolucao() {
       {evolucao.length === 0 && (
         <Card className="p-8 flex flex-col items-center text-center space-y-4">
           <TrendingUp className="w-12 h-12 text-primary" />
-          <h3 className="text-lg font-semibold">Nenhum registro ainda</h3>
+          <h3 className="text-lg font-semibold">{t("evolucao.sem_dados")}</h3>
           <p className="text-sm text-muted-foreground max-w-xs">
-            Registre seu peso e métricas semanais para acompanhar sua evolução.
+            {t("evolucao.sem_dados_desc")}
           </p>
           <Button onClick={() => document.getElementById("registro-form")?.scrollIntoView({ behavior: "smooth" })}>
-            Fazer primeiro registro
+            {t("evolucao.primeiro_registro")}
           </Button>
         </Card>
       )}
