@@ -183,9 +183,9 @@ function Onboarding() {
       <AlertDialog open={rascunhoModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Cadastro em andamento</AlertDialogTitle>
+            <AlertDialogTitle>{t("onboarding.cadastro_andamento")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Você tem um cadastro em andamento. Deseja continuar de onde parou?
+              {t("onboarding.cadastro_pergunta")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -197,7 +197,7 @@ function Onboarding() {
                 setHidratado(true);
               }}
             >
-              Começar do zero
+              {t("onboarding.comecar_zero")}
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={() => {
@@ -210,7 +210,7 @@ function Onboarding() {
                 setHidratado(true);
               }}
             >
-              Continuar
+              {t("onboarding.continuar")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
