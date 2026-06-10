@@ -82,6 +82,7 @@ const dadosSchema = z.object({
   saude: shortText(500),
   sono: z.number().min(0).max(24),
   estresse: z.number().min(0).max(10),
+  idioma: z.string().max(5).optional().default("pt"),
 });
 
 const resumoPlanoSchema = z.record(z.string(), z.string().max(50)).optional().default({});
