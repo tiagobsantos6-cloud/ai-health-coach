@@ -202,7 +202,7 @@ function Evolucao() {
 
       {evolucao.length === 1 && (
         <Card className="p-5" aria-label={`Gráfico de evolução do peso com 1 registro: ${evolucao[0].peso}kg em ${evolucao[0].data}`}>
-          <h2 className="font-semibold mb-3">Evolução do peso</h2>
+          <h2 className="font-semibold mb-3">{t("evolucao.evolucao_peso")}</h2>
           <div className="h-64" role="img" aria-label={`Gráfico de linha mostrando 1 registro de peso: ${evolucao[0].peso}kg`}>
             <ResponsiveContainer>
               <LineChart data={evolucao}>
