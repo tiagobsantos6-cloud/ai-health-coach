@@ -399,7 +399,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
             </div>
           ) : (
             <Button size="sm" variant="secondary" className="w-full" onClick={iniciarDescanso}>
-              <Timer className="w-4 h-4 mr-2" /> ⏱ Iniciar descanso ({ex.descanso_s}s)
+              <Timer className="w-4 h-4 mr-2" /> {t("treino.iniciar_descanso", { s: ex.descanso_s })}
             </Button>
           )}
         </div>
