@@ -31,6 +31,7 @@ export const Route = createFileRoute("/login")({
 
 
 function LoginPage() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
