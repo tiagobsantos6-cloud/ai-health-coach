@@ -299,7 +299,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
         aria-expanded={open}
       >
         <PlayCircle className="w-4 h-4 mr-2" />
-        Ver execução
+        {t("treino.ver_execucao")}
         <ChevronDown className={`w-4 h-4 ml-auto transition-transform ${open ? "rotate-180" : ""}`} />
       </Button>
 
