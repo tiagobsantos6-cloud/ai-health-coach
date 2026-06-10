@@ -247,6 +247,7 @@ async function buscarGifExercicio(nomePt: string): Promise<string | null> {
 }
 
 function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () => void }) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
   const [loadingGif, setLoadingGif] = useState(false);
