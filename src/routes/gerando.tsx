@@ -40,6 +40,7 @@ const mensagens = [
 ];
 
 function Gerando() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dados = useStore((s) => s.dados);
   const setPlano = useStore((s) => s.setPlano);
