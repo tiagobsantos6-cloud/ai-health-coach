@@ -227,11 +227,11 @@ function Gerando() {
           <Sparkles className="w-12 h-12 text-primary-foreground" />
         </motion.div>
         <div>
-          <h1 className="text-2xl font-bold mb-3">Gerando seu Plano de Saúde</h1>
+          <h1 className="text-2xl font-bold mb-3">{t("gerando.titulo")}</h1>
           <div role="status" aria-live="polite">
             {tentativa > 1 && (
               <p className="text-sm text-orange-700 dark:text-primary font-semibold mb-2">
-                Tentativa {tentativa} de {MAX_TENTATIVAS} — ajustando o plano...
+                {tentativa}/{MAX_TENTATIVAS}
               </p>
             )}
             <motion.p
@@ -244,7 +244,7 @@ function Gerando() {
             </motion.p>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            Isso costuma levar entre 15 e 40 segundos
+            {t("gerando.aguarde")}
           </p>
         </div>
 
@@ -255,7 +255,7 @@ function Gerando() {
 
         {elapsed > 30 && (
           <p className="text-sm text-muted-foreground">
-            Está demorando mais que o esperado... mas já estamos quase lá!
+            {t("gerando.demorando")}
           </p>
         )}
 
