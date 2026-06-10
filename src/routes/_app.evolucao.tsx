@@ -147,7 +147,7 @@ function Evolucao() {
         return (
           <Card className="p-5 space-y-4">
             <div className="flex items-baseline justify-between flex-wrap gap-2">
-              <h2 className="font-semibold">Progresso da meta</h2>
+              <h2 className="font-semibold">{t("evolucao.meta_progresso")}</h2>
               <span className="text-sm text-muted-foreground">
                 {pesoAtual.toFixed(1)}kg → {meta.peso_desejado}kg
               </span>
