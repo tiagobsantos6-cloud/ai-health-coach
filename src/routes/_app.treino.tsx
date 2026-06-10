@@ -348,7 +348,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
 
           {ex.execucao && (
             <div>
-              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">Como executar</div>
+              <div className="text-xs uppercase tracking-wide text-muted-foreground mb-1">{t("treino.como_executar")}</div>
               <p className="whitespace-pre-line leading-relaxed">{ex.execucao}</p>
             </div>
           )}
@@ -356,7 +356,7 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
           {ex.erros_comuns && (
             <div>
               <div className="flex items-center gap-1.5 text-xs uppercase tracking-wide text-destructive mb-1">
-                <AlertTriangle className="w-3.5 h-3.5" /> Erros comuns
+                <AlertTriangle className="w-3.5 h-3.5" /> {t("treino.erros_comuns")}
               </div>
               <p className="whitespace-pre-line leading-relaxed text-muted-foreground">{ex.erros_comuns}</p>
             </div>
@@ -368,13 +368,13 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 text-primary hover:underline font-medium text-sm"
           >
-            <ExternalLink className="w-4 h-4" /> ▶ Ver no YouTube
+            <ExternalLink className="w-4 h-4" /> {t("treino.ver_youtube")}
           </a>
 
           {descRunning || descanso > 0 || terminou ? (
             <div className="rounded-lg p-3 space-y-2" style={{ backgroundColor: "rgba(249,115,22,0.1)" }}>
               {terminou ? (
-                <div className="text-center font-semibold text-orange-500">Próxima série! 💪</div>
+                <div className="text-center font-semibold text-orange-500">{t("treino.proxima_serie")}</div>
               ) : (
                 <>
                   <div className="flex items-center justify-between">
