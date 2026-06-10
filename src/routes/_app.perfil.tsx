@@ -212,6 +212,12 @@ function Perfil() {
           )}
         </Card>
 
+        {/* Idioma */}
+        <Card className="p-5 space-y-3 md:col-span-2">
+          <h2 className="font-semibold">Idioma / Language</h2>
+          <LanguageSwitcher />
+        </Card>
+
         {/* Ações */}
         <Card className="p-5 space-y-3 md:col-span-2">
           <h2 className="font-semibold">Ações</h2>
