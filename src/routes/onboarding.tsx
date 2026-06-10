@@ -587,16 +587,16 @@ function Onboarding() {
         <div className="flex gap-3 mt-8">
           {step > 1 && (
             <Button variant="outline" onClick={() => setStep(step - 1)} className="flex-1">
-              <ArrowLeft className="w-4 h-4 mr-2" /> Voltar
+              <ArrowLeft className="w-4 h-4 mr-2" /> {t("onboarding.voltar")}
             </Button>
           )}
           {step < 5 ? (
             <Button onClick={handleContinuar} disabled={!canNext()} className="flex-1">
-              Continuar <ArrowRight className="w-4 h-4 ml-2" />
+              {t("onboarding.continuar")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           ) : (
             <Button onClick={finish} className="flex-1">
-              Gerar meu plano <Check className="w-4 h-4 ml-2" />
+              {t("onboarding.gerar")} <Check className="w-4 h-4 ml-2" />
             </Button>
           )}
         </div>
