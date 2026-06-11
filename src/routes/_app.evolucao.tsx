@@ -137,7 +137,7 @@ function Evolucao() {
           }
         } else {
           semanasRestantes = ritmoSemanalEsperado > 0 ? Math.ceil(restante / ritmoSemanalEsperado) : meta.prazo_semanas;
-          mensagem = "Registre mais semanas para uma análise de ritmo personalizada.";
+          mensagem = t("evolucao.registre_mais");
         }
 
         const previsao = new Date();
