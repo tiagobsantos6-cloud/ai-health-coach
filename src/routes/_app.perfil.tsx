@@ -131,8 +131,8 @@ function Perfil() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Perfil</h1>
-        <p className="text-sm text-muted-foreground">Seus dados e plano</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("perfil.titulo")}</h1>
+        <p className="text-sm text-muted-foreground">{t("perfil.subtitulo")}</p>
       </div>
 
       {/* Identidade */}
@@ -142,20 +142,20 @@ function Perfil() {
             {iniciais(dados?.nome ?? "")}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="font-bold text-lg truncate">{dados?.nome ?? "Visitante"}</div>
+            <div className="font-bold text-lg truncate">{dados?.nome ?? t("perfil.visitante")}</div>
             <div className="text-sm text-muted-foreground truncate">
-              {dados?.objetivo ?? "Sem objetivo definido"}
+              {dados?.objetivo ?? t("perfil.sem_objetivo")}
               {email ? <> · {email}</> : null}
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
               <Link to="/planos" className="text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-primary/15 text-primary hover:bg-primary/25">
-                Plano {NOMES_PLANOS[planoAss]}
+                {t("perfil.plano_atual", { nome: NOMES_PLANOS[planoAss] })}
               </Link>
               <span className="text-[11px] font-medium px-2 py-1 rounded-full bg-secondary text-muted-foreground">
-                Cadastro: {formatDate(createdAt)}
+                {t("perfil.cadastro", { data: formatDate(createdAt) })}
               </span>
               <span className="text-[11px] font-medium px-2 py-1 rounded-full bg-secondary text-muted-foreground">
-                Plano gerado: {formatDate(planoCriadoEm)}
+                {t("perfil.plano_gerado", { data: formatDate(planoCriadoEm) })}
               </span>
             </div>
           </div>
@@ -166,27 +166,27 @@ function Perfil() {
         {/* Meus dados */}
         <Card className="p-5 space-y-4">
           <div>
-            <h2 className="font-semibold">Meus dados</h2>
-            <p className="text-xs text-muted-foreground">Atualize seus dados pessoais</p>
+            <h2 className="font-semibold">{t("perfil.meus_dados")}</h2>
+            <p className="text-xs text-muted-foreground">{t("perfil.atualizar")}</p>
           </div>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="nome">Nome</Label>
+              <Label htmlFor="nome">{t("perfil.nome")}</Label>
               <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="peso">Peso (kg)</Label>
+                <Label htmlFor="peso">{t("perfil.peso")}</Label>
                 <Input id="peso" inputMode="decimal" value={peso} onChange={(e) => setPeso(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="altura">Altura (cm)</Label>
+                <Label htmlFor="altura">{t("perfil.altura")}</Label>
                 <Input id="altura" inputMode="decimal" value={altura} onChange={(e) => setAltura(e.target.value)} />
               </div>
             </div>
           </div>
           <Button onClick={salvarDados} disabled={!dados} className="w-full">
-            <Save className="w-4 h-4 mr-2" /> Salvar alterações
+            <Save className="w-4 h-4 mr-2" /> {t("perfil.salvar")}
           </Button>
         </Card>
 
@@ -194,23 +194,23 @@ function Perfil() {
         <Card className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold">Meu plano</h2>
-              <p className="text-xs text-muted-foreground">Resumo do plano gerado</p>
+              <h2 className="font-semibold">{t("perfil.meu_plano")}</h2>
+              <p className="text-xs text-muted-foreground">{t("perfil.resumo_plano")}</p>
             </div>
             <Button variant="outline" size="sm" onClick={refazer}>
-              <RefreshCw className="w-4 h-4 mr-2" /> Regenerar
+              <RefreshCw className="w-4 h-4 mr-2" /> {t("perfil.regenerar")}
             </Button>
           </div>
           {plano && dados ? (
             <div className="grid grid-cols-2 gap-3">
-              <Info label="Objetivo" value={dados.objetivo} />
-              <Info label="Gerado em" value={formatDate(planoCriadoEm)} />
-              <Info label="TMB" value={plano.resumo.tmb} />
-              <Info label="TDEE" value={plano.resumo.tdee} />
-              <Info label="Meta calórica" value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} />
+              <Info label={t("perfil.objetivo")} value={dados.objetivo} />
+              <Info label={t("perfil.gerado_em")} value={formatDate(planoCriadoEm)} />
+              <Info label={t("perfil.tmb")} value={plano.resumo.tmb} />
+              <Info label={t("perfil.tdee")} value={plano.resumo.tdee} />
+              <Info label={t("perfil.meta_calorica")} value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} />
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Nenhum plano gerado ainda.</p>
+            <p className="text-sm text-muted-foreground">{t("perfil.sem_plano")}</p>
           )}
         </Card>
 
