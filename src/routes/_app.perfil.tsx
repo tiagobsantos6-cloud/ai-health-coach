@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useStore } from "@/lib/store";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,7 @@ function formatDate(iso?: string | null) {
 }
 
 function Perfil() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dados = useStore((s) => s.dados);
   const plano = useStore((s) => s.plano);
@@ -101,11 +103,11 @@ function Perfil() {
     const p = parseFloat(peso.replace(",", "."));
     const a = parseFloat(altura.replace(",", "."));
     if (!nome.trim() || isNaN(p) || isNaN(a)) {
-      toast.error("Preencha nome, peso e altura corretamente.");
+      toast.error(t("perfil.preencha_dados"));
       return;
     }
     setDados({ ...dados, nome: nome.trim(), peso: p, altura: a });
-    toast.success("Dados atualizados!");
+    toast.success(t("perfil.dados_atualizados"));
   };
 
   const refazer = () => {
@@ -129,8 +131,8 @@ function Perfil() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold">Perfil</h1>
-        <p className="text-sm text-muted-foreground">Seus dados e plano</p>
+        <h1 className="text-2xl md:text-3xl font-bold">{t("perfil.titulo")}</h1>
+        <p className="text-sm text-muted-foreground">{t("perfil.subtitulo")}</p>
       </div>
 
       {/* Identidade */}
@@ -140,20 +142,20 @@ function Perfil() {
             {iniciais(dados?.nome ?? "")}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="font-bold text-lg truncate">{dados?.nome ?? "Visitante"}</div>
+            <div className="font-bold text-lg truncate">{dados?.nome ?? t("perfil.visitante")}</div>
             <div className="text-sm text-muted-foreground truncate">
-              {dados?.objetivo ?? "Sem objetivo definido"}
+              {dados?.objetivo ?? t("perfil.sem_objetivo")}
               {email ? <> · {email}</> : null}
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
               <Link to="/planos" className="text-[11px] font-semibold uppercase tracking-wide px-2 py-1 rounded-full bg-primary/15 text-primary hover:bg-primary/25">
-                Plano {NOMES_PLANOS[planoAss]}
+                {t("perfil.plano_atual", { nome: NOMES_PLANOS[planoAss] })}
               </Link>
               <span className="text-[11px] font-medium px-2 py-1 rounded-full bg-secondary text-muted-foreground">
-                Cadastro: {formatDate(createdAt)}
+                {t("perfil.cadastro", { data: formatDate(createdAt) })}
               </span>
               <span className="text-[11px] font-medium px-2 py-1 rounded-full bg-secondary text-muted-foreground">
-                Plano gerado: {formatDate(planoCriadoEm)}
+                {t("perfil.plano_gerado", { data: formatDate(planoCriadoEm) })}
               </span>
             </div>
           </div>
@@ -164,27 +166,27 @@ function Perfil() {
         {/* Meus dados */}
         <Card className="p-5 space-y-4">
           <div>
-            <h2 className="font-semibold">Meus dados</h2>
-            <p className="text-xs text-muted-foreground">Atualize seus dados pessoais</p>
+            <h2 className="font-semibold">{t("perfil.meus_dados")}</h2>
+            <p className="text-xs text-muted-foreground">{t("perfil.atualizar")}</p>
           </div>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="nome">Nome</Label>
+              <Label htmlFor="nome">{t("perfil.nome")}</Label>
               <Input id="nome" value={nome} onChange={(e) => setNome(e.target.value)} />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div className="space-y-1.5">
-                <Label htmlFor="peso">Peso (kg)</Label>
+                <Label htmlFor="peso">{t("perfil.peso")}</Label>
                 <Input id="peso" inputMode="decimal" value={peso} onChange={(e) => setPeso(e.target.value)} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="altura">Altura (cm)</Label>
+                <Label htmlFor="altura">{t("perfil.altura")}</Label>
                 <Input id="altura" inputMode="decimal" value={altura} onChange={(e) => setAltura(e.target.value)} />
               </div>
             </div>
           </div>
           <Button onClick={salvarDados} disabled={!dados} className="w-full">
-            <Save className="w-4 h-4 mr-2" /> Salvar alterações
+            <Save className="w-4 h-4 mr-2" /> {t("perfil.salvar")}
           </Button>
         </Card>
 
@@ -192,23 +194,23 @@ function Perfil() {
         <Card className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-semibold">Meu plano</h2>
-              <p className="text-xs text-muted-foreground">Resumo do plano gerado</p>
+              <h2 className="font-semibold">{t("perfil.meu_plano")}</h2>
+              <p className="text-xs text-muted-foreground">{t("perfil.resumo_plano")}</p>
             </div>
             <Button variant="outline" size="sm" onClick={refazer}>
-              <RefreshCw className="w-4 h-4 mr-2" /> Regenerar
+              <RefreshCw className="w-4 h-4 mr-2" /> {t("perfil.regenerar")}
             </Button>
           </div>
           {plano && dados ? (
             <div className="grid grid-cols-2 gap-3">
-              <Info label="Objetivo" value={dados.objetivo} />
-              <Info label="Gerado em" value={formatDate(planoCriadoEm)} />
-              <Info label="TMB" value={plano.resumo.tmb} />
-              <Info label="TDEE" value={plano.resumo.tdee} />
-              <Info label="Meta calórica" value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} />
+              <Info label={t("perfil.objetivo")} value={dados.objetivo} />
+              <Info label={t("perfil.gerado_em")} value={formatDate(planoCriadoEm)} />
+              <Info label={t("perfil.tmb")} value={plano.resumo.tmb} />
+              <Info label={t("perfil.tdee")} value={plano.resumo.tdee} />
+              <Info label={t("perfil.meta_calorica")} value={`${plano.resumo.meta_calorica.toString().replace(/ kcal/gi, "")} kcal`} />
             </div>
           ) : (
-            <p className="text-sm text-muted-foreground">Nenhum plano gerado ainda.</p>
+            <p className="text-sm text-muted-foreground">{t("perfil.sem_plano")}</p>
           )}
         </Card>
 
@@ -220,32 +222,32 @@ function Perfil() {
 
         {/* Ações */}
         <Card className="p-5 space-y-3 md:col-span-2">
-          <h2 className="font-semibold">Ações</h2>
+          <h2 className="font-semibold">{t("perfil.acoes")}</h2>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setTema(tema === "dark" ? "light" : "dark")}>
               {tema === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
-              {tema === "dark" ? "Tema claro" : "Tema escuro"}
+              {tema === "dark" ? t("perfil.tema_claro") : t("perfil.tema_escuro")}
             </Button>
             <AlertDialog open={openLimpar} onOpenChange={(o) => { setOpenLimpar(o); if (!o) setConfirmarTexto(""); }}>
               <AlertDialogTrigger asChild>
                 <Button variant="outline">
-                  <Trash2 className="w-4 h-4 mr-2" /> Limpar todos os dados
+                  <Trash2 className="w-4 h-4 mr-2" /> {t("perfil.limpar")}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Tem certeza? Esta ação não pode ser desfeita.</AlertDialogTitle>
+                  <AlertDialogTitle>{t("perfil.confirmar_apagar")}</AlertDialogTitle>
                   <AlertDialogDescription asChild>
                     <div className="space-y-3">
-                      <div>Você vai perder:</div>
+                      <div>{t("perfil.vai_perder")}</div>
                       <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>Seu plano alimentar e de treino</li>
-                        <li>Histórico de evolução ({evolucao.length} {evolucao.length === 1 ? "semana registrada" : "semanas registradas"})</li>
-                        <li>Registros de água</li>
-                        <li>Configurações pessoais</li>
+                        <li>{t("perfil.perder_plano")}</li>
+                        <li>{evolucao.length === 1 ? t("perfil.perder_evolucao_um", { count: evolucao.length }) : t("perfil.perder_evolucao_outros", { count: evolucao.length })}</li>
+                        <li>{t("perfil.perder_agua")}</li>
+                        <li>{t("perfil.perder_config")}</li>
                       </ul>
                       <div className="pt-1">
-                        Para confirmar, digite <span className="font-mono font-bold text-foreground">CONFIRMAR</span> abaixo:
+                        {t("perfil.para_confirmar")} <span className="font-mono font-bold text-foreground">CONFIRMAR</span>:
                       </div>
                       <Input
                         value={confirmarTexto}
@@ -257,19 +259,19 @@ function Perfil() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-secondary text-foreground hover:bg-secondary/80">Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-secondary text-foreground hover:bg-secondary/80">{t("perfil.cancelar")}</AlertDialogCancel>
                   <AlertDialogAction
                     disabled={confirmarTexto !== "CONFIRMAR"}
                     onClick={limparTudo}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:pointer-events-none"
                   >
-                    Sim, apagar tudo
+                    {t("perfil.apagar_tudo")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
             <Button variant="destructive" onClick={sair}>
-              <LogOut className="w-4 h-4 mr-2" /> Sair da conta
+              <LogOut className="w-4 h-4 mr-2" /> {t("perfil.sair")}
             </Button>
           </div>
         </Card>
@@ -278,10 +280,10 @@ function Perfil() {
         <Card className="p-5 space-y-4 md:col-span-2">
           <div className="flex items-center gap-2">
             <Bell className="w-4 h-4 text-primary" />
-            <h2 className="font-semibold">Lembretes</h2>
+            <h2 className="font-semibold">{t("perfil.lembretes")}</h2>
           </div>
           <p className="text-xs text-muted-foreground -mt-2">
-            Notificações locais no seu dispositivo. Mantenha o app aberto em segundo plano.
+            {t("perfil.lembretes_desc")}
           </p>
           <LembretesSection plano={plano} dados={dados} />
         </Card>
@@ -290,10 +292,10 @@ function Perfil() {
         <Card className="p-5 space-y-4 md:col-span-2">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-primary" />
-            <h2 className="font-semibold">Indique um amigo</h2>
+            <h2 className="font-semibold">{t("perfil.indicacoes")}</h2>
           </div>
           <p className="text-xs text-muted-foreground -mt-2">
-            Ganhe 7 dias de bônus a cada amigo que gerar o primeiro plano.
+            {t("perfil.indicacoes_desc")}
           </p>
           <IndicacaoSection userId={userId} />
         </Card>
@@ -316,6 +318,7 @@ type PlanoMini = { plano_alimentar?: Array<{ horario?: string }> } | null;
 type DadosMini = { horario?: string } | null;
 
 function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini }) {
+  const { t } = useTranslation();
   void plano; void dados; // agendamento global é feito no AppLayout via evento "lembretes:config".
   const [cfg, setCfg] = useState<LembretesConfig>(() => loadLembretes());
 
@@ -327,7 +330,7 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
     if (value) {
       const perm = await pedirPermissaoNotificacao();
       if (perm !== "granted") {
-        toast.error("Permissão de notificação negada. Ative nas configurações do navegador.");
+        toast.error(t("perfil.permissao_negada"));
         return;
       }
     }
@@ -335,9 +338,9 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
   };
 
   const itens: Array<{ key: keyof LembretesConfig; titulo: string; desc: string }> = [
-    { key: "agua", titulo: "Lembrete de água", desc: "A cada 2h entre 7h e 22h" },
-    { key: "refeicao", titulo: "Lembrete de refeição", desc: "15 min antes de cada horário do plano" },
-    { key: "treino", titulo: "Lembrete de treino", desc: "30 min antes do horário preferido" },
+    { key: "agua", titulo: t("perfil.lembrete_agua"), desc: t("perfil.lembrete_agua_desc") },
+    { key: "refeicao", titulo: t("perfil.lembrete_refeicao"), desc: t("perfil.lembrete_refeicao_desc") },
+    { key: "treino", titulo: t("perfil.lembrete_treino"), desc: t("perfil.lembrete_treino_desc") },
   ];
 
   return (
@@ -356,6 +359,7 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
 }
 
 function IndicacaoSection({ userId }: { userId: string | null }) {
+  const { t } = useTranslation();
   const contarFn = useServerFn(getMyIndicacoesCountFn);
   const [count, setCount] = useState<number>(0);
 
@@ -365,22 +369,22 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
   }, [userId, contarFn]);
 
   if (!userId) {
-    return <p className="text-sm text-muted-foreground">Carregando...</p>;
+    return <p className="text-sm text-muted-foreground">{t("perfil.carregando")}</p>;
   }
 
   const code = userId.replace(/-/g, "").slice(0, 8);
   const link = `https://vitalia.app/cadastro?ref=${code}`;
-  const wppText = `Vem comigo no AI Health Coach! Plano de nutrição e treino feito por IA. Cadastre-se: ${link}`;
+  const wppText = `${t("perfil.indicacao_wpp")} ${link}`;
 
   const copiar = async () => {
     try {
       await navigator.clipboard.writeText(link);
-      toast("Link copiado!", {
-        description: "Compartilhe com seus amigos.",
+      toast(t("perfil.link_copiado"), {
+        description: t("perfil.link_copiado_desc"),
         duration: 3000,
       });
     } catch {
-      toast.error("Não foi possível copiar.");
+      toast.error(t("perfil.copiar_falhou"));
     }
   };
 
@@ -392,19 +396,19 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
   return (
     <div className="space-y-3">
       <div className="rounded-xl bg-secondary/40 p-3 space-y-2">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Seu link</div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{t("perfil.seu_link")}</div>
         <div className="font-mono text-sm break-all">{link}</div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" onClick={copiar} aria-label="Copiar link de indicação">
-          <Copy className="w-4 h-4 mr-2" /> Copiar link
+        <Button variant="outline" onClick={copiar} aria-label={t("perfil.copiar_link")}>
+          <Copy className="w-4 h-4 mr-2" /> {t("perfil.copiar_link")}
         </Button>
-        <Button onClick={compartilharWpp} aria-label="Compartilhar no WhatsApp">
-          <Share2 className="w-4 h-4 mr-2" /> Compartilhar no WhatsApp
+        <Button onClick={compartilharWpp} aria-label={t("perfil.compartilhar_wpp")}>
+          <Share2 className="w-4 h-4 mr-2" /> {t("perfil.compartilhar_wpp")}
         </Button>
       </div>
       <div className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">{count}</span> {count === 1 ? "amigo indicado" : "amigos indicados"}
+        <span className="font-semibold text-foreground">{count}</span> {count === 1 ? t("perfil.amigos_indicados_um", { count }) : t("perfil.amigos_indicados_outros", { count })}
       </div>
     </div>
   );

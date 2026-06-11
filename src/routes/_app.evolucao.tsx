@@ -137,7 +137,7 @@ function Evolucao() {
           }
         } else {
           semanasRestantes = ritmoSemanalEsperado > 0 ? Math.ceil(restante / ritmoSemanalEsperado) : meta.prazo_semanas;
-          mensagem = "Registre mais semanas para uma análise de ritmo personalizada.";
+          mensagem = t("evolucao.registre_mais");
         }
 
         const previsao = new Date();
@@ -160,8 +160,8 @@ function Evolucao() {
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Já perdeu: {jaPerdeu.toFixed(1)}kg</span>
-                <span>Faltam: {restante.toFixed(1)}kg</span>
+                <span>{t("evolucao.ja_perdeu")} {jaPerdeu.toFixed(1)}kg</span>
+                <span>{t("evolucao.faltam")} {restante.toFixed(1)}kg</span>
                 <span>{pct.toFixed(0)}%</span>
               </div>
             </div>

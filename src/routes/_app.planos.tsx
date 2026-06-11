@@ -23,11 +23,11 @@ type Tier = {
   id: PlanoAssinatura;
   nome: string;
   preco: string;
-  periodo: string;
+  periodoKey: "planos.periodo_gratuito" | "planos.periodo_mensal";
   destaque?: boolean;
   icon: typeof Gift;
   cor: string;
-  beneficios: string[];
+  beneficiosKeys: string[];
 };
 
 const tiers: Tier[] = [
@@ -35,59 +35,59 @@ const tiers: Tier[] = [
     id: "gratuito",
     nome: "Gratuito",
     preco: "R$ 0",
-    periodo: "por 1 mês",
+    periodoKey: "planos.periodo_gratuito",
     icon: Gift,
     cor: "text-muted-foreground",
-    beneficios: [
-      "Plano alimentar inicial gerado por IA",
-      "Treino básico personalizado",
-      "Registro de água e evolução",
-      "Acesso por 30 dias",
+    beneficiosKeys: [
+      "planos.ben.gratuito.0",
+      "planos.ben.gratuito.1",
+      "planos.ben.gratuito.2",
+      "planos.ben.gratuito.3",
     ],
   },
   {
     id: "basico",
     nome: "Básico",
     preco: "R$ 9,99",
-    periodo: "por mês",
+    periodoKey: "planos.periodo_mensal",
     icon: Zap,
     cor: "text-chart-2",
-    beneficios: [
-      "Tudo do Gratuito",
-      "Regeneração ilimitada do plano",
-      "Substituições alimentares avançadas",
-      "Histórico completo de evolução",
+    beneficiosKeys: [
+      "planos.ben.basico.0",
+      "planos.ben.basico.1",
+      "planos.ben.basico.2",
+      "planos.ben.basico.3",
     ],
   },
   {
     id: "intermediario",
     nome: "Intermediário",
     preco: "R$ 14,99",
-    periodo: "por mês",
+    periodoKey: "planos.periodo_mensal",
     destaque: true,
     icon: Sparkles,
     cor: "text-primary",
-    beneficios: [
-      "Tudo do Básico",
-      "Ajustes automáticos pela IA semanalmente",
-      "Análise inteligente da evolução",
-      "Lista de compras personalizada",
-      "Suporte prioritário",
+    beneficiosKeys: [
+      "planos.ben.intermediario.0",
+      "planos.ben.intermediario.1",
+      "planos.ben.intermediario.2",
+      "planos.ben.intermediario.3",
+      "planos.ben.intermediario.4",
     ],
   },
   {
     id: "completo",
     nome: "Completo",
     preco: "R$ 19,99",
-    periodo: "por mês",
+    periodoKey: "planos.periodo_mensal",
     icon: Crown,
     cor: "text-chart-3",
-    beneficios: [
-      "Tudo do Intermediário",
-      "Coach virtual com chat ilimitado",
-      "Planos para fases (cutting, bulking, manutenção)",
-      "Receitas exclusivas e cardápios sazonais",
-      "Acompanhamento avançado de biomarcadores",
+    beneficiosKeys: [
+      "planos.ben.completo.0",
+      "planos.ben.completo.1",
+      "planos.ben.completo.2",
+      "planos.ben.completo.3",
+      "planos.ben.completo.4",
     ],
   },
 ];
@@ -135,7 +135,7 @@ function Planos() {
                   </div>
                   <div>
                     <h2 className="font-bold text-lg leading-tight">{tier.nome}</h2>
-                    <p className="text-xs text-muted-foreground">{tier.periodo}</p>
+                    <p className="text-xs text-muted-foreground">{t(tier.periodoKey)}</p>
                   </div>
                 </div>
 
@@ -147,10 +147,10 @@ function Planos() {
                 </div>
 
                 <ul className="space-y-2 flex-1">
-                  {tier.beneficios.map((b) => (
-                    <li key={b} className="flex items-start gap-2 text-sm">
+                  {tier.beneficiosKeys.map((bKey) => (
+                    <li key={bKey} className="flex items-start gap-2 text-sm">
                       <Check className={`w-4 h-4 mt-0.5 shrink-0 ${tier.cor}`} />
-                      <span>{b}</span>
+                      <span>{t(bKey)}</span>
                     </li>
                   ))}
                 </ul>

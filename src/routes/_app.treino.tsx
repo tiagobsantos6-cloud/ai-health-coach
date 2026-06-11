@@ -27,6 +27,7 @@ function Treino() {
   const plano = useStore((s) => s.plano);
   if (!plano) return null;
   const dias = plano.treino.dias;
+  const diasAbrev = t("semana.dias").split(",");
 
   return (
     <div className="space-y-6">
@@ -39,7 +40,7 @@ function Treino() {
         <TabsList className="w-full overflow-x-auto flex justify-start">
           {dias.map((d, i) => (
             <TabsTrigger key={i} value={d.dia ?? String(i)} className="text-xs">
-              {d.dia?.slice(0, 3) || `D${i + 1}`}
+              {diasAbrev[i] ?? d.dia?.slice(0, 3) ?? `D${i + 1}`}
             </TabsTrigger>
           ))}
         </TabsList>
