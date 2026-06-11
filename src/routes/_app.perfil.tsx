@@ -51,6 +51,7 @@ function formatDate(iso?: string | null) {
 }
 
 function Perfil() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const dados = useStore((s) => s.dados);
   const plano = useStore((s) => s.plano);
