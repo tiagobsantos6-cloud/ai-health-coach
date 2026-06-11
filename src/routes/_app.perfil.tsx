@@ -222,32 +222,32 @@ function Perfil() {
 
         {/* Ações */}
         <Card className="p-5 space-y-3 md:col-span-2">
-          <h2 className="font-semibold">Ações</h2>
+          <h2 className="font-semibold">{t("perfil.acoes")}</h2>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" onClick={() => setTema(tema === "dark" ? "light" : "dark")}>
               {tema === "dark" ? <Sun className="w-4 h-4 mr-2" /> : <Moon className="w-4 h-4 mr-2" />}
-              {tema === "dark" ? "Tema claro" : "Tema escuro"}
+              {tema === "dark" ? t("perfil.tema_claro") : t("perfil.tema_escuro")}
             </Button>
             <AlertDialog open={openLimpar} onOpenChange={(o) => { setOpenLimpar(o); if (!o) setConfirmarTexto(""); }}>
               <AlertDialogTrigger asChild>
                 <Button variant="outline">
-                  <Trash2 className="w-4 h-4 mr-2" /> Limpar todos os dados
+                  <Trash2 className="w-4 h-4 mr-2" /> {t("perfil.limpar")}
                 </Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Tem certeza? Esta ação não pode ser desfeita.</AlertDialogTitle>
+                  <AlertDialogTitle>{t("perfil.confirmar_apagar")}</AlertDialogTitle>
                   <AlertDialogDescription asChild>
                     <div className="space-y-3">
-                      <div>Você vai perder:</div>
+                      <div>{t("perfil.vai_perder")}</div>
                       <ul className="list-disc pl-5 space-y-1 text-sm">
-                        <li>Seu plano alimentar e de treino</li>
-                        <li>Histórico de evolução ({evolucao.length} {evolucao.length === 1 ? "semana registrada" : "semanas registradas"})</li>
-                        <li>Registros de água</li>
-                        <li>Configurações pessoais</li>
+                        <li>{t("perfil.perder_plano")}</li>
+                        <li>{evolucao.length === 1 ? t("perfil.perder_evolucao_um", { count: evolucao.length }) : t("perfil.perder_evolucao_outros", { count: evolucao.length })}</li>
+                        <li>{t("perfil.perder_agua")}</li>
+                        <li>{t("perfil.perder_config")}</li>
                       </ul>
                       <div className="pt-1">
-                        Para confirmar, digite <span className="font-mono font-bold text-foreground">CONFIRMAR</span> abaixo:
+                        {t("perfil.para_confirmar")} <span className="font-mono font-bold text-foreground">CONFIRMAR</span>:
                       </div>
                       <Input
                         value={confirmarTexto}
@@ -259,19 +259,19 @@ function Perfil() {
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="bg-secondary text-foreground hover:bg-secondary/80">Cancelar</AlertDialogCancel>
+                  <AlertDialogCancel className="bg-secondary text-foreground hover:bg-secondary/80">{t("perfil.cancelar")}</AlertDialogCancel>
                   <AlertDialogAction
                     disabled={confirmarTexto !== "CONFIRMAR"}
                     onClick={limparTudo}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 disabled:opacity-50 disabled:pointer-events-none"
                   >
-                    Sim, apagar tudo
+                    {t("perfil.apagar_tudo")}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
             <Button variant="destructive" onClick={sair}>
-              <LogOut className="w-4 h-4 mr-2" /> Sair da conta
+              <LogOut className="w-4 h-4 mr-2" /> {t("perfil.sair")}
             </Button>
           </div>
         </Card>
@@ -280,10 +280,10 @@ function Perfil() {
         <Card className="p-5 space-y-4 md:col-span-2">
           <div className="flex items-center gap-2">
             <Bell className="w-4 h-4 text-primary" />
-            <h2 className="font-semibold">Lembretes</h2>
+            <h2 className="font-semibold">{t("perfil.lembretes")}</h2>
           </div>
           <p className="text-xs text-muted-foreground -mt-2">
-            Notificações locais no seu dispositivo. Mantenha o app aberto em segundo plano.
+            {t("perfil.lembretes_desc")}
           </p>
           <LembretesSection plano={plano} dados={dados} />
         </Card>
@@ -292,10 +292,10 @@ function Perfil() {
         <Card className="p-5 space-y-4 md:col-span-2">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-primary" />
-            <h2 className="font-semibold">Indique um amigo</h2>
+            <h2 className="font-semibold">{t("perfil.indicacoes")}</h2>
           </div>
           <p className="text-xs text-muted-foreground -mt-2">
-            Ganhe 7 dias de bônus a cada amigo que gerar o primeiro plano.
+            {t("perfil.indicacoes_desc")}
           </p>
           <IndicacaoSection userId={userId} />
         </Card>
