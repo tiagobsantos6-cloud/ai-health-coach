@@ -282,9 +282,17 @@ function Compras() {
         {ORDEM_CATEGORIAS.map((cat) => {
           const arr = porCategoria.get(cat);
           if (!arr || arr.length === 0) return null;
+          const catKey: Record<Categoria, string> = {
+            "Proteínas": "compras.cat_proteinas",
+            "Carboidratos": "compras.cat_carboidratos",
+            "Frutas": "compras.cat_frutas",
+            "Laticínios": "compras.cat_laticinios",
+            "Gorduras": "compras.cat_gorduras",
+            "Outros": "compras.cat_outros",
+          };
           return (
             <Card key={cat} className="p-4 bg-card border-border rounded-2xl">
-              <h2 className="card-title mb-3">{cat}</h2>
+              <h2 className="card-title mb-3">{t(catKey[cat])}</h2>
               <ul className="divide-y divide-border">
                 {arr.map((it) => {
                   const chave = normalize(it.nome);
