@@ -164,8 +164,9 @@ function Dashboard() {
 
   const treinoHoje = (() => {
     const dia = ["Domingo","Segunda","Terça","Quarta","Quinta","Sexta","Sábado"][new Date().getDay()];
-    return plano.rotina_semanal.find((d) => d.dia_semana?.toLowerCase().startsWith(dia.toLowerCase().slice(0,3)))?.treino || "Descanso";
+    return plano.rotina_semanal.find((d) => d.dia_semana?.toLowerCase().startsWith(dia.toLowerCase().slice(0,3)))?.treino || t("dashboard.descanso");
   })();
+  const diasAbrev = t("semana.dias").split(",");
 
   // SVG ring
   const r = 90;
