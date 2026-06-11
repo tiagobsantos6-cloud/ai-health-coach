@@ -359,6 +359,7 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
 }
 
 function IndicacaoSection({ userId }: { userId: string | null }) {
+  const { t } = useTranslation();
   const contarFn = useServerFn(getMyIndicacoesCountFn);
   const [count, setCount] = useState<number>(0);
 
@@ -368,22 +369,22 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
   }, [userId, contarFn]);
 
   if (!userId) {
-    return <p className="text-sm text-muted-foreground">Carregando...</p>;
+    return <p className="text-sm text-muted-foreground">{t("perfil.carregando")}</p>;
   }
 
   const code = userId.replace(/-/g, "").slice(0, 8);
   const link = `https://vitalia.app/cadastro?ref=${code}`;
-  const wppText = `Vem comigo no AI Health Coach! Plano de nutrição e treino feito por IA. Cadastre-se: ${link}`;
+  const wppText = `${t("perfil.indicacao_wpp")} ${link}`;
 
   const copiar = async () => {
     try {
       await navigator.clipboard.writeText(link);
-      toast("Link copiado!", {
-        description: "Compartilhe com seus amigos.",
+      toast(t("perfil.link_copiado"), {
+        description: t("perfil.link_copiado_desc"),
         duration: 3000,
       });
     } catch {
-      toast.error("Não foi possível copiar.");
+      toast.error(t("perfil.copiar_falhou"));
     }
   };
 
@@ -395,19 +396,19 @@ function IndicacaoSection({ userId }: { userId: string | null }) {
   return (
     <div className="space-y-3">
       <div className="rounded-xl bg-secondary/40 p-3 space-y-2">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">Seu link</div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{t("perfil.seu_link")}</div>
         <div className="font-mono text-sm break-all">{link}</div>
       </div>
       <div className="flex flex-wrap gap-2">
-        <Button variant="outline" onClick={copiar} aria-label="Copiar link de indicação">
-          <Copy className="w-4 h-4 mr-2" /> Copiar link
+        <Button variant="outline" onClick={copiar} aria-label={t("perfil.copiar_link")}>
+          <Copy className="w-4 h-4 mr-2" /> {t("perfil.copiar_link")}
         </Button>
-        <Button onClick={compartilharWpp} aria-label="Compartilhar no WhatsApp">
-          <Share2 className="w-4 h-4 mr-2" /> Compartilhar no WhatsApp
+        <Button onClick={compartilharWpp} aria-label={t("perfil.compartilhar_wpp")}>
+          <Share2 className="w-4 h-4 mr-2" /> {t("perfil.compartilhar_wpp")}
         </Button>
       </div>
       <div className="text-sm text-muted-foreground">
-        <span className="font-semibold text-foreground">{count}</span> {count === 1 ? "amigo indicado" : "amigos indicados"}
+        <span className="font-semibold text-foreground">{count}</span> {count === 1 ? t("perfil.amigos_indicados_um", { count }) : t("perfil.amigos_indicados_outros", { count })}
       </div>
     </div>
   );
