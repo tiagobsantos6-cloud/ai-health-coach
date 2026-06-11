@@ -160,8 +160,8 @@ function Evolucao() {
                 />
               </div>
               <div className="flex justify-between text-xs text-muted-foreground">
-                <span>Já perdeu: {jaPerdeu.toFixed(1)}kg</span>
-                <span>Faltam: {restante.toFixed(1)}kg</span>
+                <span>{t("evolucao.ja_perdeu")} {jaPerdeu.toFixed(1)}kg</span>
+                <span>{t("evolucao.faltam")} {restante.toFixed(1)}kg</span>
                 <span>{pct.toFixed(0)}%</span>
               </div>
             </div>
