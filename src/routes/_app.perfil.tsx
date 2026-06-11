@@ -318,6 +318,7 @@ type PlanoMini = { plano_alimentar?: Array<{ horario?: string }> } | null;
 type DadosMini = { horario?: string } | null;
 
 function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini }) {
+  const { t } = useTranslation();
   void plano; void dados; // agendamento global é feito no AppLayout via evento "lembretes:config".
   const [cfg, setCfg] = useState<LembretesConfig>(() => loadLembretes());
 
@@ -329,7 +330,7 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
     if (value) {
       const perm = await pedirPermissaoNotificacao();
       if (perm !== "granted") {
-        toast.error("Permissão de notificação negada. Ative nas configurações do navegador.");
+        toast.error(t("perfil.permissao_negada"));
         return;
       }
     }
@@ -337,9 +338,9 @@ function LembretesSection({ plano, dados }: { plano: PlanoMini; dados: DadosMini
   };
 
   const itens: Array<{ key: keyof LembretesConfig; titulo: string; desc: string }> = [
-    { key: "agua", titulo: "Lembrete de água", desc: "A cada 2h entre 7h e 22h" },
-    { key: "refeicao", titulo: "Lembrete de refeição", desc: "15 min antes de cada horário do plano" },
-    { key: "treino", titulo: "Lembrete de treino", desc: "30 min antes do horário preferido" },
+    { key: "agua", titulo: t("perfil.lembrete_agua"), desc: t("perfil.lembrete_agua_desc") },
+    { key: "refeicao", titulo: t("perfil.lembrete_refeicao"), desc: t("perfil.lembrete_refeicao_desc") },
+    { key: "treino", titulo: t("perfil.lembrete_treino"), desc: t("perfil.lembrete_treino_desc") },
   ];
 
   return (
