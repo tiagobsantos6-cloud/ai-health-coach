@@ -103,11 +103,11 @@ function Perfil() {
     const p = parseFloat(peso.replace(",", "."));
     const a = parseFloat(altura.replace(",", "."));
     if (!nome.trim() || isNaN(p) || isNaN(a)) {
-      toast.error("Preencha nome, peso e altura corretamente.");
+      toast.error(t("perfil.preencha_dados"));
       return;
     }
     setDados({ ...dados, nome: nome.trim(), peso: p, altura: a });
-    toast.success("Dados atualizados!");
+    toast.success(t("perfil.dados_atualizados"));
   };
 
   const refazer = () => {
