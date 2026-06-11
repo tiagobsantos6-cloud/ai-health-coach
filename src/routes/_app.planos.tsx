@@ -135,7 +135,7 @@ function Planos() {
                   </div>
                   <div>
                     <h2 className="font-bold text-lg leading-tight">{tier.nome}</h2>
-                    <p className="text-xs text-muted-foreground">{tier.periodo}</p>
+                    <p className="text-xs text-muted-foreground">{t(tier.periodoKey)}</p>
                   </div>
                 </div>
 
@@ -147,10 +147,10 @@ function Planos() {
                 </div>
 
                 <ul className="space-y-2 flex-1">
-                  {tier.beneficios.map((b) => (
-                    <li key={b} className="flex items-start gap-2 text-sm">
+                  {tier.beneficiosKeys.map((bKey) => (
+                    <li key={bKey} className="flex items-start gap-2 text-sm">
                       <Check className={`w-4 h-4 mt-0.5 shrink-0 ${tier.cor}`} />
-                      <span>{b}</span>
+                      <span>{t(bKey)}</span>
                     </li>
                   ))}
                 </ul>
