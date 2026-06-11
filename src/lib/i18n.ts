@@ -71,6 +71,9 @@ const pt = {
   "evolucao.primeiro_registro": "Fazer primeiro registro",
   "evolucao.evolucao_peso": "Evolução do peso",
   "evolucao.historico": "Histórico",
+  "evolucao.registre_mais": "Registre mais semanas para uma análise de ritmo personalizada.",
+  "evolucao.ja_perdeu": "Já perdeu:",
+  "evolucao.faltam": "Faltam:",
   // Perfil
   "perfil.titulo": "Perfil", "perfil.subtitulo": "Seus dados e plano",
   "perfil.meus_dados": "Meus dados", "perfil.atualizar": "Atualize seus dados pessoais",
