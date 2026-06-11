@@ -292,7 +292,7 @@ function Dashboard() {
         <div className="grid grid-cols-7 gap-1.5">
           {plano.rotina_semanal.map((d, i) => (
             <div key={i} className="p-2 rounded-xl bg-secondary text-center">
-              <div className="text-[10px] font-bold uppercase text-muted-foreground">{d.dia_semana.slice(0, 3)}</div>
+              <div className="text-[10px] font-bold uppercase text-muted-foreground">{diasAbrev[i] ?? d.dia_semana.slice(0, 3)}</div>
               <div className="text-[11px] mt-1 truncate text-foreground">{d.treino || t("dashboard.off")}</div>
             </div>
           ))}
