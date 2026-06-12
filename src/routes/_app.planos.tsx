@@ -142,7 +142,7 @@ function Planos() {
                 <div>
                   <span className="text-3xl font-bold">{tier.preco}</span>
                   {tier.id !== "gratuito" && (
-                    <span className="text-sm text-muted-foreground">/mês</span>
+                    <span className="text-sm text-muted-foreground">{t("planos.mes_curto")}</span>
                   )}
                 </div>
 

@@ -12,7 +12,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianG
 import { Sparkles, Loader2, Lock, TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { gerarAjustes } from "@/lib/gemini";
-import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
+import { temAcesso, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/evolucao")({
   head: () => ({
@@ -28,7 +28,7 @@ export const Route = createFileRoute("/_app/evolucao")({
 
 
 function Evolucao() {
-  const { t } = useTranslation();
+  const { t, i18n: i18nInstance } = useTranslation();
   const plano = useStore((s) => s.plano);
   const dados = useStore((s) => s.dados);
   const evolucao = useStore((s) => s.evolucao);
@@ -128,12 +128,12 @@ function Evolucao() {
           }
           if (ritmoReal < ritmoSemanalEsperado * 0.7) {
             tom = "alerta";
-            mensagem = `Você está abaixo do ritmo previsto (${ritmoReal.toFixed(2)}kg/sem vs meta de ${ritmoSemanalEsperado.toFixed(2)}kg/sem). Considere ajustar a dieta ou aumentar a intensidade do treino.`;
+            mensagem = t("evolucao.ritmo_abaixo", { real: ritmoReal.toFixed(2), meta: ritmoSemanalEsperado.toFixed(2) });
           } else if (ritmoReal > ritmoSemanalEsperado * 1.1) {
             tom = "parabens";
-            mensagem = `Parabéns! Você está acima do ritmo previsto (${ritmoReal.toFixed(2)}kg/sem). Mantenha o foco e cuide da recuperação.`;
+            mensagem = t("evolucao.ritmo_parabens", { real: ritmoReal.toFixed(2) });
           } else {
-            mensagem = `Você está no ritmo (${ritmoReal.toFixed(2)}kg/sem). Continue assim!`;
+            mensagem = t("evolucao.ritmo_certo", { real: ritmoReal.toFixed(2) });
           }
         } else {
           semanasRestantes = ritmoSemanalEsperado > 0 ? Math.ceil(restante / ritmoSemanalEsperado) : meta.prazo_semanas;
@@ -142,7 +142,8 @@ function Evolucao() {
 
         const previsao = new Date();
         previsao.setDate(previsao.getDate() + semanasRestantes * 7);
-        const previsaoStr = previsao.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+        const locale = i18nInstance.language === "en" ? "en-US" : "pt-BR";
+        const previsaoStr = previsao.toLocaleDateString(locale, { day: "2-digit", month: "long", year: "numeric" });
 
         return (
           <Card className="p-5 space-y-4">
@@ -167,9 +168,9 @@ function Evolucao() {
             </div>
             {restante > 0 && (
               <p className="text-sm">
-                <span className="font-medium">Previsão:</span> atingir a meta em{" "}
+                <span className="font-medium">{t("evolucao.previsao")}</span> {t("evolucao.atingir_meta")}{" "}
                 <span className="text-primary font-medium">{previsaoStr}</span>
-                {" "}({semanasRestantes} {semanasRestantes === 1 ? "semana" : "semanas"}).
+                {" "}({semanasRestantes} {semanasRestantes === 1 ? t("evolucao.semana_um") : t("evolucao.semana_outros")}).
               </p>
             )}
             <p
@@ -255,13 +256,13 @@ function Evolucao() {
             </Button>
           ) : (
             <Button asChild size="sm" variant="outline">
-              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> Plano {NOMES_PLANOS[RECURSO_MIN.ajustes_ia_evolucao]}</Link>
+              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> {t("evolucao.plano_label", { nome: t("planos." + RECURSO_MIN.ajustes_ia_evolucao) })}</Link>
             </Button>
           )}
         </div>
         {!podeAjustesIA && (
           <p className="text-sm text-muted-foreground">
-            Os ajustes automáticos pela IA estão disponíveis no plano <span className="font-medium text-foreground">{NOMES_PLANOS[RECURSO_MIN.ajustes_ia_evolucao]}</span> ou superior.
+            {t("evolucao.ajustes_msg", { nome: t("planos." + RECURSO_MIN.ajustes_ia_evolucao) })}
           </p>
         )}
         {podeAjustesIA && ajustes && (
@@ -270,7 +271,7 @@ function Evolucao() {
           </div>
         )}
         {podeAjustesIA && !ajustes && evolucao.length === 0 && (
-          <p className="text-sm text-muted-foreground">Registre pelo menos uma semana para gerar ajustes.</p>
+          <p className="text-sm text-muted-foreground">{t("evolucao.gerar_min")}</p>
         )}
       </Card>
 
@@ -280,12 +281,12 @@ function Evolucao() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-muted-foreground border-b border-border">
-                <th className="py-2">Data</th>
-                <th>Peso</th>
-                <th>Energia</th>
-                <th>Fome</th>
-                <th>Treino</th>
-                <th>Obs</th>
+                <th className="py-2">{t("evolucao.col_data")}</th>
+                <th>{t("evolucao.col_peso")}</th>
+                <th>{t("evolucao.col_energia")}</th>
+                <th>{t("evolucao.col_fome")}</th>
+                <th>{t("evolucao.col_treino")}</th>
+                <th>{t("evolucao.col_obs")}</th>
               </tr>
             </thead>
             <tbody>
@@ -303,7 +304,7 @@ function Evolucao() {
                 <tr>
                   <td colSpan={6} className="py-3 text-center text-xs text-muted-foreground">
                     <Link to="/planos" className="text-primary hover:underline inline-flex items-center gap-1">
-                      <Lock className="w-3 h-3" /> Veja todo o histórico no plano {NOMES_PLANOS[RECURSO_MIN.historico_completo_evolucao]}
+                      <Lock className="w-3 h-3" /> {t("evolucao.veja_historico", { nome: t("planos." + RECURSO_MIN.historico_completo_evolucao) })}
                     </Link>
                   </td>
                 </tr>
