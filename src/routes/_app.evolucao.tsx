@@ -128,12 +128,12 @@ function Evolucao() {
           }
           if (ritmoReal < ritmoSemanalEsperado * 0.7) {
             tom = "alerta";
-            mensagem = `Você está abaixo do ritmo previsto (${ritmoReal.toFixed(2)}kg/sem vs meta de ${ritmoSemanalEsperado.toFixed(2)}kg/sem). Considere ajustar a dieta ou aumentar a intensidade do treino.`;
+            mensagem = t("evolucao.ritmo_abaixo", { real: ritmoReal.toFixed(2), meta: ritmoSemanalEsperado.toFixed(2) });
           } else if (ritmoReal > ritmoSemanalEsperado * 1.1) {
             tom = "parabens";
-            mensagem = `Parabéns! Você está acima do ritmo previsto (${ritmoReal.toFixed(2)}kg/sem). Mantenha o foco e cuide da recuperação.`;
+            mensagem = t("evolucao.ritmo_parabens", { real: ritmoReal.toFixed(2) });
           } else {
-            mensagem = `Você está no ritmo (${ritmoReal.toFixed(2)}kg/sem). Continue assim!`;
+            mensagem = t("evolucao.ritmo_certo", { real: ritmoReal.toFixed(2) });
           }
         } else {
           semanasRestantes = ritmoSemanalEsperado > 0 ? Math.ceil(restante / ritmoSemanalEsperado) : meta.prazo_semanas;
@@ -142,7 +142,8 @@ function Evolucao() {
 
         const previsao = new Date();
         previsao.setDate(previsao.getDate() + semanasRestantes * 7);
-        const previsaoStr = previsao.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" });
+        const locale = i18nInstance.language === "en" ? "en-US" : "pt-BR";
+        const previsaoStr = previsao.toLocaleDateString(locale, { day: "2-digit", month: "long", year: "numeric" });
 
         return (
           <Card className="p-5 space-y-4">
@@ -167,9 +168,9 @@ function Evolucao() {
             </div>
             {restante > 0 && (
               <p className="text-sm">
-                <span className="font-medium">Previsão:</span> atingir a meta em{" "}
+                <span className="font-medium">{t("evolucao.previsao")}</span> {t("evolucao.atingir_meta")}{" "}
                 <span className="text-primary font-medium">{previsaoStr}</span>
-                {" "}({semanasRestantes} {semanasRestantes === 1 ? "semana" : "semanas"}).
+                {" "}({semanasRestantes} {semanasRestantes === 1 ? t("evolucao.semana_um") : t("evolucao.semana_outros")}).
               </p>
             )}
             <p
