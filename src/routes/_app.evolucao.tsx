@@ -256,13 +256,13 @@ function Evolucao() {
             </Button>
           ) : (
             <Button asChild size="sm" variant="outline">
-              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> Plano {NOMES_PLANOS[RECURSO_MIN.ajustes_ia_evolucao]}</Link>
+              <Link to="/planos"><Lock className="w-4 h-4 mr-2" /> {t("evolucao.plano_label", { nome: t("planos." + RECURSO_MIN.ajustes_ia_evolucao) })}</Link>
             </Button>
           )}
         </div>
         {!podeAjustesIA && (
           <p className="text-sm text-muted-foreground">
-            Os ajustes automáticos pela IA estão disponíveis no plano <span className="font-medium text-foreground">{NOMES_PLANOS[RECURSO_MIN.ajustes_ia_evolucao]}</span> ou superior.
+            {t("evolucao.ajustes_msg", { nome: t("planos." + RECURSO_MIN.ajustes_ia_evolucao) })}
           </p>
         )}
         {podeAjustesIA && ajustes && (
@@ -271,7 +271,7 @@ function Evolucao() {
           </div>
         )}
         {podeAjustesIA && !ajustes && evolucao.length === 0 && (
-          <p className="text-sm text-muted-foreground">Registre pelo menos uma semana para gerar ajustes.</p>
+          <p className="text-sm text-muted-foreground">{t("evolucao.gerar_min")}</p>
         )}
       </Card>
 
@@ -281,12 +281,12 @@ function Evolucao() {
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left text-muted-foreground border-b border-border">
-                <th className="py-2">Data</th>
-                <th>Peso</th>
-                <th>Energia</th>
-                <th>Fome</th>
-                <th>Treino</th>
-                <th>Obs</th>
+                <th className="py-2">{t("evolucao.col_data")}</th>
+                <th>{t("evolucao.col_peso")}</th>
+                <th>{t("evolucao.col_energia")}</th>
+                <th>{t("evolucao.col_fome")}</th>
+                <th>{t("evolucao.col_treino")}</th>
+                <th>{t("evolucao.col_obs")}</th>
               </tr>
             </thead>
             <tbody>
@@ -304,7 +304,7 @@ function Evolucao() {
                 <tr>
                   <td colSpan={6} className="py-3 text-center text-xs text-muted-foreground">
                     <Link to="/planos" className="text-primary hover:underline inline-flex items-center gap-1">
-                      <Lock className="w-3 h-3" /> Veja todo o histórico no plano {NOMES_PLANOS[RECURSO_MIN.historico_completo_evolucao]}
+                      <Lock className="w-3 h-3" /> {t("evolucao.veja_historico", { nome: t("planos." + RECURSO_MIN.historico_completo_evolucao) })}
                     </Link>
                   </td>
                 </tr>
