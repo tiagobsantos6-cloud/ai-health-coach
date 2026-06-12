@@ -18,10 +18,26 @@ export const getMyDataFn = createServerFn({ method: "GET" })
     return { dados: data?.dados ?? null, plano: data?.plano ?? null, updatedAt: data?.updated_at ?? null };
   });
 
-const payloadSchema = z.object({
-  dados: z.unknown().nullable().optional(),
-  plano: z.unknown().nullable().optional(),
-});
+const MAX_PAYLOAD_BYTES = 512_000; // 512 KB total across dados + plano
+
+const payloadSchema = z
+  .object({
+    dados: z.unknown().nullable().optional(),
+    plano: z.unknown().nullable().optional(),
+  })
+  .refine(
+    (val) => {
+      try {
+        const size =
+          JSON.stringify(val.dados ?? null).length +
+          JSON.stringify(val.plano ?? null).length;
+        return size <= MAX_PAYLOAD_BYTES;
+      } catch {
+        return false;
+      }
+    },
+    { message: "Payload muito grande. Limite de 512KB." }
+  );
 
 export const saveMyDataFn = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuth, requireSupabaseAuth])
