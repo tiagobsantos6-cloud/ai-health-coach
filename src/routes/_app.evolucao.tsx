@@ -12,7 +12,7 @@ import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, CartesianG
 import { Sparkles, Loader2, Lock, TrendingUp } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { gerarAjustes } from "@/lib/gemini";
-import { temAcesso, NOMES_PLANOS, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
+import { temAcesso, RECURSO_MIN, LIMITE_HISTORICO_GRATUITO } from "@/lib/planos";
 
 export const Route = createFileRoute("/_app/evolucao")({
   head: () => ({
