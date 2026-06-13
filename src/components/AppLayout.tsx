@@ -66,7 +66,9 @@ export function AppLayout() {
   const tierQuery = useQuery({
     queryKey: ["my-tier", userId],
     queryFn: () => fetchTier(),
-    staleTime: 60_000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
     enabled: !!userId,
   });
 
@@ -74,7 +76,9 @@ export function AppLayout() {
   const dataQuery = useQuery({
     queryKey: ["my-data", userId],
     queryFn: () => fetchData(),
-    staleTime: 30_000,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
+    refetchOnWindowFocus: false,
     enabled: !!userId,
   });
 

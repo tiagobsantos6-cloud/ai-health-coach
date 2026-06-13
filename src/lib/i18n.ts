@@ -482,16 +482,19 @@ const en: typeof pt = {
   "geral.sim": "Yes", "geral.nao": "No",
 };
 
-const stored = typeof window !== "undefined" ? (localStorage.getItem("idioma") ?? "pt") : "pt";
+const savedLang = typeof window !== "undefined"
+  ? (localStorage.getItem("idioma") === "en" ? "en" : "pt")
+  : "pt";
 
 i18n.use(initReactI18next).init({
   resources: {
     pt: { translation: pt },
     en: { translation: en },
   },
-  lng: stored,
+  lng: savedLang,
   fallbackLng: "pt",
   interpolation: { escapeValue: false },
+  initAsync: false,
   react: { useSuspense: false },
 });
 
