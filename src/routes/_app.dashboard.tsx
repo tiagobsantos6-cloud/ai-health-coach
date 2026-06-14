@@ -418,7 +418,7 @@ function SonoCard({ metaHoras }: { metaHoras: number }) {
           <span className="text-muted-foreground font-normal"> · hoje</span>
         </div>
       ) : (
-        <div className="text-[11px] text-muted-foreground mt-0.5">meta diária</div>
+        <div className="text-[11px] text-muted-foreground mt-0.5">{t("dashboard.meta_diaria")}</div>
       )}
     </Card>
   );
