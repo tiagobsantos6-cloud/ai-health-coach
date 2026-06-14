@@ -202,9 +202,9 @@ function Evolucao() {
       )}
 
       {evolucao.length === 1 && (
-        <Card className="p-5" aria-label={`Gráfico de evolução do peso com 1 registro: ${evolucao[0].peso}kg em ${evolucao[0].data}`}>
+        <Card className="p-5" aria-label={i18nInstance.language === "en" ? `Weight progress chart with 1 record: ${evolucao[0].peso}kg on ${evolucao[0].data}` : `Gráfico de evolução do peso com 1 registro: ${evolucao[0].peso}kg em ${evolucao[0].data}`}>
           <h2 className="font-semibold mb-3">{t("evolucao.evolucao_peso")}</h2>
-          <div className="h-64" role="img" aria-label={`Gráfico de linha mostrando 1 registro de peso: ${evolucao[0].peso}kg`}>
+          <div className="h-64" role="img" aria-label={i18nInstance.language === "en" ? `Line chart showing 1 weight record: ${evolucao[0].peso}kg` : `Gráfico de linha mostrando 1 registro de peso: ${evolucao[0].peso}kg`}>
             <ResponsiveContainer>
               <LineChart data={evolucao}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
@@ -226,7 +226,10 @@ function Evolucao() {
         const ultimo = evolucao[evolucao.length - 1];
         const delta = (ultimo.peso - primeiro.peso).toFixed(1);
         const sentido = Number(delta) < 0 ? "perda" : Number(delta) > 0 ? "ganho" : "manutenção";
-        const ariaLabel = `Gráfico de linha da evolução do peso com ${evolucao.length} registros: variação de ${primeiro.peso}kg em ${primeiro.data} para ${ultimo.peso}kg em ${ultimo.data} (${sentido} de ${Math.abs(Number(delta))}kg).`;
+        const sentidoEn = sentido === "perda" ? "loss" : sentido === "ganho" ? "gain" : "maintenance";
+        const ariaLabel = i18nInstance.language === "en"
+          ? `Line chart of weight progress with ${evolucao.length} records: variation from ${primeiro.peso}kg on ${primeiro.data} to ${ultimo.peso}kg on ${ultimo.data} (${sentidoEn} of ${Math.abs(Number(delta))}kg).`
+          : `Gráfico de linha da evolução do peso com ${evolucao.length} registros: variação de ${primeiro.peso}kg em ${primeiro.data} para ${ultimo.peso}kg em ${ultimo.data} (${sentido} de ${Math.abs(Number(delta))}kg).`;
         return (
           <Card className="p-5" aria-label={ariaLabel}>
             <h2 className="font-semibold mb-3">{t("evolucao.evolucao_peso")}</h2>

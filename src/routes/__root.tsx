@@ -1,68 +1,53 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
-  Link,
   createRootRouteWithContext,
-  useRouter,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useTranslation } from "react-i18next";
 
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <div className="text-6xl mb-4">🏋️</div>
-        <h1 className="text-3xl font-bold text-foreground">Página não encontrada</h1>
-        <p className="mt-3 text-sm text-muted-foreground">
-          A página que você procura não existe ou foi movida.
-        </p>
-        <div className="mt-6">
-          <Link
-            to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Voltar ao início
-          </Link>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 bg-background text-foreground">
+      <div className="text-6xl">🏋️</div>
+      <h1 className="text-2xl font-bold">
+        {lang === "en" ? "Page not found" : "Página não encontrada"}
+      </h1>
+      <p className="text-muted-foreground text-center">
+        {lang === "en"
+          ? "The page you are looking for does not exist or has been moved."
+          : "A página que você procura não existe ou foi movida."}
+      </p>
+      <a href="/" className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium">
+        {lang === "en" ? "Back to home" : "Voltar ao início"}
+      </a>
     </div>
   );
 }
 
-function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
+function ErrorComponent({ error }: { error: Error; reset: () => void }) {
   console.error(error);
-  const router = useRouter();
-
+  const { i18n } = useTranslation();
+  const lang = i18n.language;
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
-      <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
-          This page didn't load
-        </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
-          Something went wrong on our end. You can try refreshing or head back home.
-        </p>
-        <div className="mt-6 flex flex-wrap justify-center gap-2">
-          <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
-          >
-            Try again
-          </button>
-          <a
-            href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
-          >
-            Go home
-          </a>
-        </div>
-      </div>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8 bg-background text-foreground">
+      <div className="text-6xl">⚠️</div>
+      <h1 className="text-2xl font-bold">
+        {lang === "en" ? "Something went wrong" : "Algo deu errado"}
+      </h1>
+      <p className="text-muted-foreground text-center">
+        {lang === "en"
+          ? "An unexpected error occurred. Please try again."
+          : "Ocorreu um erro inesperado. Por favor, tente novamente."}
+      </p>
+      <a href="/" className="px-6 py-3 rounded-xl bg-primary text-primary-foreground font-medium">
+        {lang === "en" ? "Back to home" : "Voltar ao início"}
+      </a>
     </div>
   );
 }

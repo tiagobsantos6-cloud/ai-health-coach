@@ -94,6 +94,7 @@ type Exercicio = {
 };
 
 function ExercicioCard({ ex }: { ex: Exercicio }) {
+  const { i18n } = useTranslation();
   const [timer, setTimer] = useState(0);
   const [running, setRunning] = useState(false);
   const ref = useRef<number | null>(null);
@@ -138,7 +139,7 @@ function ExercicioCard({ ex }: { ex: Exercicio }) {
           <div className="font-bold">{ex.series} × {ex.repeticoes}</div>
           <button
             onClick={startTimer}
-            aria-label="Iniciar timer de descanso"
+            aria-label={i18n.language === "en" ? "Start rest timer" : "Iniciar timer de descanso"}
             className="text-xs text-orange-700 dark:text-primary flex items-center gap-1 mt-1 hover:underline"
           >
             <Timer className="w-3 h-3" /> {ex.descanso_s}s
@@ -155,10 +156,10 @@ function ExercicioCard({ ex }: { ex: Exercicio }) {
           <div className="flex items-center justify-between">
             <div className="text-2xl font-bold text-primary tabular-nums">{timer}s</div>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" onClick={() => setRunning(!running)} aria-label={running ? "Pausar" : "Retomar"}>
+              <Button size="sm" variant="outline" onClick={() => setRunning(!running)} aria-label={i18n.language === "en" ? (running ? "Pause" : "Resume") : (running ? "Pausar" : "Retomar")}>
                 {running ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
               </Button>
-              <Button size="sm" variant="outline" onClick={() => { setTimer(0); setRunning(false); }} aria-label="Reiniciar">
+              <Button size="sm" variant="outline" onClick={() => { setTimer(0); setRunning(false); }} aria-label={i18n.language === "en" ? "Restart" : "Reiniciar"}>
                 <RotateCcw className="w-4 h-4" />
               </Button>
             </div>
@@ -248,7 +249,7 @@ async function buscarGifExercicio(nomePt: string): Promise<string | null> {
 }
 
 function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () => void }) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [open, setOpen] = useState(false);
   const [gifUrl, setGifUrl] = useState<string | null>(null);
   const [loadingGif, setLoadingGif] = useState(false);
@@ -381,10 +382,10 @@ function ExecucaoPanel({ ex, onStartTimer }: { ex: Exercicio; onStartTimer: () =
                   <div className="flex items-center justify-between">
                     <div className="text-2xl font-bold tabular-nums text-orange-500">{descanso}s</div>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" onClick={() => setDescRunning((r) => !r)} aria-label={descRunning ? "Pausar" : "Retomar"}>
+                      <Button size="sm" variant="outline" onClick={() => setDescRunning((r) => !r)} aria-label={i18n.language === "en" ? (descRunning ? "Pause" : "Resume") : (descRunning ? "Pausar" : "Retomar")}>
                         {descRunning ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => { setDescanso(0); setDescRunning(false); setTerminou(false); }} aria-label="Reiniciar">
+                      <Button size="sm" variant="outline" onClick={() => { setDescanso(0); setDescRunning(false); setTerminou(false); }} aria-label={i18n.language === "en" ? "Restart" : "Reiniciar"}>
                         <RotateCcw className="w-4 h-4" />
                       </Button>
                     </div>
@@ -442,6 +443,7 @@ function ModoTreino({
   diaNome: string;
   onClose: () => void;
 }) {
+  const { t, i18n } = useTranslation();
   const [idx, setIdx] = useState(0);
   const [seriesFeitas, setSeriesFeitas] = useState<number[]>(() => exercicios.map(() => 0));
   const [pulado, setPulado] = useState<boolean[]>(() => exercicios.map(() => false));
@@ -553,7 +555,7 @@ function ModoTreino({
           </div>
           <div className="flex items-center gap-3">
             <div className="text-sm tabular-nums text-muted-foreground">{fmtTempo(tempoTotal)}</div>
-            <button onClick={onClose} aria-label="Sair do modo treino" className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80">
+            <button onClick={onClose} aria-label={i18n.language === "en" ? "Exit workout mode" : "Sair do modo treino"} className="w-9 h-9 rounded-full bg-secondary flex items-center justify-center hover:bg-secondary/80">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -625,7 +627,7 @@ function ModoTreino({
 
               {descRunning || descanso > 0 ? (
                 <Card className="p-5 bg-primary/10 border-primary/30 text-center space-y-2">
-                  <div className="text-xs uppercase tracking-wider text-primary font-semibold">Descanso</div>
+                  <div className="text-xs uppercase tracking-wider text-primary font-semibold">{t("dashboard.descanso")}</div>
                   <div className="text-5xl font-bold text-primary tabular-nums">{descanso}s</div>
                   <div className="h-2 bg-primary/20 rounded-full overflow-hidden">
                     <div
