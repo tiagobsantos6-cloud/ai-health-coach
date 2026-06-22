@@ -494,8 +494,8 @@ i18n.use(initReactI18next).init({
   lng: savedLang,
   fallbackLng: "pt",
   interpolation: { escapeValue: false },
-  initAsync: false,
   react: { useSuspense: false },
+  ...({ initImmediate: false } as Record<string, unknown>),
 });
 
 export function mudarIdioma(lang: "pt" | "en") {
