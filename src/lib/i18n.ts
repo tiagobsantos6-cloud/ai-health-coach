@@ -494,7 +494,7 @@ i18n.use(initReactI18next).init({
   lng: savedLang,
   fallbackLng: "pt",
   interpolation: { escapeValue: false },
-  initAsync: false,
+  initImmediate: false,
   react: { useSuspense: false },
 });
 
