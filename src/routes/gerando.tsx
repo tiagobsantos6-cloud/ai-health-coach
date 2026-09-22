@@ -30,13 +30,9 @@ export const Route = createFileRoute("/gerando")({
 
 const MAX_TENTATIVAS = 3;
 
-const mensagens = [
-  "Calculando suas necessidades calóricas...",
-  "Montando o plano alimentar perfeito...",
-  "Personalizando seus treinos...",
-  "Definindo metas de hidratação...",
-  "Preparando estratégias de disciplina...",
-  "Quase lá! Finalizando seu plano...",
+const mensagensKeys = [
+  "gerando.msg1", "gerando.msg2", "gerando.msg3",
+  "gerando.msg4", "gerando.msg5", "gerando.msg6",
 ];
 
 function Gerando() {
@@ -55,7 +51,7 @@ function Gerando() {
   const startedAtRef = useRef<number>(Date.now());
 
   useEffect(() => {
-    const interval = setInterval(() => setMsgIdx((i) => (i + 1) % mensagens.length), 2200);
+    const interval = setInterval(() => setMsgIdx((i) => (i + 1) % mensagensKeys.length), 2200);
     return () => clearInterval(interval);
   }, []);
 

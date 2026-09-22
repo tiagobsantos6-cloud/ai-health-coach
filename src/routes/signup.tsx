@@ -9,13 +9,13 @@ import { Label } from "@/components/ui/label";
 import { Sparkles, Mail } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
-const errosPtBr: Record<string, string> = {
-  "User already registered": "Este email já está cadastrado. Tente fazer login.",
-  "Invalid email": "Email inválido. Verifique e tente novamente.",
-  "Password should be at least 6 characters": "A senha deve ter pelo menos 6 caracteres.",
-  "Email rate limit exceeded": "Muitos emails enviados. Aguarde alguns minutos.",
-  "Signup requires a valid password": "Informe uma senha válida.",
-  "Unable to validate email": "Não foi possível validar o email.",
+const erroKeys: Record<string, string> = {
+  "User already registered": "auth.err_ja_cadastrado",
+  "Invalid email": "auth.err_email_invalido",
+  "Password should be at least 6 characters": "auth.err_senha_curta",
+  "Email rate limit exceeded": "auth.err_email_rate",
+  "Signup requires a valid password": "auth.err_senha_valida",
+  "Unable to validate email": "auth.err_validar_email",
 };
 
 export const Route = createFileRoute("/signup")({
@@ -61,7 +61,8 @@ function SignupPage() {
   }, []);
 
   const traduzirErro = (msg: string): string => {
-    return errosPtBr[msg] ?? msg;
+    const key = erroKeys[msg];
+    return key ? t(key) : msg;
   };
 
   const startCountdown = () => {
@@ -82,11 +83,11 @@ function SignupPage() {
     e.preventDefault();
     setError(null);
     if (password !== confirmPassword) {
-      setError("As senhas não coincidem.");
+      setError(t("auth.err_senhas_diferentes"));
       return;
     }
     if (password.length < 6) {
-      setError("A senha deve ter pelo menos 6 caracteres.");
+      setError(t("auth.err_senha_curta"));
       return;
     }
     setLoading(true);

@@ -134,7 +134,7 @@ function Planos() {
                     <Icon className="w-5 h-5" />
                   </div>
                   <div>
-                    <h2 className="font-bold text-lg leading-tight">{tier.nome}</h2>
+                    <h2 className="font-bold text-lg leading-tight">{t(`planos.${tier.id}`)}</h2>
                     <p className="text-xs text-muted-foreground">{t(tier.periodoKey)}</p>
                   </div>
                 </div>
