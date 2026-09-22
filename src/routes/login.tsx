@@ -10,11 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Sparkles } from "lucide-react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
-const errosPtBr: Record<string, string> = {
-  "Invalid login credentials": "Email ou senha incorretos. Tente novamente.",
-  "Email not confirmed": "Email ainda não confirmado. Verifique sua caixa de entrada.",
-  "User not found": "Usuário não encontrado.",
-  "Rate limit exceeded": "Muitas tentativas. Aguarde um pouco.",
+const erroKeys: Record<string, string> = {
+  "Invalid login credentials": "auth.err_credenciais",
+  "Email not confirmed": "auth.err_nao_confirmado",
+  "User not found": "auth.err_nao_encontrado",
+  "Rate limit exceeded": "auth.err_rate",
 };
 
 export const Route = createFileRoute("/login")({
@@ -52,7 +52,7 @@ function LoginPage() {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
     if (error) {
-      const msg = errosPtBr[error.message] ?? "E-mail ou senha inválidos.";
+      const msg = t(erroKeys[error.message] ?? "auth.err_generico");
       setError(msg);
       return;
     }
@@ -66,7 +66,7 @@ function LoginPage() {
       redirect_uri: window.location.origin,
     });
     if (result.error) {
-      setError("Não foi possível entrar com Google.");
+      setError(t("auth.err_google"));
       setGoogleLoading(false);
       return;
     }
