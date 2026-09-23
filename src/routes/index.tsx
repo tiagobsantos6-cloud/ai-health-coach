@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { supabase } from "@/integrations/supabase/client";
 import { useServerFn } from "@tanstack/react-start";
 import { getMyDataFn } from "@/lib/userdata.functions";
@@ -33,6 +34,7 @@ export const Route = createFileRoute("/")({
 });
 
 function Landing() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const fetchData = useServerFn(getMyDataFn);
   const hydrateFromServer = useStore((s) => s.hydrateFromServer);
@@ -75,8 +77,8 @@ function Landing() {
             <span className="font-bold text-lg">AI Health Coach</span>
           </div>
           <div className="flex items-center gap-2">
-            <Link to="/login"><Button variant="ghost" size="sm">Entrar</Button></Link>
-            <Link to="/signup"><Button size="sm">Começar grátis</Button></Link>
+            <Link to="/login"><Button variant="ghost" size="sm">{t("landing.entrar")}</Button></Link>
+            <Link to="/signup"><Button size="sm">{t("landing.comecar")}</Button></Link>
           </div>
         </div>
       </header>
@@ -85,29 +87,28 @@ function Landing() {
       <section className="px-4 py-16 md:py-24">
         <div className="max-w-3xl mx-auto text-center space-y-6">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
-            <Sparkles className="w-3.5 h-3.5" /> Powered by IA
+            <Sparkles className="w-3.5 h-3.5" /> {t("landing.powered")}
           </div>
           <h1 className="text-4xl md:text-6xl font-bold tracking-tight leading-tight">
-            Seu coach de saúde com{" "}
+            {t("landing.h1a")}{" "}
             <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Inteligência Artificial
+              {t("landing.h1b")}
             </span>
           </h1>
           <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
-            Receba um plano personalizado de nutrição, treino e hidratação em 1 minuto.
-            Acompanhamento diário, lista de compras semanal e evolução em tempo real.
+            {t("landing.hero_p")}
           </p>
           <div className="flex flex-wrap gap-3 justify-center pt-2">
             <Link to="/signup">
               <Button size="lg" className="text-base">
-                Criar meu plano grátis <ArrowRight className="w-4 h-4 ml-2" />
+                {t("landing.cta_criar")} <ArrowRight className="w-4 h-4 ml-2" />
               </Button>
             </Link>
             <Link to="/login">
-              <Button size="lg" variant="outline" className="text-base">Já tenho conta</Button>
+              <Button size="lg" variant="outline" className="text-base">{t("landing.ja_tenho")}</Button>
             </Link>
           </div>
-          <p className="text-xs text-muted-foreground">Sem cartão de crédito · Primeiro plano grátis</p>
+          <p className="text-xs text-muted-foreground">{t("landing.sem_cartao")}</p>
         </div>
       </section>
 
@@ -115,15 +116,15 @@ function Landing() {
       <section className="px-4 py-12 md:py-16 bg-secondary/30">
         <div className="max-w-5xl mx-auto">
           <h2 className="text-2xl md:text-3xl font-bold text-center mb-10">
-            Tudo que você precisa para evoluir
+            {t("landing.ben_titulo")}
           </h2>
           <div className="grid gap-4 md:grid-cols-3">
-            <Beneficio icon={Brain} titulo="IA personalizada" desc="Cálculo de TMB, TDEE e meta calórica baseados no seu biotipo, objetivo e rotina." />
-            <Beneficio icon={Utensils} titulo="Dieta completa" desc="Plano alimentar com horários, calorias e medidas caseiras prontas para seguir." />
-            <Beneficio icon={Dumbbell} titulo="Treino guiado" desc="Modo treino fullscreen com timer de descanso e progresso por exercício." />
-            <Beneficio icon={Droplets} titulo="Hidratação inteligente" desc="Meta diária de água com lembretes locais a cada 2 horas." />
-            <Beneficio icon={TrendingUp} titulo="Evolução semanal" desc="Registre peso, medidas e fotos. Veja sua jornada em gráficos." />
-            <Beneficio icon={ShieldCheck} titulo="Seus dados, seguros" desc="Tudo criptografado e armazenado com segurança de nível bancário." />
+            <Beneficio icon={Brain} titulo={t("landing.ben1_t")} desc={t("landing.ben1_d")} />
+            <Beneficio icon={Utensils} titulo={t("landing.ben2_t")} desc={t("landing.ben2_d")} />
+            <Beneficio icon={Dumbbell} titulo={t("landing.ben3_t")} desc={t("landing.ben3_d")} />
+            <Beneficio icon={Droplets} titulo={t("landing.ben4_t")} desc={t("landing.ben4_d")} />
+            <Beneficio icon={TrendingUp} titulo={t("landing.ben5_t")} desc={t("landing.ben5_d")} />
+            <Beneficio icon={ShieldCheck} titulo={t("landing.ben6_t")} desc={t("landing.ben6_d")} />
           </div>
         </div>
       </section>
@@ -131,20 +132,20 @@ function Landing() {
       {/* CTA */}
       <section className="px-4 py-16 md:py-20">
         <div className="max-w-2xl mx-auto text-center space-y-5">
-          <h2 className="text-3xl md:text-4xl font-bold">Comece sua transformação hoje</h2>
+          <h2 className="text-3xl md:text-4xl font-bold">{t("landing.cta_titulo")}</h2>
           <p className="text-muted-foreground">
-            Mais de mil pessoas já criaram seu plano com a AI Health Coach. Leva 1 minuto e é grátis.
+            {t("landing.cta_p")}
           </p>
           <Link to="/signup">
             <Button size="lg" className="text-base">
-              Criar meu plano grátis <ArrowRight className="w-4 h-4 ml-2" />
+              {t("landing.cta_criar")} <ArrowRight className="w-4 h-4 ml-2" />
             </Button>
           </Link>
         </div>
       </section>
 
       <footer className="border-t border-border/40 px-4 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} AI Health Coach · Coach de saúde com IA
+        © {new Date().getFullYear()} AI Health Coach · {t("landing.footer")}
       </footer>
     </div>
   );
