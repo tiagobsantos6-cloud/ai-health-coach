@@ -236,7 +236,7 @@ function Gerando() {
               animate={{ opacity: 1, y: 0 }}
               className="text-muted-foreground"
             >
-              {mensagens[msgIdx]}
+              {t(mensagensKeys[msgIdx])}
             </motion.p>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
