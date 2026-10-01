@@ -9,44 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as AppRouteImport } from './routes/_app'
-import { Route as CadastroRouteImport } from './routes/cadastro'
-import { Route as GerandoRouteImport } from './routes/gerando'
-import { Route as LoginRouteImport } from './routes/login'
-import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as SignupRouteImport } from './routes/signup'
-import { Route as AppAguaRouteImport } from './routes/_app.agua'
-import { Route as AppComprasRouteImport } from './routes/_app.compras'
-import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
-import { Route as AppDietaRouteImport } from './routes/_app.dieta'
-import { Route as AppEvolucaoRouteImport } from './routes/_app.evolucao'
-import { Route as AppPerfilRouteImport } from './routes/_app.perfil'
-import { Route as AppPlanosRouteImport } from './routes/_app.planos'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as GerandoRouteImport } from './routes/gerando'
+import { Route as CadastroRouteImport } from './routes/cadastro'
+import { Route as AppRouteImport } from './routes/_app'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTreinoRouteImport } from './routes/_app.treino'
+import { Route as AppPlanosRouteImport } from './routes/_app.planos'
+import { Route as AppPerfilRouteImport } from './routes/_app.perfil'
+import { Route as AppEvolucaoRouteImport } from './routes/_app.evolucao'
+import { Route as AppDietaRouteImport } from './routes/_app.dieta'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
+import { Route as AppComprasRouteImport } from './routes/_app.compras'
+import { Route as AppAguaRouteImport } from './routes/_app.agua'
 
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CadastroRoute = CadastroRouteImport.update({
-  id: '/cadastro',
-  path: '/cadastro',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const GerandoRoute = GerandoRouteImport.update({
-  id: '/gerando',
-  path: '/gerando',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const LoginRoute = LoginRouteImport.update({
-  id: '/login',
-  path: '/login',
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const OnboardingRoute = OnboardingRouteImport.update({
@@ -54,39 +35,33 @@ const OnboardingRoute = OnboardingRouteImport.update({
   path: '/onboarding',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SignupRoute = SignupRouteImport.update({
-  id: '/signup',
-  path: '/signup',
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AppAguaRoute = AppAguaRouteImport.update({
-  id: '/agua',
-  path: '/agua',
-  getParentRoute: () => AppRoute,
+const GerandoRoute = GerandoRouteImport.update({
+  id: '/gerando',
+  path: '/gerando',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppComprasRoute = AppComprasRouteImport.update({
-  id: '/compras',
-  path: '/compras',
-  getParentRoute: () => AppRoute,
+const CadastroRoute = CadastroRouteImport.update({
+  id: '/cadastro',
+  path: '/cadastro',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppDashboardRoute = AppDashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
-  getParentRoute: () => AppRoute,
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppDietaRoute = AppDietaRouteImport.update({
-  id: '/dieta',
-  path: '/dieta',
-  getParentRoute: () => AppRoute,
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
-const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
-  id: '/evolucao',
-  path: '/evolucao',
-  getParentRoute: () => AppRoute,
-} as any)
-const AppPerfilRoute = AppPerfilRouteImport.update({
-  id: '/perfil',
-  path: '/perfil',
+const AppTreinoRoute = AppTreinoRouteImport.update({
+  id: '/treino',
+  path: '/treino',
   getParentRoute: () => AppRoute,
 } as any)
 const AppPlanosRoute = AppPlanosRouteImport.update({
@@ -94,9 +69,34 @@ const AppPlanosRoute = AppPlanosRouteImport.update({
   path: '/planos',
   getParentRoute: () => AppRoute,
 } as any)
-const AppTreinoRoute = AppTreinoRouteImport.update({
-  id: '/treino',
-  path: '/treino',
+const AppPerfilRoute = AppPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppEvolucaoRoute = AppEvolucaoRouteImport.update({
+  id: '/evolucao',
+  path: '/evolucao',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDietaRoute = AppDietaRouteImport.update({
+  id: '/dieta',
+  path: '/dieta',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppComprasRoute = AppComprasRouteImport.update({
+  id: '/compras',
+  path: '/compras',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAguaRoute = AppAguaRouteImport.update({
+  id: '/agua',
+  path: '/agua',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -214,39 +214,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AppRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/cadastro': {
-      id: '/cadastro'
-      path: '/cadastro'
-      fullPath: '/cadastro'
-      preLoaderRoute: typeof CadastroRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/gerando': {
-      id: '/gerando'
-      path: '/gerando'
-      fullPath: '/gerando'
-      preLoaderRoute: typeof GerandoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/login': {
-      id: '/login'
-      path: '/login'
-      fullPath: '/login'
-      preLoaderRoute: typeof LoginRouteImport
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding': {
@@ -256,53 +228,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof OnboardingRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/signup': {
-      id: '/signup'
-      path: '/signup'
-      fullPath: '/signup'
-      preLoaderRoute: typeof SignupRouteImport
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/_app/agua': {
-      id: '/_app/agua'
-      path: '/agua'
-      fullPath: '/agua'
-      preLoaderRoute: typeof AppAguaRouteImport
-      parentRoute: typeof AppRoute
+    '/gerando': {
+      id: '/gerando'
+      path: '/gerando'
+      fullPath: '/gerando'
+      preLoaderRoute: typeof GerandoRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/compras': {
-      id: '/_app/compras'
-      path: '/compras'
-      fullPath: '/compras'
-      preLoaderRoute: typeof AppComprasRouteImport
-      parentRoute: typeof AppRoute
+    '/cadastro': {
+      id: '/cadastro'
+      path: '/cadastro'
+      fullPath: '/cadastro'
+      preLoaderRoute: typeof CadastroRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/dashboard': {
-      id: '/_app/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof AppDashboardRouteImport
-      parentRoute: typeof AppRoute
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/dieta': {
-      id: '/_app/dieta'
-      path: '/dieta'
-      fullPath: '/dieta'
-      preLoaderRoute: typeof AppDietaRouteImport
-      parentRoute: typeof AppRoute
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
-    '/_app/evolucao': {
-      id: '/_app/evolucao'
-      path: '/evolucao'
-      fullPath: '/evolucao'
-      preLoaderRoute: typeof AppEvolucaoRouteImport
-      parentRoute: typeof AppRoute
-    }
-    '/_app/perfil': {
-      id: '/_app/perfil'
-      path: '/perfil'
-      fullPath: '/perfil'
-      preLoaderRoute: typeof AppPerfilRouteImport
+    '/_app/treino': {
+      id: '/_app/treino'
+      path: '/treino'
+      fullPath: '/treino'
+      preLoaderRoute: typeof AppTreinoRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/planos': {
@@ -312,11 +277,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppPlanosRouteImport
       parentRoute: typeof AppRoute
     }
-    '/_app/treino': {
-      id: '/_app/treino'
-      path: '/treino'
-      fullPath: '/treino'
-      preLoaderRoute: typeof AppTreinoRouteImport
+    '/_app/perfil': {
+      id: '/_app/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AppPerfilRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/evolucao': {
+      id: '/_app/evolucao'
+      path: '/evolucao'
+      fullPath: '/evolucao'
+      preLoaderRoute: typeof AppEvolucaoRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dieta': {
+      id: '/_app/dieta'
+      path: '/dieta'
+      fullPath: '/dieta'
+      preLoaderRoute: typeof AppDietaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/compras': {
+      id: '/_app/compras'
+      path: '/compras'
+      fullPath: '/compras'
+      preLoaderRoute: typeof AppComprasRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/agua': {
+      id: '/_app/agua'
+      path: '/agua'
+      fullPath: '/agua'
+      preLoaderRoute: typeof AppAguaRouteImport
       parentRoute: typeof AppRoute
     }
   }
